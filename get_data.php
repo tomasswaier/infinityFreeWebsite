@@ -1,6 +1,6 @@
 <?php
 	
-	$running_localy=false;
+	$running_localy=true;
 	$number_of_questions=2;
 	//$number_of_questions=$_POST['number'];
 	//$connection=mysqli_connect('sql311.infinityfree.com','if0_37903792','0000963214785','if0_37903792_ppi');

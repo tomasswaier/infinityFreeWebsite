@@ -63,6 +63,7 @@ function load_questions(event) {
           answer_true.setAttribute("type", "radio");
           answer_true.setAttribute("value", "true");
           answer_true.setAttribute("id", button_id);
+          answer_true.setAttribute("name", button_id);
           cell_true.appendChild(answer_true);
 
           const cell_false = document.createElement("td");
@@ -70,6 +71,7 @@ function load_questions(event) {
           answer_false.setAttribute("type", "radio");
           answer_false.setAttribute("value", "false");
           answer_false.setAttribute("id", button_id);
+          answer_false.setAttribute("name", button_id);
           cell_false.appendChild(answer_false);
           // text
 
@@ -192,24 +194,34 @@ function submit_form(event) {
     // Iterate through the inputs and log their values and IDs/names
     for (const input of inputs) {
       // type is important to check what value it's expectin
-      const id = parseInt(input.id.split("_")[1]);
+      const id = input.id;
+      const id_number = parseInt(id.split("_")[1]);
       const value = input.value;
       if (value == 'submit') {
         continue;
       }
       const type = input.type;
       const checked = input.checked;
-      if (!id) {
+      if (!id_number) {
         console.log("Element Doesnt Exist");
-        console.log(
-            `ID: ${id}, Value: ${value}, Type: ${type}, Checked: ${checked}`);
+        console.log(`ID: ${id_number}, Value: ${value}, Type: ${
+            type}, Checked: ${checked}`);
         continue;
       }
 
-      if (is_correct(id, value, type, checked, correct_values)) {
+      var parent = input.parentElement.parentElement.parentElement;
+      var classes = parent.getAttribute("class");
+      if (is_correct(id_number, value, type, checked, correct_values)) {
+        if (classes && classes.includes("red_background")) {
+        }
+
+        parent.setAttribute("class", "green_background");
         console.log("correct");
       } else {
-        console.log("incorrect");
+        if (!classes.includes("green_background")) {
+          parent.setAttribute("class", "red_background");
+          console.log("incorrect");
+        }
       }
 
       // console.log(

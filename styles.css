@@ -13,3 +13,9 @@ ul{
 .block{
 	width:100%;
 }
+.green_background{
+	background-color:green;
+}
+.red_background{
+	background-color:red;
+}
