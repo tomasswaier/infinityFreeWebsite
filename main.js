@@ -1,0 +1,220 @@
+/*
+ * ngl I feel bad about putting it all in one file but like how else is it
+ * supposed to look like ? I dont wanna have 2 functions in 2 files thats icky
+ * :p
+ */
+var data;
+function load_questions(event) {
+  /*
+   * fetches data from server , goes over every row and adds things based on sum
+   * (ngl i could rewrite this)
+   */
+  event.preventDefault();
+
+  const xmlhttp = new XMLHttpRequest();
+
+  xmlhttp.onload = function() {
+    if (this.status === 200) {
+      const myObj = JSON.parse(this.responseText);
+
+      // console.log(myObj);
+
+      const userList = document.getElementById("user-list");
+      userList.innerHTML = ""; // Clear the list
+      data = myObj;
+
+      const table = document.createElement("table");
+      userList.appendChild(table);
+      table.setAttribute("id", "main_table");
+      table.setAttribute("class", "main_table");
+      // Loop through the data and display each question - I will not be putting
+      // this into multiple functions bcs it's funky already
+      let question_index = 1;
+      myObj.forEach(function(element) {
+        // question row
+        const table_row = document.createElement('tr');
+        //  question number on the left
+        const table_number_cell = document.createElement('td');
+        const table_number = document.createElement("span");
+        table_number.textContent = question_index;
+        table_number_cell.appendChild(table_number);
+        question_index++;
+
+        // question text
+        const table_question_cell = document.createElement('td');
+        const question_text = document.createElement('p');
+        question_text.textContent = element.question;
+        const all_options_wrapper = document.createElement('div');
+        all_options_wrapper.setAttribute("class", "block");
+        // add option
+        element.options.forEach(function(options) {
+          // window around one option
+          const option_wrapper = document.createElement('div');
+          option_wrapper.setAttribute("class", "block");
+          // fieldset to make suer only one is true
+          const option_field_set = document.createElement('fieldset');
+
+          // true and false buttons
+          const button_id = "option_" + options.options_id;
+
+          const cell_true = document.createElement("td");
+          const answer_true = document.createElement("input");
+
+          answer_true.setAttribute("type", "radio");
+          answer_true.setAttribute("value", "true");
+          answer_true.setAttribute("id", button_id);
+          cell_true.appendChild(answer_true);
+
+          const cell_false = document.createElement("td");
+          const answer_false = document.createElement("input");
+          answer_false.setAttribute("type", "radio");
+          answer_false.setAttribute("value", "false");
+          answer_false.setAttribute("id", button_id);
+          cell_false.appendChild(answer_false);
+          // text
+
+          const option = document.createElement("td");
+          option.textContent = options.option_text;
+
+          // append all children
+          option_field_set.appendChild(cell_true);
+          option_field_set.appendChild(cell_false);
+          option_field_set.appendChild(option);
+          option_wrapper.appendChild(option_field_set);
+          all_options_wrapper.appendChild(option_wrapper);
+        });
+        table_question_cell.append(question_text);
+        table_question_cell.append(all_options_wrapper);
+        table_row.appendChild(table_number_cell);
+        table_row.appendChild(table_question_cell);
+
+        table.appendChild(table_row);
+      });
+      const submit_button = document.createElement("input");
+      submit_button.setAttribute("type", "submit");
+      submit_button.setAttribute("value", "submit");
+      submit_button.setAttribute("id", "submit_form_button");
+      submit_button.addEventListener("click", submit_form);
+      console.log(submit_button);
+      table.appendChild(submit_button);
+
+    } else {
+      console.error("Requesting questions failed with status " + this.status);
+    }
+  };
+
+  xmlhttp.open("GET", "get_data.php", true);
+  xmlhttp.send();
+}
+function convert_to_array(data) {
+  if (typeof data === "object" && !Array.isArray(data)) {
+    data = Object.entries(data);
+  }
+  if (typeof data === "object") {
+    for (let index = 0; index < data.length; index += 1) {
+      const subsection = data[index];
+      data[index] = convert_to_array(subsection);
+    }
+  }
+  return data;
+}
+function extract_correct_answers(data) {
+  /*
+   * Iterate over every option in the multidimensional array that we received
+   * and append the option along with it's value to the result array note :
+   * adding support here in case the answer is an array of strings is not needed
+   * since im not looking at the value but instead just blindly appending where
+   * value should be
+   */
+  var result = [];
+  for (const question_wraper of data) {
+    //[3] is always the ['options'] section of the array (ik it's icky)
+    for (const options of question_wraper[3]) {
+      // when converting array of objects of arrays of objects of arrays to an
+      // array something went wrong this fixes it :3
+      if (typeof options == "string") {
+        continue;
+      }
+      for (const option of options) {
+        // console.log(option);
+        result.push([ option[0][1], option[2][1] ]);
+      }
+    }
+  }
+  console.log(result);
+  return result;
+}
+function get_correct_answer(data, id) {
+  /*
+   * I will not be sorting the array and doing binary search because im not a
+   * nerd
+   * note : add binary search
+   */
+  for (const id_option of data) {
+    if (id_option[0] == id) {
+      return id_option[1];
+    }
+  }
+  console.error("ERROR ID NOT FOUND :" + id);
+  return undefined;
+}
+function is_correct(id, value, type, checked, correct_values) {
+  var correct_value = get_correct_answer(correct_values, id);
+  if (type == "radio") {
+    correct_value = (correct_value == 1) ? "true" : "false";
+    // console.log(correct_value)
+    if (correct_value == value && checked == true) {
+      return true;
+    } else {
+      return undefined;
+    }
+  }
+  console.log("undefined type option , cannot evaluate ");
+}
+
+function submit_form(event) {
+  event.preventDefault();
+  if (data == undefined) {
+    console.log("meow");
+  } else {
+    console.log(data);
+    var mydata = convert_to_array(data);
+    console.log(mydata);
+    var correct_values = extract_correct_answers(data);
+
+    // meow
+    const form = document.getElementById(
+        "user-list"); // or "main_form" for the main form
+
+    // Get all input elements in the form
+    const inputs = form.querySelectorAll("input");
+
+    // Iterate through the inputs and log their values and IDs/names
+    for (const input of inputs) {
+      // type is important to check what value it's expectin
+      const id = parseInt(input.id.split("_")[1]);
+      const value = input.value;
+      if (value == 'submit') {
+        continue;
+      }
+      const type = input.type;
+      const checked = input.checked;
+      if (!id) {
+        console.log("Element Doesnt Exist");
+        console.log(
+            `ID: ${id}, Value: ${value}, Type: ${type}, Checked: ${checked}`);
+        continue;
+      }
+
+      if (is_correct(id, value, type, checked, correct_values)) {
+        console.log("correct");
+      } else {
+        console.log("incorrect");
+      }
+
+      // console.log(
+      //     `ID: ${id}, Value: ${value}, Type: ${type}, Checked: ${checked}`);
+    };
+  }
+}
+document.getElementById("my_button").addEventListener("click", load_questions);
