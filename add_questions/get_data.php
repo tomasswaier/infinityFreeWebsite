@@ -3,15 +3,20 @@
 	$running_localy=true;
 	$number_of_questions=2;
 	//$number_of_questions=$_POST['number'];
-	//$connection=mysqli_connect('sql311.infinityfree.com','if0_37903792','0000963214785','if0_37903792_ppi');
 	$connection;
 	if($running_localy){
 
-		$connection=mysqli_connect('localhost','maryann','1234','ppi');
+		$config = require $_SERVER['DOCUMENT_ROOT'] . '/config/local.php';
+		$connection = mysqli_connect(
+		    $config['DB_HOST'],
+		    $config['DB_USER'],
+		    $config['DB_PASSWORD'],
+		    $config['DB_NAME']
+		);
 		//echo "running localy";
 	}else{
 		//echo "not runninglocaly";
-		$config = require 'meow/config.php';
+		$config = require $_SERVER['DOCUMENT_ROOT'] . '/config/config.php';
 		
 		$connection = mysqli_connect(
 		    $config['DB_HOST'],
