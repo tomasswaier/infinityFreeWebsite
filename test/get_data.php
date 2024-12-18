@@ -26,7 +26,7 @@
 		);
 	}
 	mysqli_set_charset($connection, "utf8");
-	$questionsQuery = "SELECT question_id,question,question_type FROM question WHERE test_id = 1 ORDER BY RAND() LIMIT $number_of_questions";
+	$questionsQuery = "SELECT question_id,question,question_type,question_image FROM question WHERE test_id = 1 ORDER BY RAND() LIMIT $number_of_questions";
 
 	$result=mysqli_query($connection,$questionsQuery);
 	$formated=mysqli_fetch_all($result, MYSQLI_ASSOC);

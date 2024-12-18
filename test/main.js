@@ -89,8 +89,28 @@ function load_questions(event) {
         const table_question_cell = document.createElement('td');
         const question_text = document.createElement('p');
         question_text.textContent = element.question;
+
         const all_options_wrapper = document.createElement('div');
         all_options_wrapper.setAttribute("class", "block");
+
+        if (element.question_type == "multiple-choice") {
+
+          const indicator = document.createElement('div');
+          const indicator_true = document.createElement('td');
+          const indicator_true_text = document.createElement('span');
+          indicator_true_text.innerText = "True";
+          indicator_true.appendChild(indicator_true_text);
+          indicator.appendChild(indicator_true);
+
+          const indicator_false = document.createElement('td');
+          const indicator_false_text = document.createElement('span');
+          indicator_false_text.innerText = "False";
+          indicator_false.appendChild(indicator_false_text);
+          indicator.appendChild(indicator_false);
+
+          all_options_wrapper.appendChild(indicator);
+        }
+
         // add option
         element.options.forEach(function(options) {
           // window around one option
@@ -199,10 +219,10 @@ function is_correct(id, value, type, input_value, correct_values) {
     }
   } else if (type == 'text') {
     // if the answer can be multiple options then devide them by column
-    correct_value = correct_value.split(",");
+    correct_value = correct_value.split(";");
     for (const correct_option of correct_value) {
       console.log(correct_option, input_value);
-      if (correct_option == input_value) {
+      if (correct_option === input_value) {
         return true;
       }
     }
