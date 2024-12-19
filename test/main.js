@@ -149,10 +149,10 @@ function load_questions(event) {
   xmlhttp.send();
 }
 function convert_to_array(data) {
-  if (typeof data === "object" && !Array.isArray(data)) {
+  if (typeof data === "object" && !Array.isArray(data) && data) {
     data = Object.entries(data);
   }
-  if (typeof data === "object") {
+  if (data && typeof data === "object") {
     for (let index = 0; index < data.length; index += 1) {
       const subsection = data[index];
       data[index] = convert_to_array(subsection);
@@ -171,10 +171,10 @@ function extract_correct_answers(data) {
   var result = [];
   for (const question_wraper of data) {
     //[3] is always the ['options'] section of the array (ik it's icky)
-    for (const options of question_wraper[3]) {
+    for (const options of question_wraper[4]) {
       // when converting array of objects of arrays of objects of arrays to an
       // array something went wrong this fixes it :3
-      if (typeof options == "string") {
+      if (!options || typeof options == "string") {
         continue;
       }
       for (const option of options) {
@@ -237,7 +237,7 @@ function submit_form(event) {
   if (data == undefined) {
     console.log("Data wasn't loaded");
   } else {
-    // console.log(data);
+    console.log(data);
     data = convert_to_array(data);
     console.log(data);
     var correct_values = extract_correct_answers(data);
