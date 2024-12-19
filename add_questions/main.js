@@ -1,3 +1,87 @@
+function display_input_image() {
+
+  var image = document.getElementById("user_image").files[0];
+
+  var reader = new FileReader();
+
+  reader.onload =
+      function(
+          e) { document.getElementById("display_image").src = e.target.result; }
+
+      reader.readAsDataURL(image);
+}
+var question_number = 1;
+function add_child_type_multiple_choice(event) {
+  event.preventDefault();
+  const wrapper = document.getElementById("options_table");
+  const table_row = document.createElement("tr");
+  wrapper.appendChild(table_row);
+  const fieldset = document.createElement("fieldset");
+  table_row.appendChild(fieldset);
+
+  const answer_true = document.createElement("input");
+  answer_true.setAttribute("type", "radio");
+  answer_true.setAttribute("value", "true");
+  answer_true.setAttribute("id", question_number);
+  answer_true.setAttribute("name", question_number);
+  fieldset.appendChild(answer_true);
+  const answer_false = document.createElement("input");
+  answer_false.setAttribute("type", "radio");
+  answer_false.setAttribute("value", "false");
+  answer_false.setAttribute("id", question_number);
+  answer_false.setAttribute("name", question_number);
+  answer_false.checked = true;
+  // answer_false.checked = true;
+
+  fieldset.appendChild(answer_false);
+  const user_input_field = document.createElement("textarea");
+  user_input_field.required = true;
+  user_input_field.setAttribute("cols", "50");
+  user_input_field.setAttribute("rows", "2");
+  user_input_field.setAttribute("id", question_number);
+  user_input_field.setAttribute("placeholder", "option text ...");
+  fieldset.appendChild(user_input_field);
+  question_number++;
+}
+function add_child_type_write_in(event) {
+  event.preventDefault();
+  const wrapper = document.getElementById("options_table");
+  const table_row = document.createElement("tr");
+  wrapper.appendChild(table_row);
+  const fieldset = document.createElement("fieldset");
+  table_row.appendChild(fieldset);
+  const user_input_field = document.createElement("input");
+  user_input_field.setAttribute("type", "text");
+  user_input_field.setAttribute("id", question_number);
+  user_input_field.setAttribute("placeholder", "option text ...");
+  user_input_field.required = true;
+  fieldset.appendChild(user_input_field);
+}
+function display_option_type(event, user_option) {
+  // reset the number counter bcs
+  question_number = 1;
+
+  const question_type_user_input_wrapper =
+      document.getElementById("question_type_user_input_wrapper");
+  question_type_user_input_wrapper.innerHTML = "";
+  const options_table = document.createElement("table");
+  options_table.setAttribute("id", "options_table");
+  question_type_user_input_wrapper.appendChild(options_table);
+  // I could just change the onClick attribute to be more clean but I kinda
+  // don't care that much
+  const option_input_creator = document.createElement("button");
+  option_input_creator.setAttribute("type", "button");
+  option_input_creator.innerHTML = "+";
+  question_type_user_input_wrapper.appendChild(option_input_creator);
+  if (user_option == "multiple-choice") {
+    option_input_creator.onclick = add_child_type_multiple_choice;
+    add_child_type_multiple_choice(event);
+  }
+  if (user_option == "write-in") {
+    option_input_creator.onclick = add_child_type_write_in;
+    add_child_type_write_in(event);
+  }
+}
 function load_input_field(event) {
   event.preventDefault();
   // load and clear everything
@@ -20,21 +104,32 @@ function load_input_field(event) {
   // add question name
   const question_name_wrapper = document.createElement("div");
   question_name_wrapper.setAttribute("class", "block");
-  const question_name_text = document.createElement("span");
-  question_name_text.innerHTML = "question name:";
-  const question_name_input = document.createElement("input");
-  question_name_input.setAttribute("type", "text");
-  question_name_input.setAttribute("id", "question_name_text");
-  question_name_wrapper.appendChild(question_name_text);
+  const question_name_input = document.createElement("textarea");
+  question_name_input.required = true;
+  question_name_input.setAttribute("rows", "4");
+  question_name_input.setAttribute("cols", "50");
+  question_name_input.setAttribute("placeholder",
+                                   "Question : who has dog with 4 eyes?");
   question_name_wrapper.appendChild(question_name_input);
   form_element.appendChild(question_name_wrapper);
 
+  // get user image
+  const has_image = document.createElement("div");
+  has_image.innerHTML =
+      '<input id="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
+  form_element.appendChild(has_image);
   // add options field
   const question_type_selector_wrapper = document.createElement("div");
   form_element.append(question_type_selector_wrapper);
   const question_type_selector = document.createElement("select");
-  question_type_selector.setAttribute("id", "question_type_selector");
   question_type_selector_wrapper.appendChild(question_type_selector);
+  question_type_selector.setAttribute("id", "question_type_selector");
+  question_type_selector.setAttribute("onChange",
+                                      "display_option_type(event,this.value)");
+  const question_type_user_input_wrapper = document.createElement("div");
+  question_type_user_input_wrapper.setAttribute(
+      "id", "question_type_user_input_wrapper");
+  form_element.append(question_type_user_input_wrapper);
   // we could do it by some php x sql bullshit where we receive all the enum
   // options but idc i want it to work
   const question_types = [ "multiple-choice", "write-in" ];
@@ -44,10 +139,12 @@ function load_input_field(event) {
     question_type_option.innerHTML = question_type;
     question_type_selector.appendChild(question_type_option);
   }
-  const has_image = document.createElement("div");
-  has_image.innerHTML =
-      "<span>Upload image:</span><select id='has_image'><option value='true'>Yes</option><option value='false'>No</option></select>";
-  form_element.appendChild(has_image);
+
+  display_option_type(event, "multiple-choice");
+  const submit_button = document.createElement("button");
+  submit_button.setAttribute("type", "button");
+  submit_button.innerText = "submit";
+  form_element.appendChild(submit_button);
 }
 
 document.getElementById("my_button")
