@@ -10,7 +10,7 @@ function display_input_image() {
 
       reader.readAsDataURL(image);
 }
-var question_number = 1;
+var option_number = 1;
 function add_child_type_multiple_choice(event) {
   event.preventDefault();
   const wrapper = document.getElementById("options_table");
@@ -22,14 +22,18 @@ function add_child_type_multiple_choice(event) {
   const answer_true = document.createElement("input");
   answer_true.setAttribute("type", "radio");
   answer_true.setAttribute("value", "true");
-  answer_true.setAttribute("id", question_number);
-  answer_true.setAttribute("name", question_number);
+  answer_true.setAttribute("id",
+                           "correct_option_multiple_choice_" + option_number);
+  answer_true.setAttribute("name",
+                           "correct_option_multiple_choice_" + option_number);
   fieldset.appendChild(answer_true);
   const answer_false = document.createElement("input");
   answer_false.setAttribute("type", "radio");
   answer_false.setAttribute("value", "false");
-  answer_false.setAttribute("id", question_number);
-  answer_false.setAttribute("name", question_number);
+  answer_false.setAttribute("id",
+                            "correct_option_multiple_choice_" + option_number);
+  answer_false.setAttribute("name",
+                            "correct_option_multiple_choice_" + option_number);
   answer_false.checked = true;
   // answer_false.checked = true;
 
@@ -38,10 +42,10 @@ function add_child_type_multiple_choice(event) {
   user_input_field.required = true;
   user_input_field.setAttribute("cols", "50");
   user_input_field.setAttribute("rows", "2");
-  user_input_field.setAttribute("id", question_number);
+  user_input_field.setAttribute("name", "option_number_" + option_number);
   user_input_field.setAttribute("placeholder", "option text ...");
   fieldset.appendChild(user_input_field);
-  question_number++;
+  option_number++;
 }
 function add_child_type_write_in(event) {
   event.preventDefault();
@@ -52,21 +56,26 @@ function add_child_type_write_in(event) {
   table_row.appendChild(fieldset);
   const user_input_field = document.createElement("input");
   user_input_field.setAttribute("type", "text");
-  user_input_field.setAttribute("id", question_number);
+  user_input_field.setAttribute("id",
+                                "correct_option_write_in_" + option_number);
+  user_input_field.setAttribute("name",
+                                "correct_option_write_in_" + option_number);
   user_input_field.setAttribute("placeholder", "option text ...");
   user_input_field.required = true;
   fieldset.appendChild(user_input_field);
+  option_number++;
 }
 function display_option_type(event, user_option) {
   // reset the number counter bcs
-  question_number = 1;
+  option_number = 1;
 
   const question_type_user_input_wrapper =
       document.getElementById("question_type_user_input_wrapper");
   question_type_user_input_wrapper.innerHTML = "";
   const options_table = document.createElement("table");
-  options_table.setAttribute("id", "options_table");
   question_type_user_input_wrapper.appendChild(options_table);
+  options_table.setAttribute("id", "options_table");
+  options_table.setAttribute("name", "options_table");
   // I could just change the onClick attribute to be more clean but I kinda
   // don't care that much
   const option_input_creator = document.createElement("button");
@@ -97,6 +106,7 @@ function load_input_field(event) {
   test_input.setAttribute("type", "number");
   test_input.setAttribute("value", "1");
   test_input.setAttribute("id", "test_number");
+  test_input.setAttribute("name", "test_number");
   test_wrapper.appendChild(test_text);
   test_wrapper.appendChild(test_input);
   form_element.appendChild(test_wrapper);
@@ -108,6 +118,7 @@ function load_input_field(event) {
   question_name_input.required = true;
   question_name_input.setAttribute("rows", "4");
   question_name_input.setAttribute("cols", "50");
+  question_name_input.setAttribute("name", "question_text");
   question_name_input.setAttribute("placeholder",
                                    "Question : who has dog with 4 eyes?");
   question_name_wrapper.appendChild(question_name_input);
@@ -116,7 +127,7 @@ function load_input_field(event) {
   // get user image
   const has_image = document.createElement("div");
   has_image.innerHTML =
-      '<input id="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
+      '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
   form_element.appendChild(has_image);
   // add options field
   const question_type_selector_wrapper = document.createElement("div");
@@ -141,9 +152,10 @@ function load_input_field(event) {
   }
 
   display_option_type(event, "multiple-choice");
-  const submit_button = document.createElement("button");
-  submit_button.setAttribute("type", "button");
-  submit_button.innerText = "submit";
+  const submit_button = document.createElement("input");
+  submit_button.setAttribute("type", "submit");
+  submit_button.setAttribute("name", "submit");
+  submit_button.setAttribute("value", "submit");
   form_element.appendChild(submit_button);
 }
 
