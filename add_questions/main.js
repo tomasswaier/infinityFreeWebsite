@@ -81,6 +81,12 @@ function display_option_type(event, user_option) {
   option_input_creator.innerHTML = "+";
   question_type_user_input_wrapper.appendChild(option_input_creator);
   if (user_option == "multiple-choice") {
+
+    const indicator = document.createElement("tr");
+    options_table.appendChild(indicator);
+    const true_indicator = document.createElement("td");
+    true_indicator.innerText = "true/false";
+    indicator.appendChild(true_indicator);
     option_input_creator.onclick = add_child_type_multiple_choice;
     add_child_type_multiple_choice(event);
   }

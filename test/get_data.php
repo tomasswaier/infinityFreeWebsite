@@ -1,6 +1,6 @@
 <?php
 	
-	$number_of_questions=2;
+	$number_of_questions=30;
 	//$number_of_questions=$_POST['number'];
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	mysqli_set_charset($connection, "utf8");

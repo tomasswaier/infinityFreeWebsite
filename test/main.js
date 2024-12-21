@@ -100,6 +100,16 @@ function load_questions(event) {
         const all_options_wrapper = document.createElement('div');
         table_question_cell.append(all_options_wrapper);
         all_options_wrapper.setAttribute("class", "block");
+        if (element.question_type == "multiple-choice") {
+          const indicator = document.createElement("tr");
+          all_options_wrapper.appendChild(indicator);
+          const true_indicator = document.createElement("td");
+          true_indicator.innerText = "true";
+          indicator.appendChild(true_indicator);
+          const false_indicator = document.createElement("td");
+          false_indicator.innerText = "false";
+          indicator.appendChild(false_indicator);
+        }
 
         // add option
         element.options.forEach(function(options) {
