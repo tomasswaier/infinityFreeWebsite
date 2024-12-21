@@ -90,7 +90,7 @@ function load_questions(event) {
         const question_text = document.createElement('p');
         table_question_cell.append(question_text);
         question_text.textContent = element.question;
-        if (element.question_image) {
+        if (element.question_image != "NULL") {
           const test_image = document.createElement("img");
           test_image.setAttribute("src", "../resources/test_images/" +
                                              element.question_image);

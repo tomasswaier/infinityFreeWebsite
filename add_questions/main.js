@@ -56,10 +56,8 @@ function add_child_type_write_in(event) {
   table_row.appendChild(fieldset);
   const user_input_field = document.createElement("input");
   user_input_field.setAttribute("type", "text");
-  user_input_field.setAttribute("id",
-                                "correct_option_write_in_" + option_number);
-  user_input_field.setAttribute("name",
-                                "correct_option_write_in_" + option_number);
+  user_input_field.setAttribute("id", "option_number_" + option_number);
+  user_input_field.setAttribute("name", "option_number_" + option_number);
   user_input_field.setAttribute("placeholder", "option text ...");
   user_input_field.required = true;
   fieldset.appendChild(user_input_field);
