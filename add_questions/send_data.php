@@ -1,5 +1,8 @@
 <?php
 function get_highest_id($con){
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
 	
 	$result=0;
 	$get_last_id_query="SELECT MAX(question_id) as 'max' FROM question";
@@ -16,7 +19,7 @@ function get_highest_id($con){
 
 
 if ($_POST['submit']){
-	$connection= require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
+	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	if(!$connection){
 		echo " connection problem";
 	}

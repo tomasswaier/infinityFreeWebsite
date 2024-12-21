@@ -6,8 +6,9 @@
 
 $running_localy=true;
 $connection;
-$config = require $_SERVER['DOCUMENT_ROOT'] . '/config/local.php';
+
 if($running_localy){
+	$config = require_once(__DIR__ . '/local.php');
 
 	$connection = mysqli_connect(
 	    $config['DB_HOST'],
@@ -16,6 +17,7 @@ if($running_localy){
 	    $config['DB_NAME']
 	);
 }else{
+	$config = require_once(__DIR__ . '/config.php');
 	
 	$connection = mysqli_connect(
 	    $config['DB_HOST'],

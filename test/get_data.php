@@ -1,30 +1,8 @@
 <?php
 	
-	$running_localy=true;
 	$number_of_questions=2;
 	//$number_of_questions=$_POST['number'];
-	$connection;
-	if($running_localy){
-
-		$config = require $_SERVER['DOCUMENT_ROOT'] . '/config/local.php';
-		$connection = mysqli_connect(
-		    $config['DB_HOST'],
-		    $config['DB_USER'],
-		    $config['DB_PASSWORD'],
-		    $config['DB_NAME']
-		);
-		//echo "running localy";
-	}else{
-		//echo "not runninglocaly";
-		$config = require $_SERVER['DOCUMENT_ROOT'] . '/config/config.php';
-		
-		$connection = mysqli_connect(
-		    $config['DB_HOST'],
-		    $config['DB_USER'],
-		    $config['DB_PASSWORD'],
-		    $config['DB_NAME']
-		);
-	}
+	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	mysqli_set_charset($connection, "utf8");
 	$questionsQuery = "SELECT question_id,question,question_type,question_image FROM question WHERE test_id = 1 ORDER BY RAND() LIMIT $number_of_questions";
 
