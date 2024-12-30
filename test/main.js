@@ -1,5 +1,6 @@
 /* ngl I feel bad about putting it all in one file but like how else is it
  * supposed to look like ? I dont wanna have 2 functions in 2 files thats icky
+ * (the above was written before addition of another 6 functions :p
  * :p sry for variable names being inconsistant
  */
 function create_child_option(type, fieldset, options_id, option_text) {
@@ -8,6 +9,7 @@ function create_child_option(type, fieldset, options_id, option_text) {
   if (type == 'multiple-choice') {
 
     const cell_true = document.createElement("td");
+    cell_true.classList.add("radio_button_margin");
     const answer_true = document.createElement("input");
     answer_true.setAttribute("type", "radio");
     answer_true.setAttribute("value", "true");
@@ -16,6 +18,7 @@ function create_child_option(type, fieldset, options_id, option_text) {
     cell_true.appendChild(answer_true);
 
     const cell_false = document.createElement("td");
+    cell_false.classList.add("radio_button_margin");
     const answer_false = document.createElement("input");
     answer_false.setAttribute("type", "radio");
     answer_false.setAttribute("value", "false");
@@ -25,7 +28,9 @@ function create_child_option(type, fieldset, options_id, option_text) {
     // text
 
     const option = document.createElement("td");
-    option.textContent = option_text;
+    const option_text_element = document.createElement("span");
+    option_text_element.textContent = option_text;
+    option.appendChild(option_text_element);
 
     // append all children
     fieldset.appendChild(cell_true);
@@ -56,7 +61,7 @@ function load_questions(event) {
       document.getElementById("number_of_questions").value;
   console.log(number_of_questions);
   $(document).ready(
-      function() { createCookie("cookie", number_of_questions); });
+      function() { createCookie("number_of_questions", number_of_questions); });
   let test_id = document.getElementById("test_selector").value;
   $(document).ready(function() { createCookie("test_id", test_id); });
   event.preventDefault();
@@ -107,13 +112,17 @@ function load_questions(event) {
         table_question_cell.append(all_options_wrapper);
         all_options_wrapper.setAttribute("class", "block");
         if (element.question_type == "multiple-choice") {
-          const indicator = document.createElement("tr");
+          const indicator = document.createElement("fieldset");
           all_options_wrapper.appendChild(indicator);
           const true_indicator = document.createElement("td");
-          true_indicator.innerText = "true";
+          true_indicator.classList.add("radio_button_margin")
+          true_indicator.classList.add("red_text")
+          true_indicator.innerText = "True";
           indicator.appendChild(true_indicator);
           const false_indicator = document.createElement("td");
-          false_indicator.innerText = "false";
+          false_indicator.innerText = "False";
+          false_indicator.classList.add("radio_button_margin")
+          false_indicator.classList.add("red_text")
           indicator.appendChild(false_indicator);
         }
 

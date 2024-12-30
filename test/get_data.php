@@ -1,6 +1,6 @@
 <?php
 	$number_of_questions=number_format($_COOKIE["number_of_questions"]);
-	//$number_of_questions=intval($_COOKIE["number_of_questions"]);
+	//$number_of_questions=number_format($_COOKIE["number_of_questions"]);
 	$test_id=number_format($_COOKIE["test_id"]);
 	//$test_id=1;
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';

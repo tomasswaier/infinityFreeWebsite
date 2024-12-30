@@ -1,7 +1,11 @@
+:root{
+        --stu_red:#831135;
+}
 .main_table {
 	margin:30px;
-	border:1px solid black;
 	padding-inline:20px;
+        width:100%;
+        max-width:800px;
 
 }
 
@@ -21,3 +25,76 @@ ul{
 .red_background{
 	background-color:red;
 }
+html{
+        background-color:white;
+
+}
+/*
+input:is([type="text"],[type="number"]){
+
+        border-width:0;
+        background-color:var(--input_field_blue);
+}
+*/
+input:is([type="radio"]){
+        margin:0;
+        /*position:absolute;
+         */
+}
+table{
+        border-width:0;
+}
+fieldset:has(input:is([type="text"])){
+        border-width:0;
+}
+fieldset{
+        padding:0;
+        display: flex;
+        flex-wrap:nowrap;
+        position:block;
+
+}
+.radio_button_margin{
+        width:40px;
+        display: flex;
+        flex-wrap:nowrap;
+        justify-content:center;
+        position:block;
+}
+.red_text{
+        color:var(--stu_red);
+}
+.stu_header{
+        color:white;
+        height:max(15vh,120px);
+}
+.stu_bg{
+        background-color:var(--stu_red);
+}
+.logo{
+        font-size:max(6vh,30px);
+}
+
+.stu_header_2{
+        text-align:right;
+        font-size:max(3vh,20px);        
+}
+.stu_header_3{
+        margin:2px;
+        text-align:right;
+}
+
+body{
+        margin:0;
+}
+
+
+
+
+
+
+
+
+
+
+
