@@ -1,15 +1,10 @@
 function load_tests() {
-  /*
-   * loads all questions into understandable format
-   */
-  console.log("meow");
-  console.log(number_of_questions);
-
-  const xmlhttp = new XMLHttpRequest();
-
-  xmlhttp.onload = function() {
-    if (this.status === 200) {
-      const myObj = JSON.parse(this.responseText);
+  $.ajax({
+    url : "load_tests.php",
+    mothod : "GET",
+    // dataTypep : 'json',
+    success : function(data) {
+      const myObj = JSON.parse(data);
 
       console.log(myObj);
 
@@ -19,16 +14,12 @@ function load_tests() {
         const test_option = document.createElement("option");
         test_option.setAttribute("value", element['test_id']);
         test_option.setAttribute("id", "test_option_" + element['test_id']);
-        test_option.innerHTML = element['test_name'];
+        test_option.innerHTML =
+            element['test_name'] + "/" + element['test_author'];
         userList.appendChild(test_option);
       });
-
-    } else {
-      console.error("Requesting questions failed with status " + this.status);
-    }
-  };
-
-  xmlhttp.open("GET", "load_tests.php", true);
-  xmlhttp.send();
+    },
+    error : function() { alert("error :<"); }
+  });
 }
 load_tests();

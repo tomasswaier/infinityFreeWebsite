@@ -11,6 +11,28 @@ function display_input_image() {
       reader.readAsDataURL(image);
 }
 var option_number = 1;
+function add_test_options(parent, data) {
+  console.log(data);
+  myObj = JSON.parse(data);
+  console.log(data);
+  myObj.forEach(test_option => {
+    option = document.createElement("option");
+    option.innerText =
+        test_option['test_name'] + "/" + test_option['test_author'];
+    option.setAttribute("value", test_option['test_id']);
+    option.setAttribute("id", "test_option_" + test_option['test_id']);
+    parent.appendChild(option);
+  });
+}
+function get_test_options(parent) {
+  $.ajax({
+    url : "load_data.php",
+    mothod : "GET",
+    // dataTypep : 'json',
+    success : function(data) { add_test_options(parent, data); },
+    error : function() { alert("error :<"); }
+  });
+}
 function add_child_type_multiple_choice(event) {
   event.preventDefault();
   const wrapper = document.getElementById("options_table");
@@ -106,13 +128,18 @@ function load_input_field(event) {
   test_wrapper.setAttribute("class", "block");
   const test_text = document.createElement("span");
   test_text.innerHTML = "Test number (default ppi = 1):";
-  const test_input = document.createElement("input");
-  test_input.setAttribute("type", "number");
-  test_input.setAttribute("value", "1");
-  test_input.setAttribute("id", "test_number");
-  test_input.setAttribute("name", "test_number");
+  test_id_value = document.createElement("select");
+  test_id_value.setAttribute("name", "test_number");
+  get_test_options(test_id_value);
+  /* change this
+const test_input = document.createElement("input");
+test_input.setAttribute("type", "number");
+test_input.setAttribute("value", "1");
+test_input.setAttribute("id", "test_number");
+test_input.setAttribute("name", "test_number");
+*/
   test_wrapper.appendChild(test_text);
-  test_wrapper.appendChild(test_input);
+  test_wrapper.appendChild(test_id_value);
   form_element.appendChild(test_wrapper);
 
   // add question name

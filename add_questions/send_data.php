@@ -54,7 +54,7 @@ if ($_POST['submit']){
 	echo "<hr><pre>";
 	print_r($_POST);
 	echo "<pre><hr>";
-	*/
+	 */
 
 
 	$question_text=$_POST['question_text'];
@@ -65,6 +65,7 @@ if ($_POST['submit']){
 		$question_type="write-in";
 	}
 	$test_id=$_POST['test_number'];
+	echo $test_id;
 
 	$question_text=$_POST['question_text'];
 	$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES ('$question_text','$question_type','$test_id','$file_name')";

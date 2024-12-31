@@ -1,8 +1,6 @@
 <?php
-	$number_of_questions=number_format($_COOKIE["number_of_questions"]);
-	//$number_of_questions=number_format($_COOKIE["number_of_questions"]);
-	$test_id=number_format($_COOKIE["test_id"]);
-	//$test_id=1;
+	$test_id=$_POST['test_id'];
+	$number_of_questions=$_POST['number_of_questions'];
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	mysqli_set_charset($connection, "utf8");
 	$questionsQuery = "SELECT question_id,question,question_type,question_image FROM question WHERE test_id = $test_id ORDER BY RAND() LIMIT $number_of_questions";
@@ -34,16 +32,9 @@
 	    	$question['options'] = $options;
 	    	$questions[] = $question;
 	}
-	/*
-	echo "<hr><pre>";
-	print_r($questions);
-	echo "<pre><hr>";
-	echo "<script> var data = " . json_encode($questions) . "; </script>";
-	*/
 	
 	
 
-	//header('Content-Type: application/json');
 	echo json_encode($questions);
 ?>
 

@@ -52,122 +52,34 @@ function create_child_option(type, fieldset, options_id, option_text) {
   }
 }
 var data;
+var number_of_questions;
+var test_id
 function load_questions(event) {
   /*
    * fetches data from server , goes over every row and adds things based on sum
    * (ngl i could rewrite this)
+   * todo : fix bug where test is loaded with id of previously selected text
    */
-  let number_of_questions =
-      document.getElementById("number_of_questions").value;
-  console.log(number_of_questions);
-  $(document).ready(
-      function() { createCookie("number_of_questions", number_of_questions); });
-  let test_id = document.getElementById("test_selector").value;
-  $(document).ready(function() { createCookie("test_id", test_id); });
+  number_of_questions = document.getElementById("number_of_questions").value;
+  // console.log(number_of_questions);
+
+  //$(document).ready(function() { createCookie("number_of_questions",
+  // number_of_questions); });
+  test_id = document.getElementById("test_selector").value;
+  // console.log(test_id);
+  //$(document).ready(function() { createCookie("test_id", test_id); });
   event.preventDefault();
 
-  const xmlhttp = new XMLHttpRequest();
+  // const xmlhttp = new XMLHttpRequest();
+  $.ajax({
+    url : "get_data.php",
+    method : "POST",
+    data : ({test_id : test_id, number_of_questions : number_of_questions}),
+    dataType : 'json',
+    success : function(data) { display_questions(data); },
+    error : function() { alert("ewwow"); }
 
-  xmlhttp.onload = function() {
-    if (this.status === 200) {
-      const myObj = JSON.parse(this.responseText);
-
-      // console.log(myObj);
-
-      const userList = document.getElementById("user-list");
-      userList.innerHTML = ""; // Clear the list
-      data = myObj;
-
-      const table = document.createElement("table");
-      userList.appendChild(table);
-      table.setAttribute("id", "main_table");
-      table.setAttribute("class", "main_table");
-      // Loop through the data and display each question - I will not be putting
-      // this into multiple functions bcs it's funky already
-      let question_index = 1;
-      myObj.forEach(function(element) {
-        // console.log(element);
-        //  question row
-        const table_row = document.createElement('tr');
-        //  question number on the left
-        const table_number_cell = document.createElement('td');
-        const table_number = document.createElement("span");
-        table_number.textContent = question_index;
-        table_number_cell.appendChild(table_number);
-        question_index++;
-
-        // question text
-        const table_question_cell = document.createElement('td');
-        const question_text = document.createElement('pre');
-        table_question_cell.append(question_text);
-        question_text.textContent = element.question;
-        if (element.question_image != "NULL") {
-          const test_image = document.createElement("img");
-          test_image.setAttribute("src", "../resources/test_images/" +
-                                             element.question_image);
-          table_question_cell.appendChild(test_image);
-        }
-
-        const all_options_wrapper = document.createElement('div');
-        table_question_cell.append(all_options_wrapper);
-        all_options_wrapper.setAttribute("class", "block");
-        if (element.question_type == "multiple-choice") {
-          const indicator = document.createElement("fieldset");
-          all_options_wrapper.appendChild(indicator);
-          // the indicator has grey background :3
-          indicator.classList.add("grey_background");
-          const true_indicator = document.createElement("td");
-          true_indicator.classList.add("radio_button_margin")
-          true_indicator.classList.add("red_text")
-          true_indicator.innerText = "True";
-          indicator.appendChild(true_indicator);
-          const false_indicator = document.createElement("td");
-          false_indicator.innerText = "False";
-          false_indicator.classList.add("radio_button_margin")
-          false_indicator.classList.add("red_text")
-          indicator.appendChild(false_indicator);
-        }
-        var grey_background_index = 0;
-        // add option
-        element.options.forEach(function(options) {
-          // window around one option
-          const option_wrapper = document.createElement('div');
-          option_wrapper.setAttribute("class", "block");
-          // fieldset to make sure only one is true
-          const option_field_set = document.createElement('fieldset');
-          // grey backgorund like in ais
-          if (grey_background_index % 2 == 1 &&
-              element.question_type == "multiple-choice") {
-            option_field_set.classList.add("grey_background");
-          }
-          grey_background_index++;
-          create_child_option(element.question_type, option_field_set,
-                              options.options_id, options.option_text);
-
-          // true and false buttons
-          option_wrapper.appendChild(option_field_set);
-          all_options_wrapper.appendChild(option_wrapper);
-        });
-        table_row.appendChild(table_number_cell);
-        table_row.appendChild(table_question_cell);
-
-        table.appendChild(table_row);
-      });
-      const submit_button = document.createElement("input");
-      submit_button.setAttribute("type", "submit");
-      submit_button.setAttribute("value", "submit");
-      submit_button.setAttribute("id", "submit_form_button");
-      submit_button.addEventListener("click", submit_form);
-      // console.log(submit_button);
-      table.appendChild(submit_button);
-
-    } else {
-      console.error("Requesting questions failed with status " + this.status);
-    }
-  };
-
-  xmlhttp.open("GET", "get_data.php", true);
-  xmlhttp.send();
+  });
 }
 
 // part for confirming
@@ -244,7 +156,7 @@ function is_correct(id, value, type, input_value, correct_values) {
     // if the answer can be multiple options then devide them by column
     correct_value = correct_value.split(";");
     for (const correct_option of correct_value) {
-      console.log(correct_option, input_value);
+      // console.log(correct_option, input_value);
       if (correct_option === input_value) {
         return true;
       }
@@ -260,9 +172,9 @@ function submit_form(event) {
   if (data == undefined) {
     console.log("Data wasn't loaded");
   } else {
-    console.log(data);
+    // console.log(data);
     data = convert_to_array(data);
-    console.log(data);
+    // console.log(data);
     var correct_values = extract_correct_answers(data);
 
     // meow
@@ -324,7 +236,96 @@ function submit_form(event) {
   }
 }
 document.getElementById("my_button").addEventListener("click", load_questions);
-function createCookie(name, number_of_questions) {
-  document.cookie =
-      name + "=" + number_of_questions + "; path=/; SameSite=Lax;";
+
+function display_questions(received_data) {
+  // console.log(data);
+  data = received_data;
+
+  // console.log(data);
+
+  const userList = document.getElementById("user-list");
+  userList.innerHTML = ""; // Clear the list
+
+  const table = document.createElement("table");
+  userList.appendChild(table);
+  table.setAttribute("id", "main_table");
+  table.setAttribute("class", "main_table");
+  // Loop through the data and display each question - I will not be putting
+  // this into multiple functions bcs it's funky already
+  let question_index = 1;
+  data.forEach(function(element) {
+    // console.log(element);
+    //  question row
+    const table_row = document.createElement('tr');
+    //  question number on the left
+    const table_number_cell = document.createElement('td');
+    const table_number = document.createElement("span");
+    table_number.textContent = question_index;
+    table_number_cell.appendChild(table_number);
+    question_index++;
+
+    // question text
+    const table_question_cell = document.createElement('td');
+    const question_text = document.createElement('pre');
+    table_question_cell.append(question_text);
+    question_text.textContent = element.question;
+    if (element.question_image != "NULL") {
+      const test_image = document.createElement("img");
+      test_image.setAttribute("src", "../resources/test_images/" +
+                                         element.question_image);
+      table_question_cell.appendChild(test_image);
+    }
+
+    const all_options_wrapper = document.createElement('div');
+    table_question_cell.append(all_options_wrapper);
+    all_options_wrapper.setAttribute("class", "block");
+    if (element.question_type == "multiple-choice") {
+      const indicator = document.createElement("fieldset");
+      all_options_wrapper.appendChild(indicator);
+      // the indicator has grey background :3
+      indicator.classList.add("grey_background");
+      const true_indicator = document.createElement("td");
+      true_indicator.classList.add("radio_button_margin")
+      true_indicator.classList.add("red_text")
+      true_indicator.innerText = "True";
+      indicator.appendChild(true_indicator);
+      const false_indicator = document.createElement("td");
+      false_indicator.innerText = "False";
+      false_indicator.classList.add("radio_button_margin")
+      false_indicator.classList.add("red_text")
+      indicator.appendChild(false_indicator);
+    }
+    var grey_background_index = 0;
+    // add option
+    element.options.forEach(function(options) {
+      // window around one option
+      const option_wrapper = document.createElement('div');
+      option_wrapper.setAttribute("class", "block");
+      // fieldset to make sure only one is true
+      const option_field_set = document.createElement('fieldset');
+      // grey backgorund like in ais
+      if (grey_background_index % 2 == 1 &&
+          element.question_type == "multiple-choice") {
+        option_field_set.classList.add("grey_background");
+      }
+      grey_background_index++;
+      create_child_option(element.question_type, option_field_set,
+                          options.options_id, options.option_text);
+
+      // true and false buttons
+      option_wrapper.appendChild(option_field_set);
+      all_options_wrapper.appendChild(option_wrapper);
+    });
+    table_row.appendChild(table_number_cell);
+    table_row.appendChild(table_question_cell);
+
+    table.appendChild(table_row);
+  });
+  const submit_button = document.createElement("input");
+  submit_button.setAttribute("type", "submit");
+  submit_button.setAttribute("value", "submit");
+  submit_button.setAttribute("id", "submit_form_button");
+  submit_button.addEventListener("click", submit_form);
+  // console.log(submit_button);
+  table.appendChild(submit_button);
 }
