@@ -1,5 +1,6 @@
 :root{
         --stu_red:#831135;
+        --stu_pointless_grey:#e7ebed;
 }
 .main_table {
 	margin:30px;
@@ -18,6 +19,7 @@ ul{
 }
 .block{
 	width:100%;
+        overflow: hidden;
 }
 .green_background{
 	background-color:green;
@@ -44,14 +46,12 @@ input:is([type="radio"]){
 table{
         border-width:0;
 }
-fieldset:has(input:is([type="text"])){
-        border-width:0;
-}
 fieldset{
         padding:0;
         display: flex;
         flex-wrap:nowrap;
         position:block;
+        border-width:0;
 
 }
 .radio_button_margin{
@@ -88,7 +88,17 @@ body{
         margin:0;
 }
 
-
+.grey_background{
+        background-color:var(--stu_pointless_grey);
+}
+.f20{
+        font-size:20px;
+}
+.left_block{
+        width:100px;
+        float:left;
+        border-right:2px solid white;
+}
 
 
 

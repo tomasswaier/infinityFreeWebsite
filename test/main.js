@@ -114,6 +114,8 @@ function load_questions(event) {
         if (element.question_type == "multiple-choice") {
           const indicator = document.createElement("fieldset");
           all_options_wrapper.appendChild(indicator);
+          // the indicator has grey background :3
+          indicator.classList.add("grey_background");
           const true_indicator = document.createElement("td");
           true_indicator.classList.add("radio_button_margin")
           true_indicator.classList.add("red_text")
@@ -125,7 +127,7 @@ function load_questions(event) {
           false_indicator.classList.add("red_text")
           indicator.appendChild(false_indicator);
         }
-
+        var grey_background_index = 0;
         // add option
         element.options.forEach(function(options) {
           // window around one option
@@ -133,6 +135,12 @@ function load_questions(event) {
           option_wrapper.setAttribute("class", "block");
           // fieldset to make sure only one is true
           const option_field_set = document.createElement('fieldset');
+          // grey backgorund like in ais
+          if (grey_background_index % 2 == 1 &&
+              element.question_type == "multiple-choice") {
+            option_field_set.classList.add("grey_background");
+          }
+          grey_background_index++;
           create_child_option(element.question_type, option_field_set,
                               options.options_id, options.option_text);
 
@@ -287,7 +295,8 @@ function submit_form(event) {
         continue;
       }
 
-      var parent = input.parentElement.parentElement.parentElement;
+      // var parent = input.parentElement.parentElement.parentElement;
+      var parent = input.parentElement.parentElement;
       var classes = parent.getAttribute("class");
       if (is_correct(id_number, value, type, input_value, correct_values)) {
         if (classes && classes.includes("red_background")) {
@@ -296,7 +305,7 @@ function submit_form(event) {
         parent.setAttribute("class", "green_background");
         // console.log("correct");
       } else {
-        if (!classes.includes("green_background")) {
+        if (!classes || !classes.includes("green_background")) {
           parent.setAttribute("class", "red_background");
           // console.log("incorrect");
           if (type == "text") {
