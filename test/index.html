@@ -38,7 +38,7 @@
                 <form id="user-list">meow
                 </form>
         </div>
-	<form id='main_form' >
+	<form id='main_form' onkeydown="if(event.keyCode === 13) {alert('You have pressed Enter key, use submit button instead'); return false;}" >
                 <select id="test_selector" name="test_selector">
 
                 </select>

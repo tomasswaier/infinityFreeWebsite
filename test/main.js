@@ -60,24 +60,32 @@ function load_questions(event) {
    * (ngl i could rewrite this)
    * todo : fix bug where test is loaded with id of previously selected text
    */
-  number_of_questions = document.getElementById("number_of_questions").value;
-  // console.log(number_of_questions);
-
-  //$(document).ready(function() { createCookie("number_of_questions",
-  // number_of_questions); });
-  test_id = document.getElementById("test_selector").value;
-  // console.log(test_id);
-  //$(document).ready(function() { createCookie("test_id", test_id); });
-  event.preventDefault();
-
-  // const xmlhttp = new XMLHttpRequest();
+  // is it too dum to do this ?
+  const pathHash = String(window.location).split("#");
+  const isNumeric = (string) => string == Number.parseInt(string)
+  if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
+    console.log(pathHash[1]);
+    number_of_questions = pathHash[3];
+    test_id = pathHash[2];
+    document.getElementById("test_selector").value = test_id;
+  }
+  else {
+    console.log("no hash parameters given");
+    number_of_questions = document.getElementById("number_of_questions").value;
+    test_id = document.getElementById("test_selector").value;
+  }
+  if (event) {
+    event.preventDefault();
+  }
   $.ajax({
     url : "get_data.php",
     method : "POST",
     data : ({test_id : test_id, number_of_questions : number_of_questions}),
     dataType : 'json',
     success : function(data) { display_questions(data); },
-    error : function() { alert("ewwow"); }
+    error : function() {
+      alert("Error fetching data pls report it to me Anča(.MaryAnn)");
+    }
 
   });
 }
