@@ -9,7 +9,8 @@ function load_tests() {
     load_questions();
   }
   else {
-    console.log(pathHash[3], isNumeric(pathHash[2]));
+    console.log("test number :" + pathHash[2] +
+                " number of questions: " + pathHash[3]);
     $.ajax({
       url : "load_tests.php",
       mothod : "POST",

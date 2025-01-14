@@ -65,7 +65,7 @@ function load_questions(event) {
   const isNumeric = (string) => string == Number.parseInt(string)
   var test_id_object = document.getElementById("test_selector");
   if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
-    console.log(pathHash[1]);
+    console.log("test input name:" + pathHash[1]);
     number_of_questions = pathHash[3];
     test_id = pathHash[2];
     test_id_object.value = test_id;
