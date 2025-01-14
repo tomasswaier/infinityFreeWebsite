@@ -52,37 +52,22 @@ function create_child_option(type, fieldset, options_id, option_text) {
   }
 }
 var data;
-var number_of_questions;
-var test_id
 function load_questions(event) {
-  /*
-   * fetches data from server , goes over every row and adds things based on sum
-   * (ngl i could rewrite this)
-   * todo : fix bug where test is loaded with id of previously selected text
-   */
-  // is it too dum to do this ?
-  const pathHash = String(window.location).split("#");
-  const isNumeric = (string) => string == Number.parseInt(string)
-  var test_id_object = document.getElementById("test_selector");
-  if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
-    console.log("test input name:" + pathHash[1]);
-    number_of_questions = pathHash[3];
-    test_id = pathHash[2];
-    test_id_object.value = test_id;
-  } else {
-
-    console.log("no hash parameters given");
-    number_of_questions = document.getElementById("number_of_questions").value;
-    test_id = test_id_object.value;
-    const index_of_option = test_id_object.getAttribute("name");
-    console.log("meow" + index_of_option);
-    window.location.hash =
-        "#" + test_id_object.options[test_id_object.selectedIndex].text + "#" +
-        test_id + "#" + number_of_questions;
-  }
   if (event) {
     event.preventDefault();
   }
+  var number_of_questions;
+  var test_id;
+  console.log("no hash parameters given");
+  number_of_questions = document.getElementById("number_of_questions").value;
+  var test_id_object = document.getElementById("test_selector");
+  test_id = test_id_object.value;
+  // const index_of_option = test_id_object.getAttribute("name");
+  // console.log("meow" + index_of_option);
+  window.location.hash =
+      "#" + test_id_object.options[test_id_object.selectedIndex].text + "#" +
+      test_id + "#" + number_of_questions;
+  console.log(test_id, number_of_questions);
   $.ajax({
     url : "get_data.php",
     method : "POST",
@@ -90,11 +75,11 @@ function load_questions(event) {
     dataType : 'json',
     success : function(data) { display_questions(data); },
     error : function() {
-      alert(
-          "reload the page to fix Error fetching data pls report it to me Anča(.MaryAnn) id:" +
-          test_id + " num:" + number_of_questions);
+      /*alert(
+          "reload the page to fix Error fetching data pls report it to me
+         Anča(.MaryAnn) id:" + test_id + " num:" + number_of_questions);
+          */
     },
-    timeout : 5000
 
   });
 }
@@ -252,7 +237,8 @@ function submit_form(event) {
     };
   }
 }
-document.getElementById("my_button").addEventListener("click", load_questions);
+document.getElementById("my_button")
+    .addEventListener("click", function(event) { load_questions(event) });
 
 function display_questions(received_data) {
   console.log(data);

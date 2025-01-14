@@ -1,4 +1,6 @@
 <?php
+	error_log(print_r($_POST, true));
+
 	$test_id=$_POST['test_id'];
 	$number_of_questions=$_POST['number_of_questions'];
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
