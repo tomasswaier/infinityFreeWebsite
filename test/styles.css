@@ -6,8 +6,14 @@
 	margin:30px;
 	padding-inline:20px;
         width:100%;
-        max-width:800px;
+        max-width:min(1000px,90vw);
 
+}
+img{
+        max-width:min(80vw,800px);
+}
+pre{
+        white-space: pre-wrap
 }
 
 tr{

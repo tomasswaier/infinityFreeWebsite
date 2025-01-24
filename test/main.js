@@ -61,6 +61,9 @@ function load_questions(event) {
   console.log("no hash parameters given");
   number_of_questions = document.getElementById("number_of_questions").value;
   var test_id_object = document.getElementById("test_selector");
+  if (test_id_object) {
+    console.log(test_id_object);
+  }
   test_id = test_id_object.value;
   // const index_of_option = test_id_object.getAttribute("name");
   // console.log("meow" + index_of_option);
@@ -269,8 +272,11 @@ function display_questions(received_data) {
 
     // question text
     const table_question_cell = document.createElement('td');
+    const table_question_wrapper = document.createElement("div");
+    table_question_cell.append(table_question_wrapper);
     const question_text = document.createElement('pre');
-    table_question_cell.append(question_text);
+
+    table_question_wrapper.append(question_text);
     question_text.textContent = element.question;
     if (element.question_image != "NULL") {
       const test_image = document.createElement("img");

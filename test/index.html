@@ -2,7 +2,7 @@
 <html lang='en'>
 <head>
 	<meta charset="UTF-8">
-	<title>testing</title>
+	<title>I hate PPI</title>
         <link rel="stylesheet" href="styles.css">
         <meta name="viewport" content="width=device-width; initial-scale=1.0;">
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -35,10 +35,10 @@
                                 
                         <span class="right_block"><b>Otázka</b></span>        
                 </div>
-                <form id="user-list">meow
+                <form id="user-list" onkeydown="if(event.keycode === 13) {/*alert('you have pressed enter key, use submit button instead');*/ return false;}">meow
                 </form>
         </div>
-	<form id='main_form' onkeydown="if(event.keyCode === 13) {/*alert('You have pressed Enter key, use submit button instead');*/ return false;}" >
+	<form id='main_form' onkeydown="if(event.keycode === 13) {/*alert('you have pressed enter key, use submit button instead');*/ return false;}" >
                 <select id="test_selector" name="test_selector">
 
                 </select>

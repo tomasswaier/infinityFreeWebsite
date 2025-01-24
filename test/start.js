@@ -34,7 +34,9 @@ function load_tests() {
         document.getElementById("number_of_questions")
             .setAttribute("value", pathHash[3])
         if (pathHash[2] <= index) {
-          document.getElementById("test_selector").value = pathHash[2];
+          var test_id_object = document.getElementById("test_selector")
+          test_id_object.value = pathHash[2];
+          // test_id_object.selectedIndex
         }
       }
     },
@@ -42,10 +44,8 @@ function load_tests() {
       console.log("failed to run start.js database connection error")
     },
   });
-  /*
-if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
-load_questions();
-}
-*/
+  if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
+    load_questions();
+  }
 }
 load_tests();
