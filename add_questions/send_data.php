@@ -17,6 +17,10 @@ function get_highest_id($con){
 	return $result;
 }
 function validate_token($con,$test_id,$token){
+	if(!is_numeric($test_id)){
+		echo "test id isn't numeric";
+		exit(0);
+	}
 	$query_correct_token="SELECT test_secret FROM test WHERE test_id = '$test_id'";
 	$result=mysqli_query($con,$query_correct_token);
 	$row = $result->fetch_assoc();
