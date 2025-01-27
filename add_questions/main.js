@@ -183,12 +183,54 @@ test_input.setAttribute("name", "test_number");
   }
 
   display_option_type(event, "multiple-choice");
-  const submit_button = document.createElement("input");
-  submit_button.setAttribute("type", "submit");
-  submit_button.setAttribute("name", "submit");
-  submit_button.setAttribute("value", "submit");
-  form_element.appendChild(submit_button);
+  /*
+const submit_button = document.createElement("input");
+submit_button.setAttribute("type", "submit");
+submit_button.setAttribute("name", "submit");
+submit_button.setAttribute("value", "submit");
+form_element.appendChild(submit_button);
+*/
+
+  const test_submit_button = document.createElement("input");
+  test_submit_button.setAttribute("onclick", "send_form_data(event)");
+  test_submit_button.setAttribute("type", "submit");
+  test_submit_button.setAttribute("name", "submit");
+  test_submit_button.setAttribute("value", "submit");
+  document.body.appendChild(test_submit_button);
 }
 
 document.getElementById("my_button")
     .addEventListener("click", load_input_field);
+
+function send_form_data(event) {
+  event.preventDefault();
+  const form = document.querySelector("#user-list");
+  console.log(form);
+  const form_data = new FormData(form);
+  // add submit type to work with previously created php code
+  form_data.append("submit", "1");
+  console.log(form_data);
+  $.ajax({
+    url : "send_data.php",
+    method : "POST",
+    data : (form_data),
+    processData : false,
+    contentType : false,
+    success : function(data) {
+      console.log("success");
+      console.log(data);
+      const server_response = document.createElement("span");
+      server_response.innerHTML = data;
+
+      document.body.appendChild(server_response);
+    },
+    error : function() {
+      console.log("error");
+      /*alert(
+          "reload the page to fix Error fetching data pls report it to me
+         Anča(.MaryAnn) id:" + test_id + " num:" + number_of_questions);
+          */
+    },
+
+  });
+}

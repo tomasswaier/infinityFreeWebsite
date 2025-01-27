@@ -35,8 +35,8 @@ if ($_POST['submit']){
 		if(in_array($file_extension,$allowed_extensions)){
 			$last_id=get_highest_id($connection);
 			$file_path= $_SERVER['DOCUMENT_ROOT'] . '/resources/test_images/' . $last_id . "." . $file_extension;
-			echo $file_path;
-			echo "<br>$file_tmp";
+			echo "$file_path<br>";
+			//echo "<br>$file_tmp";
 			if(move_uploaded_file($file_tmp,$file_path)){
 				echo" file uploaded";
 				$file_name=$last_id . "." . $file_extension;
@@ -59,8 +59,8 @@ if ($_POST['submit']){
 
 	$question_text=$_POST['question_text'];
 	$question_text=str_replace("'",'"',$question_text);
-	echo "<br>question :";
-	echo $question_text;
+	//echo "<br>question :";
+	//echo $question_text;
 	$question_type="";
 	if(isset($_POST['correct_option_multiple_choice_1'])){
 		$question_type="multiple-choice";
@@ -68,13 +68,13 @@ if ($_POST['submit']){
 		$question_type="write-in";
 	}
 	$test_id=$_POST['test_number'];
-	echo $test_id;
+	//echo $test_id;
 
 	$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES ('$question_text','$question_type','$test_id','$file_name')";
 	//echo "<br>$query";
 	if($connection){
-		echo "<br>sql query:";
-		echo $query;
+		//echo "<br>sql query:";
+		//echo $query;
 	}
 	if (mysqli_query($connection,$query)){
 		echo"<br>Question successfully inserted<br>";
@@ -104,7 +104,7 @@ if ($_POST['submit']){
 	    	if (mysqli_query($connection, $query)) {
 	    	    echo "Option inserted successfully<br>";
 	    	} else {
-	    	    echo "Problem with data insertion: " . mysqli_error($connection) . "<br>";
+	    	    echo "Problem with option insertion: " . mysqli_error($connection) . "<br>";
 	    	}
 	    	$flag = '1';
 	

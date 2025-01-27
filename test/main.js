@@ -265,6 +265,7 @@ function display_questions(received_data) {
     const table_row = document.createElement('tr');
     //  question number on the left
     const table_number_cell = document.createElement('td');
+    table_number_cell.classList.add("number_indicator");
     const table_number = document.createElement("span");
     table_number.textContent = question_index;
     table_number_cell.appendChild(table_number);
@@ -272,6 +273,7 @@ function display_questions(received_data) {
 
     // question text
     const table_question_cell = document.createElement('td');
+    table_question_cell.classList.add("question_cell");
     const table_question_wrapper = document.createElement("div");
     table_question_cell.append(table_question_wrapper);
     const question_text = document.createElement('pre');

@@ -3,16 +3,16 @@
         --stu_pointless_grey:#e7ebed;
 }
 .main_table {
-	margin:30px;
-	padding-inline:20px;
         width:100%;
-        max-width:min(1000px,90vw);
+        max-width:min(1000px,100%);
+
 
 }
 img{
         max-width:min(80vw,800px);
 }
 pre{
+        width:100%;
         white-space: pre-wrap
 }
 
@@ -101,11 +101,23 @@ body{
         font-size:20px;
 }
 .left_block{
-        width:100px;
+        width:min(100px,10vw);
+        min-width:60px;
         float:left;
+        font-size:1rem;
+        font-weight:bold;
         border-right:2px solid white;
 }
-
+.question_cell{
+        width:min(90vw,900px);
+        max-width:90vw;
+}
+.number_indicator{
+        width:min(100px,10vw);
+        min-width:60px;
+        /*max-width:min(100px,10vw);
+         */
+}
 
 
 
