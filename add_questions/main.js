@@ -12,9 +12,9 @@ function display_input_image() {
 }
 var option_number = 1;
 function add_test_options(parent, data) {
-  console.log(data);
+  // console.log(data);
   myObj = JSON.parse(data);
-  console.log(data);
+  // console.log(data);
   myObj.forEach(test_option => {
     option = document.createElement("option");
     option.innerText =
@@ -34,7 +34,9 @@ function get_test_options(parent) {
   });
 }
 function add_child_type_multiple_choice(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   const wrapper = document.getElementById("options_table");
   const table_row = document.createElement("tr");
   wrapper.appendChild(table_row);
@@ -118,19 +120,14 @@ function display_option_type(event, user_option) {
   }
 }
 function load_input_field(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   // load and clear everything
   const form_element = document.getElementById("user-list");
   form_element.innerHTML = "";
 
   // choose which test
-  const test_wrapper = document.createElement("div");
-  test_wrapper.setAttribute("class", "block");
-  const test_text = document.createElement("span");
-  test_text.innerHTML = "Test number (default ppi = 1):";
-  test_id_value = document.createElement("select");
-  test_id_value.setAttribute("name", "test_number");
-  get_test_options(test_id_value);
   /* change this
 const test_input = document.createElement("input");
 test_input.setAttribute("type", "number");
@@ -138,9 +135,6 @@ test_input.setAttribute("value", "1");
 test_input.setAttribute("id", "test_number");
 test_input.setAttribute("name", "test_number");
 */
-  test_wrapper.appendChild(test_text);
-  test_wrapper.appendChild(test_id_value);
-  form_element.appendChild(test_wrapper);
 
   // add question name
   const question_name_wrapper = document.createElement("div");
@@ -183,14 +177,6 @@ test_input.setAttribute("name", "test_number");
   }
 
   display_option_type(event, "multiple-choice");
-  /*
-const submit_button = document.createElement("input");
-submit_button.setAttribute("type", "submit");
-submit_button.setAttribute("name", "submit");
-submit_button.setAttribute("value", "submit");
-form_element.appendChild(submit_button);
-*/
-
   const test_submit_button = document.createElement("input");
   test_submit_button.setAttribute("onclick", "send_form_data(event)");
   test_submit_button.setAttribute("type", "submit");
@@ -199,16 +185,27 @@ form_element.appendChild(submit_button);
   document.body.appendChild(test_submit_button);
 }
 
+/*
 document.getElementById("my_button")
     .addEventListener("click", load_input_field);
+    */
 
 function send_form_data(event) {
+  const path_hash = String(window.location).split("#");
+  if (path_hash.length < 4) {
+    document.body.append("wrong hash");
+    return;
+  }
+
   event.preventDefault();
   const form = document.querySelector("#user-list");
-  console.log(form);
+  // console.log(form);
   const form_data = new FormData(form);
   // add submit type to work with previously created php code
   form_data.append("submit", "1");
+  console.log(path_hash)
+  form_data.append("token", path_hash[3]);
+  form_data.append("test_number", path_hash[2]);
   console.log(form_data);
   $.ajax({
     url : "send_data.php",

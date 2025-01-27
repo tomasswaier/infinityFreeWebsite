@@ -16,16 +16,32 @@ function get_highest_id($con){
 	
 	return $result;
 }
+function validate_token($con,$test_id,$token){
+	$query_correct_token="SELECT test_secret FROM test WHERE test_id = '$test_id'";
+	$result=mysqli_query($con,$query_correct_token);
+	$row = $result->fetch_assoc();
+	$correct_token = $row['test_secret'];
+	return hash_equals($correct_token, $token);
+}
 
 
 if ($_POST['submit']){
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	if(!$connection){
 		echo " connection problem";
+		exit(0);
 	}
 	else{
 		mysqli_set_charset($connection, "utf8");
 	}
+	$test_id=$_POST["test_number"];
+	$token=$_POST["token"];
+    	$valid=validate_token($connection, $test_id, $token);
+
+    	if ($valid === false) {
+    	    echo "Invalid token!";
+    	    exit(0);
+	}	
 	$file_name='NULL';
 	if ($_FILES['user_image']['name']){
 		$file_name=$_FILES['user_image']['name'];
