@@ -21,8 +21,11 @@ function validate_token($con,$test_id,$token){
 		echo "test id isn't numeric";
 		exit(0);
 	}
-	$query_correct_token="SELECT test_secret FROM test WHERE test_id = '$test_id'";
-	$result=mysqli_query($con,$query_correct_token);
+	$query_correct_token="SELECT test_secret FROM test WHERE test_id = ?";
+	$stmt=mysqli_prepare($con,$query_correct_token);
+	mysqli_stmt_bind_param($stmt, "i", $test_id);
+	mysqli_stmt_execute($stmt);
+    	$result = mysqli_stmt_get_result($stmt);
 	$row = $result->fetch_assoc();
 	$correct_token = $row['test_secret'];
 	return hash_equals($correct_token, $token);
@@ -90,18 +93,23 @@ if ($_POST['submit']){
 	$test_id=$_POST['test_number'];
 	//echo $test_id;
 
-	$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES ('$question_text','$question_type','$test_id','$file_name')";
+	$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES (?,?,?,?)";
+	//$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES ('$question_text','$question_type','$test_id','$file_name')";
+	$stmt=mysqli_prepare($connection,$query);
+	mysqli_stmt_bind_param($stmt, "ssis", $question_text, $question_type, $test_id, $file_name);
+
 	//echo "<br>$query";
 	if($connection){
 		//echo "<br>sql query:";
 		//echo $query;
 	}
-	if (mysqli_query($connection,$query)){
+	if (mysqli_stmt_execute($stmt)){
 		echo"<br>Question successfully inserted<br>";
 	}
 	else{
 		echo"<br>Question insertion failed<br>";
 	}
+	//$result = mysqli_stmt_get_result($stmt);
 
 	$flag = '1';
 	
@@ -118,10 +126,13 @@ if ($_POST['submit']){
 	
 		// I did not write this and i kinda have no idea why it's doing what it's doing
 	    if (strpos($key, "option_number_") !== false) {
-	    	$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES ('$last_id', '$val', '$flag')";
+	    	$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES (?, ?, ?)";
+	    	//$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES ('$last_id', '$val', '$flag')";
+		$stmt=mysqli_prepare($connection,$query);
+		mysqli_stmt_bind_param($stmt, "isi", $last_id,$val,$flag);
         
 	    	//echo "<br>$query";
-	    	if (mysqli_query($connection, $query)) {
+		if (mysqli_stmt_execute($stmt)){
 	    	    echo "Option inserted successfully<br>";
 	    	} else {
 	    	    echo "Problem with option insertion: " . mysqli_error($connection) . "<br>";
