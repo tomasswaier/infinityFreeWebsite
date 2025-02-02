@@ -3,7 +3,8 @@
  * (the above was written before addition of another 6 functions :p
  * :p sry for variable names being inconsistant
  */
-function create_child_option(type, fieldset, options_id, option_text) {
+function create_child_option(type, fieldset, options_id, option_text,
+                             option_number) {
   const element_id = "option_" + options_id;
   // console.log(type);
   if (type == 'multiple-choice') {
@@ -39,6 +40,9 @@ function create_child_option(type, fieldset, options_id, option_text) {
     return;
   } else if (type == "write-in") {
     const input_cell = document.createElement("td");
+    const option_number_indicator = document.createElement("span")
+    option_number_indicator.innerText = option_number + ")"
+    input_cell.appendChild(option_number_indicator)
     const input_element = document.createElement("input");
     input_element.setAttribute("type", "text");
     input_element.setAttribute("id", element_id);
@@ -336,7 +340,8 @@ function display_questions(received_data) {
       }
       grey_background_index++;
       create_child_option(element.question_type, option_field_set,
-                          options.options_id, options.option_text);
+                          options.options_id, options.option_text,
+                          grey_background_index);
 
       // true and false buttons
       option_wrapper.appendChild(option_field_set);
