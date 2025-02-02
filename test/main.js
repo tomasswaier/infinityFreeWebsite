@@ -238,6 +238,21 @@ function submit_form(event) {
       //     `ID: ${id}, Value: ${value}, Type: ${type}, Checked:
       //     ${checked}`);
     };
+    const pathHash = String(window.location).split("#");
+    // I will assume that no one is playing around with the url
+    var test_id = pathHash[2];
+    if (!test_id) {
+      test_id = 0
+    }
+
+    $.ajax({
+      url : "submit.php",
+      method : "POST",
+      data : ({test_id : test_id}),
+      success : function() { console.log("Data submited successfully"); },
+      error : function() { console.log("Data not submite successfully"); },
+
+    });
   }
 }
 document.getElementById("my_button")

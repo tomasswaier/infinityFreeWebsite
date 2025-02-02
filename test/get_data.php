@@ -2,7 +2,17 @@
 	error_log(print_r($_POST, true));
 
 	$test_id=$_POST['test_id'];
+	if(!is_numeric($test_id)){
+		echo "test id isn't numeric";
+		exit(0);
+	}
+
 	$number_of_questions=$_POST['number_of_questions'];
+	if(!is_numeric($number_of_questions)){
+		echo "number of questions field isn't numeric";
+		exit(0);
+	}
+
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
 	mysqli_set_charset($connection, "utf8");
 	$questionsQuery = "SELECT question_id,question,question_type,question_image FROM question WHERE test_id = $test_id ORDER BY RAND() LIMIT $number_of_questions";
