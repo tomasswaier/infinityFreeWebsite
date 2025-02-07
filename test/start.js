@@ -1,6 +1,16 @@
 function load_tests() {
   // should be rewritten so that instaed i use actual hash but whatever
-  window.addEventListener("hashchange", function() { /*location.reload()*/ });
+  let ais_array = [
+    "Acute Ischemic Stroke", "Amniotic Infection Syndrome",
+    "Airborne Intercept System", "Advanced Infantry System",
+    "Aviation Industry Standards", "Aircraft Inspection Safety",
+    "Amateur Interstellar Society", "Androgen Insensitivity Syndrome",
+    "Anterior Ischemic Syndrome", "Acoustic Imaging System",
+    "Advanced Induction Stove", "Automated Inventory System",
+    "Aged Italian Sausage", "Aromatic Infused Syrup"
+  ]
+  document.getElementById("ais_text").innerText =
+      ais_array[Math.floor(Math.random() * ais_array.length)].toUpperCase();
   const pathHash = String(window.location).split("#");
   const isNumeric = (string) => string == Number.parseInt(string)
 
@@ -12,6 +22,7 @@ function load_tests() {
     if (selector) {
       selector.remove()
     }
+    document.getElementById("user-list").innerText = "test :" + pathHash[1]
   } else {
     $.ajax({
       url : "load_tests.php",

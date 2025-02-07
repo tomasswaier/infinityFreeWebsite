@@ -1,5 +1,5 @@
 :root{
-        --stu_red:#831135;
+        --stu_red:#A33155;
         --stu_pointless_grey:#e7ebed;
 }
 .main_table {
@@ -84,6 +84,7 @@ fieldset{
 .stu_header_2{
         text-align:right;
         font-size:max(3vh,20px);        
+        padding-right:max(10px,4vh);
 }
 .stu_header_3{
         margin:2px;
