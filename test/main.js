@@ -62,19 +62,30 @@ function load_questions(event) {
   }
   var number_of_questions;
   var test_id;
-  console.log("no hash parameters given");
-  number_of_questions = document.getElementById("number_of_questions").value;
-  var test_id_object = document.getElementById("test_selector");
-  if (test_id_object) {
-    console.log(test_id_object);
+  const pathHash = String(window.location).split("#");
+  const isNumeric = (string) => string == Number.parseInt(string)
+  if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
+    // load_questions();
+    number_of_questions = pathHash[3]
+    test_id = pathHash[2]
   }
-  test_id = test_id_object.value;
-  // const index_of_option = test_id_object.getAttribute("name");
-  // console.log("meow" + index_of_option);
-  window.location.hash =
-      "#" + test_id_object.options[test_id_object.selectedIndex].text + "#" +
-      test_id + "#" + number_of_questions;
-  console.log(test_id, number_of_questions);
+  else {
+
+    console.log("no hash parameters given");
+    number_of_questions = document.getElementById("number_of_questions").value;
+    var test_id_object = document.getElementById("test_selector");
+    if (test_id_object) {
+      console.log(test_id_object);
+    }
+    test_id = test_id_object.value;
+    // const index_of_option = test_id_object.getAttribute("name");
+    // console.log("meow" + index_of_option);
+    window.location.hash =
+        "#" + test_id_object.options[test_id_object.selectedIndex].text + "#" +
+        test_id + "#" + number_of_questions;
+
+    console.log(test_id, number_of_questions);
+  }
   $.ajax({
     url : "get_data.php",
     method : "POST",
@@ -89,6 +100,10 @@ function load_questions(event) {
     },
 
   });
+  let selector = document.getElementById("test_selector")
+  if (selector) {
+    selector.remove()
+  }
 }
 
 // part for confirming

@@ -5,8 +5,6 @@
 .main_table {
         width:100%;
         max-width:min(1000px,100%);
-
-
 }
 img{
         max-width:min(80vw,800px);
@@ -62,7 +60,9 @@ fieldset{
 }
 .radio_button_margin{
         width:40px;
+        min-width:42;
         display: flex;
+        flex-shrink:0;
         flex-wrap:nowrap;
         justify-content:center;
         position:block;
