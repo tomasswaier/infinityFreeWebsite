@@ -27,7 +27,7 @@
 	    	$questionType = $question['question_type'];
 	
 	    	$options = [];
-	    	if ($questionType === 'multiple-choice') {
+	    	if ($questionType === 'boolean-choice') {
 	    	    	$optionsQuery = "SELECT options_id,option_text,is_correct FROM options WHERE question_id = $questionId ORDER BY RAND()";
 	    	    	$optionsResult = mysqli_query($connection,$optionsQuery);
 	    	    	while ($option= mysqli_fetch_assoc($optionsResult)) {

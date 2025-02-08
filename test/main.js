@@ -7,7 +7,7 @@ function create_child_option(type, fieldset, options_id, option_text,
                              option_number) {
   const element_id = "option_" + options_id;
   // console.log(type);
-  if (type == 'multiple-choice') {
+  if (type == 'boolean-choice') {
 
     const cell_true = document.createElement("td");
     cell_true.classList.add("radio_button_margin");
@@ -66,7 +66,7 @@ function load_questions(event) {
   const isNumeric = (string) => string == Number.parseInt(string)
   if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
     // load_questions();
-    number_of_questions = pathHash[3]
+    number_of_questions = document.getElementById("number_of_questions").value;
     test_id = pathHash[2]
   }
   else {
@@ -324,7 +324,7 @@ function display_questions(received_data) {
     const all_options_wrapper = document.createElement('div');
     table_question_cell.append(all_options_wrapper);
     all_options_wrapper.setAttribute("class", "block");
-    if (element.question_type == "multiple-choice") {
+    if (element.question_type == "boolean-choice") {
       const indicator = document.createElement("fieldset");
       all_options_wrapper.appendChild(indicator);
       // the indicator has grey background :3
@@ -350,7 +350,7 @@ function display_questions(received_data) {
       const option_field_set = document.createElement('fieldset');
       // grey backgorund like in ais
       if (grey_background_index % 2 == 1 &&
-          element.question_type == "multiple-choice") {
+          element.question_type == "boolean-choice") {
         option_field_set.classList.add("grey_background");
       }
       grey_background_index++;

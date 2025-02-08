@@ -33,7 +33,7 @@ function get_test_options(parent) {
     error : function() { alert("error :<"); }
   });
 }
-function add_child_type_multiple_choice(event) {
+function add_child_type_boolean_choice(event) {
   if (event) {
     event.preventDefault();
   }
@@ -47,17 +47,17 @@ function add_child_type_multiple_choice(event) {
   answer_true.setAttribute("type", "radio");
   answer_true.setAttribute("value", "true");
   answer_true.setAttribute("id",
-                           "correct_option_multiple_choice_" + option_number);
+                           "correct_option_boolean_choice_" + option_number);
   answer_true.setAttribute("name",
-                           "correct_option_multiple_choice_" + option_number);
+                           "correct_option_boolean_choice_" + option_number);
   fieldset.appendChild(answer_true);
   const answer_false = document.createElement("input");
   answer_false.setAttribute("type", "radio");
   answer_false.setAttribute("value", "false");
   answer_false.setAttribute("id",
-                            "correct_option_multiple_choice_" + option_number);
+                            "correct_option_boolean_choice_" + option_number);
   answer_false.setAttribute("name",
-                            "correct_option_multiple_choice_" + option_number);
+                            "correct_option_boolean_choice_" + option_number);
   answer_false.checked = true;
   // answer_false.checked = true;
 
@@ -104,15 +104,15 @@ function display_option_type(event, user_option) {
   option_input_creator.setAttribute("type", "button");
   option_input_creator.innerHTML = "+";
   question_type_user_input_wrapper.appendChild(option_input_creator);
-  if (user_option == "multiple-choice") {
+  if (user_option == "boolean-choice") {
 
     const indicator = document.createElement("tr");
     options_table.appendChild(indicator);
     const true_indicator = document.createElement("td");
     true_indicator.innerText = "true/false";
     indicator.appendChild(true_indicator);
-    option_input_creator.onclick = add_child_type_multiple_choice;
-    add_child_type_multiple_choice(event);
+    option_input_creator.onclick = add_child_type_boolean_choice;
+    add_child_type_boolean_choice(event);
   }
   if (user_option == "write-in") {
     option_input_creator.onclick = add_child_type_write_in;
@@ -168,7 +168,7 @@ test_input.setAttribute("name", "test_number");
   form_element.append(question_type_user_input_wrapper);
   // we could do it by some php x sql bullshit where we receive all the enum
   // options but idc i want it to work
-  const question_types = [ "multiple-choice", "write-in" ];
+  const question_types = [ "boolean-choice", "write-in", "multiple-choice" ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
     question_type_option.setAttribute("value", question_type);
@@ -176,7 +176,7 @@ test_input.setAttribute("name", "test_number");
     question_type_selector.appendChild(question_type_option);
   }
 
-  display_option_type(event, "multiple-choice");
+  display_option_type(event, "boolean-choice");
   const test_submit_button = document.createElement("input");
   test_submit_button.setAttribute("onclick", "send_form_data(event)");
   test_submit_button.setAttribute("type", "submit");

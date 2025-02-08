@@ -33,6 +33,8 @@ function display_test_selector() {
 }
 
 function update_url(event) {
+  /* The load test button takes inputs from the url and not the user:q
+   */
   event.preventDefault();
   const test_id_object = document.getElementById("test_number");
   // console.log(test_id_object);

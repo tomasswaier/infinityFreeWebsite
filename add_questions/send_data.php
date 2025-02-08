@@ -85,8 +85,8 @@ if ($_POST['submit']){
 	//echo "<br>question :";
 	//echo $question_text;
 	$question_type="";
-	if(isset($_POST['correct_option_multiple_choice_1'])){
-		$question_type="multiple-choice";
+	if(isset($_POST['correct_option_boolean_choice_1'])){
+		$question_type="boolean-choice";
 	}else{
 		$question_type="write-in";
 	}
@@ -120,7 +120,7 @@ if ($_POST['submit']){
 	    $key = mysqli_real_escape_string($connection, $key);
 	    $val = mysqli_real_escape_string($connection, $val);
 	
-	    if (strpos($key, "correct_option_multiple_choice_") !== false) {
+	    if (strpos($key, "correct_option_boolean_choice_") !== false) {
 	        $flag = ($val === 'true' || $val == 1)? '1':'0'; 
 	    }
 	
