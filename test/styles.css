@@ -119,6 +119,15 @@ body{
         /*max-width:min(100px,10vw);
          */
 }
+.enforce_same_size{
+        display:flex;
+        flex-wrap:nowrap;
+}
+table{
+        flex-direction:column;
+        table-layout: fixed;
+
+}
 
 
 

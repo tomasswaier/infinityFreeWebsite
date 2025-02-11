@@ -14,8 +14,6 @@ function load_tests() {
   const pathHash = String(window.location).split("#");
   const isNumeric = (string) => string == Number.parseInt(string)
 
-  console.log("test number :" + pathHash[2] +
-              " number of questions: " + pathHash[3]);
   if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
     // load_questions();
     let selector = document.getElementById("test_selector")
@@ -23,7 +21,8 @@ function load_tests() {
       selector.remove()
     }
     document.getElementById("user-list").innerText = "test :" + pathHash[1]
-  } else {
+  }
+  else {
     $.ajax({
       url : "load_tests.php",
       mothod : "POST",

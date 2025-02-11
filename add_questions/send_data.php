@@ -30,7 +30,26 @@ function validate_token($con,$test_id,$token){
 	$correct_token = $row['test_secret'];
 	return hash_equals($correct_token, $token);
 }
-
+function get_key_flag($key,$val){
+	if (strpos($key, "correct_option_boolean_choice_") !== false) {
+	    return ($val === 'true' || $val == 1)? '1':'0'; 
+	}elseif (strpos($key, "correct_option_multiple_choice_") !== false) {
+	    return $val;
+	}
+	return 1;
+}
+function get_extras(){
+	$result_string="";
+	foreach ($_POST as $key => $val) {
+		if (strpos($key, "multiple_choice_option_name_") !== false) {
+			if (strlen($result_string)>0){
+				$result_string.=";";
+			}
+			$result_string.=$val;
+		}
+	}
+	return $result_string;
+}
 
 if ($_POST['submit']){
 	require $_SERVER['DOCUMENT_ROOT'] . '/config/initiate_connection.php';
@@ -87,42 +106,38 @@ if ($_POST['submit']){
 	$question_type="";
 	if(isset($_POST['correct_option_boolean_choice_1'])){
 		$question_type="boolean-choice";
+	}elseif (isset($_POST['correct_option_multiple_choice_0'])) {
+		$question_type="multiple-choice";
 	}else{
 		$question_type="write-in";
 	}
 	$test_id=$_POST['test_number'];
-	//echo $test_id;
 
-	$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES (?,?,?,?)";
-	//$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES ('$question_text','$question_type','$test_id','$file_name')";
-	$stmt=mysqli_prepare($connection,$query);
-	mysqli_stmt_bind_param($stmt, "ssis", $question_text, $question_type, $test_id, $file_name);
-
-	//echo "<br>$query";
-	if($connection){
-		//echo "<br>sql query:";
-		//echo $query;
+	if ($question_type=="multiple-choice") {
+		
+		$extras=get_extras();
+		$query="INSERT INTO question (question,question_type,test_id,question_image,question_extras) VALUES (?,?,?,?,?)";
+		$stmt=mysqli_prepare($connection,$query);
+		mysqli_stmt_bind_param($stmt, "ssiss", $question_text, $question_type, $test_id, $file_name,$extras);
+	}else {
+		$query="INSERT INTO question (question,question_type,test_id,question_image) VALUES (?,?,?,?)";
+		$stmt=mysqli_prepare($connection,$query);
+		mysqli_stmt_bind_param($stmt, "ssis", $question_text, $question_type, $test_id, $file_name);
 	}
+
 	if (mysqli_stmt_execute($stmt)){
 		echo"<br>Question successfully inserted<br>";
 	}
 	else{
 		echo"<br>Question insertion failed<br>";
 	}
-	//$result = mysqli_stmt_get_result($stmt);
-
 	$flag = '1';
-	
 	//we ask for the highes id again which should be our question_num
 	$last_id=get_highest_id($connection);
 	
 	foreach ($_POST as $key => $val) {
 	    $key = mysqli_real_escape_string($connection, $key);
 	    $val = mysqli_real_escape_string($connection, $val);
-	
-	    if (strpos($key, "correct_option_boolean_choice_") !== false) {
-	        $flag = ($val === 'true' || $val == 1)? '1':'0'; 
-	    }
 	
 		// I did not write this and i kinda have no idea why it's doing what it's doing
 	    if (strpos($key, "option_number_") !== false) {
@@ -139,6 +154,8 @@ if ($_POST['submit']){
 	    	}
 	    	$flag = '1';
 	
+	    }elseif (strpos($key, "correct_option_") !== false) {
+	    	$flag=get_key_flag($key,$val);	
 	    }
 	}
 

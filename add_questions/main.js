@@ -1,9 +1,7 @@
 function display_input_image() {
-
+  // displays  selected user image to user for confirmation/better ux
   var image = document.getElementById("user_image").files[0];
-
   var reader = new FileReader();
-
   reader.onload =
       function(
           e) { document.getElementById("display_image").src = e.target.result; }
@@ -11,86 +9,176 @@ function display_input_image() {
       reader.readAsDataURL(image);
 }
 var option_number = 1;
-function add_test_options(parent, data) {
-  // console.log(data);
-  myObj = JSON.parse(data);
-  // console.log(data);
-  myObj.forEach(test_option => {
-    option = document.createElement("option");
-    option.innerText =
-        test_option['test_name'] + "/" + test_option['test_author'];
-    option.setAttribute("value", test_option['test_id']);
-    option.setAttribute("id", "test_option_" + test_option['test_id']);
-    parent.appendChild(option);
-  });
-}
-function get_test_options(parent) {
-  $.ajax({
-    url : "load_data.php",
-    mothod : "GET",
-    // dataTypep : 'json',
-    success : function(data) { add_test_options(parent, data); },
-    error : function() { alert("error :<"); }
-  });
-}
-function add_child_type_boolean_choice(event) {
-  if (event) {
-    event.preventDefault();
+class MultipleChoice {
+  constructor(event, button, options_table) {
+    var self = this;
+    this.table = options_table;
+    this.number_of_columns = 0;
+    this.initialize_column_row();
+    this.row_number = 0;
+    var self = this;
+    button.onclick = function(
+        event) { self.add_child_type_multiple_choice(event) };
   }
-  const wrapper = document.getElementById("options_table");
-  const table_row = document.createElement("tr");
-  wrapper.appendChild(table_row);
-  const fieldset = document.createElement("fieldset");
-  table_row.appendChild(fieldset);
+  initialize_column_row() {
+    const table_head = document.createElement("thead");
+    this.table.appendChild(table_head);
+    const column_names_row = document.createElement("tr");
+    column_names_row.setAttribute("id", "column_names_row");
+    column_names_row.classList.add("block");
+    table_head.appendChild(column_names_row);
+    const button_add_columns = document.createElement("button");
+    button_add_columns.setAttribute("type", "button");
+    button_add_columns.setAttribute("id", "button_add_columns");
+    button_add_columns.innerHTML = "+";
+    const self = this;
+    button_add_columns.onclick = function(
+        event) { self.add_table_column(event) };
+    column_names_row.appendChild(button_add_columns)
+  }
+  add_child_type_multiple_choice(event) {
+    // adds one row with this.number_of_columns number of radio buttons + input
+    if (event) {
+      event.preventDefault();
+    }
+    const button = document.getElementById("button_add_columns")
+    if (button) {
+      // if this is first time we are adding rows this removes the button for
+      // adding columns + adds blank cell
+      button.remove()
+      const column_row = document.getElementById("column_names_row");
+      const empty_cell = document.createElement("td");
+      empty_cell.classList.add("cell")
+      column_row.appendChild(empty_cell)
+    }
+    const new_options_row = document.createElement("tr");
+    new_options_row.classList.add("even_margin");
+    this.table.appendChild(new_options_row);
+    for (let i = 0; i < this.number_of_columns; i++) {
+      const option_wrapper = document.createElement("td");
+      option_wrapper.classList.add("cell", "even_margin")
+      new_options_row.appendChild(option_wrapper)
+      const radio_button_option = document.createElement("input");
+      radio_button_option.setAttribute("type", "radio");
+      radio_button_option.setAttribute("value", i);
+      radio_button_option.setAttribute(
+          "name", "correct_option_multiple_choice_" + this.row_number);
+      option_wrapper.appendChild(radio_button_option);
+    }
+    const input_wrapper = document.createElement("td")
+    new_options_row.appendChild(input_wrapper);
+    input_wrapper.classList.add("cell")
+    const input_field = document.createElement("input");
+    input_wrapper.appendChild(input_field)
+    input_field.setAttribute("id", "option_number_" + this.row_number);
+    input_field.setAttribute("name", "option_number_" + this.row_number);
+    input_field.classList.add("cell");
+    this.row_number++;
+  }
+  add_table_column(event) {
+    // collumns at the top providing description for columns
+    if (event) {
+      event.preventDefault();
+    }
+    const new_column = document.createElement("td");
 
-  const answer_true = document.createElement("input");
-  answer_true.setAttribute("type", "radio");
-  answer_true.setAttribute("value", "true");
-  answer_true.setAttribute("id",
-                           "correct_option_boolean_choice_" + option_number);
-  answer_true.setAttribute("name",
-                           "correct_option_boolean_choice_" + option_number);
-  fieldset.appendChild(answer_true);
-  const answer_false = document.createElement("input");
-  answer_false.setAttribute("type", "radio");
-  answer_false.setAttribute("value", "false");
-  answer_false.setAttribute("id",
-                            "correct_option_boolean_choice_" + option_number);
-  answer_false.setAttribute("name",
-                            "correct_option_boolean_choice_" + option_number);
-  answer_false.checked = true;
-  // answer_false.checked = true;
+    const column_row = document.getElementById("column_names_row");
+    column_row.appendChild(new_column);
+    new_column.setAttribute("id", "column_name_" + this.number_of_columns);
+    new_column.classList.add("cell");
+    const data_fieldset = document.createElement("fieldset")
 
-  fieldset.appendChild(answer_false);
-  const user_input_field = document.createElement("textarea");
-  user_input_field.required = true;
-  user_input_field.setAttribute("cols", "50");
-  user_input_field.setAttribute("rows", "2");
-  user_input_field.setAttribute("name", "option_number_" + option_number);
-  user_input_field.setAttribute("placeholder", "option text ...");
-  fieldset.appendChild(user_input_field);
-  option_number++;
+    new_column.appendChild(data_fieldset);
+    const column_input_area = document.createElement("input");
+    data_fieldset.appendChild(column_input_area)
+    column_input_area.setAttribute("id", "multiple_choice_option_name_" +
+                                             this.number_of_columns);
+    column_input_area.setAttribute("name", "multiple_choice_option_name_" +
+                                               this.number_of_columns);
+    column_input_area.setAttribute("type", "text");
+
+    this.number_of_columns++;
+  }
 }
-function add_child_type_write_in(event) {
-  event.preventDefault();
-  const wrapper = document.getElementById("options_table");
-  const table_row = document.createElement("tr");
-  wrapper.appendChild(table_row);
-  const fieldset = document.createElement("fieldset");
-  table_row.appendChild(fieldset);
-  const user_input_field = document.createElement("input");
-  user_input_field.setAttribute("type", "text");
-  user_input_field.setAttribute("id", "option_number_" + option_number);
-  user_input_field.setAttribute("name", "option_number_" + option_number);
-  user_input_field.setAttribute("placeholder", "option text ...");
-  user_input_field.required = true;
-  fieldset.appendChild(user_input_field);
-  option_number++;
+class BooleanChoiceClass {
+  constructor(event, button, options_table) {
+    const indicator = document.createElement("tr");
+    options_table.appendChild(indicator);
+    const true_indicator = document.createElement("td");
+    true_indicator.innerText = "true/false";
+    indicator.appendChild(true_indicator);
+    var self = this;
+    button.onclick = function(
+        event) { self.add_child_type_boolean_choice(event) };
+  }
+  add_child_type_boolean_choice(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    const wrapper = document.getElementById("options_table");
+    const table_row = document.createElement("tr");
+    wrapper.appendChild(table_row);
+    const fieldset = document.createElement("fieldset");
+    table_row.appendChild(fieldset);
+
+    const answer_true = document.createElement("input");
+    answer_true.setAttribute("type", "radio");
+    answer_true.setAttribute("value", "true");
+    answer_true.setAttribute("id",
+                             "correct_option_boolean_choice_" + option_number);
+    answer_true.setAttribute("name",
+                             "correct_option_boolean_choice_" + option_number);
+    fieldset.appendChild(answer_true);
+    const answer_false = document.createElement("input");
+    answer_false.setAttribute("type", "radio");
+    answer_false.setAttribute("value", "false");
+    answer_false.setAttribute("id",
+                              "correct_option_boolean_choice_" + option_number);
+    answer_false.setAttribute("name",
+                              "correct_option_boolean_choice_" + option_number);
+    answer_false.checked = true;
+    // answer_false.checked = true;
+
+    fieldset.appendChild(answer_false);
+    const user_input_field = document.createElement("textarea");
+    user_input_field.required = true;
+    user_input_field.setAttribute("cols", "50");
+    user_input_field.setAttribute("rows", "2");
+    user_input_field.setAttribute("name", "option_number_" + option_number);
+    user_input_field.setAttribute("placeholder", "option text ...");
+    fieldset.appendChild(user_input_field);
+    option_number++;
+  }
+}
+class WriteIn {
+  constructor(event, button) {
+    var self = this;
+    button.onclick = function(event) { self.add_child_type_write_in(event) };
+  }
+
+  add_child_type_write_in(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    const wrapper = document.getElementById("options_table");
+    const table_row = document.createElement("tr");
+    wrapper.appendChild(table_row);
+    const fieldset = document.createElement("fieldset");
+    table_row.appendChild(fieldset);
+    const user_input_field = document.createElement("input");
+    user_input_field.setAttribute("type", "text");
+    user_input_field.setAttribute("id", "option_number_" + option_number);
+    user_input_field.setAttribute("name", "option_number_" + option_number);
+    user_input_field.setAttribute("placeholder", "option text ...");
+    user_input_field.required = true;
+    fieldset.appendChild(user_input_field);
+    option_number++;
+  }
 }
 function display_option_type(event, user_option) {
-  // reset the number counter bcs
+  // reset the number counter
   option_number = 1;
-
+  // remove every previous option
   const question_type_user_input_wrapper =
       document.getElementById("question_type_user_input_wrapper");
   question_type_user_input_wrapper.innerHTML = "";
@@ -106,17 +194,20 @@ function display_option_type(event, user_option) {
   question_type_user_input_wrapper.appendChild(option_input_creator);
   if (user_option == "boolean-choice") {
 
-    const indicator = document.createElement("tr");
-    options_table.appendChild(indicator);
-    const true_indicator = document.createElement("td");
-    true_indicator.innerText = "true/false";
-    indicator.appendChild(true_indicator);
-    option_input_creator.onclick = add_child_type_boolean_choice;
-    add_child_type_boolean_choice(event);
-  }
-  if (user_option == "write-in") {
-    option_input_creator.onclick = add_child_type_write_in;
-    add_child_type_write_in(event);
+    var boolean_choice_object =
+        new BooleanChoiceClass(event, option_input_creator, options_table)
+    boolean_choice_object.add_child_type_boolean_choice(event)
+
+  } else if (user_option == "write-in") {
+    var write_in_object = new WriteIn(event, option_input_creator)
+    write_in_object.add_child_type_write_in(event)
+  } else if (user_option == "multiple-choice") {
+    // function that initiates
+    var multiple_choice_object =
+        new MultipleChoice(event, option_input_creator, options_table)
+    multiple_choice_object.add_table_column()
+    // option_input_creator.onclick = add_child_type_multiple_choice;
+    // add_child_type_write_in(event);
   }
 }
 function load_input_field(event) {
@@ -126,17 +217,7 @@ function load_input_field(event) {
   // load and clear everything
   const form_element = document.getElementById("user-list");
   form_element.innerHTML = "";
-
-  // choose which test
-  /* change this
-const test_input = document.createElement("input");
-test_input.setAttribute("type", "number");
-test_input.setAttribute("value", "1");
-test_input.setAttribute("id", "test_number");
-test_input.setAttribute("name", "test_number");
-*/
-
-  // add question name
+  // apend field for question text input
   const question_name_wrapper = document.createElement("div");
   question_name_wrapper.setAttribute("class", "block");
   const question_name_input = document.createElement("textarea");
@@ -148,13 +229,12 @@ test_input.setAttribute("name", "test_number");
                                    "Question : who has dog with 4 eyes?");
   question_name_wrapper.appendChild(question_name_input);
   form_element.appendChild(question_name_wrapper);
-
-  // get user image
+  // append field for optional user image
   const has_image = document.createElement("div");
   has_image.innerHTML =
       '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
   form_element.appendChild(has_image);
-  // add options field
+  // apend options select element
   const question_type_selector_wrapper = document.createElement("div");
   form_element.append(question_type_selector_wrapper);
   const question_type_selector = document.createElement("select");
@@ -163,11 +243,14 @@ test_input.setAttribute("name", "test_number");
   question_type_selector.setAttribute("onChange",
                                       "display_option_type(event,this.value)");
   const question_type_user_input_wrapper = document.createElement("div");
+  question_type_user_input_wrapper.classList.add("main_table");
   question_type_user_input_wrapper.setAttribute(
       "id", "question_type_user_input_wrapper");
   form_element.append(question_type_user_input_wrapper);
   // we could do it by some php x sql bullshit where we receive all the enum
-  // options but idc i want it to work
+  // options but idc i want it to work + it wouldn't work half the time bcs
+  // webhosting issues
+  // append options to selector
   const question_types = [ "boolean-choice", "write-in", "multiple-choice" ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
@@ -175,8 +258,9 @@ test_input.setAttribute("name", "test_number");
     question_type_option.innerHTML = question_type;
     question_type_selector.appendChild(question_type_option);
   }
-
+  // append default option(boolean-choice) to form
   display_option_type(event, "boolean-choice");
+  // append final button
   const test_submit_button = document.createElement("input");
   test_submit_button.setAttribute("onclick", "send_form_data(event)");
   test_submit_button.setAttribute("type", "submit");

@@ -13,7 +13,7 @@ function create_child_option(type, fieldset, options_id, option_text,
     cell_true.classList.add("radio_button_margin");
     const answer_true = document.createElement("input");
     answer_true.setAttribute("type", "radio");
-    answer_true.setAttribute("value", "true");
+    answer_true.setAttribute("value", "1");
     answer_true.setAttribute("id", element_id);
     answer_true.setAttribute("name", element_id);
     cell_true.appendChild(answer_true);
@@ -22,7 +22,7 @@ function create_child_option(type, fieldset, options_id, option_text,
     cell_false.classList.add("radio_button_margin");
     const answer_false = document.createElement("input");
     answer_false.setAttribute("type", "radio");
-    answer_false.setAttribute("value", "false");
+    answer_false.setAttribute("value", "0");
     answer_false.setAttribute("id", element_id);
     answer_false.setAttribute("name", element_id);
     cell_false.appendChild(answer_false);
@@ -75,7 +75,7 @@ function load_questions(event) {
     number_of_questions = document.getElementById("number_of_questions").value;
     var test_id_object = document.getElementById("test_selector");
     if (test_id_object) {
-      console.log(test_id_object);
+      // console.log(test_id_object);
     }
     test_id = test_id_object.value;
     // const index_of_option = test_id_object.getAttribute("name");
@@ -84,7 +84,7 @@ function load_questions(event) {
         "#" + test_id_object.options[test_id_object.selectedIndex].text + "#" +
         test_id + "#" + number_of_questions;
 
-    console.log(test_id, number_of_questions);
+    // console.log(test_id, number_of_questions);
   }
   $.ajax({
     url : "get_data.php",
@@ -127,10 +127,11 @@ function extract_correct_answers(data) {
    * since im not looking at the value but instead just blindly appending where
    * value should be
    */
+  console.log(data);
   var result = [];
   for (const question_wraper of data) {
-    //[3] is always the ['options'] section of the array (ik it's icky)
-    for (const options of question_wraper[4]) {
+    //[5] is always the ['options'] section of the array (ik it's icky)
+    for (const options of question_wraper[5]) {
       // when converting array of objects of arrays of objects of arrays to an
       // array something went wrong this fixes it :3
       if (!options || typeof options == "string") {
@@ -168,15 +169,15 @@ function get_correct_answer(data, id, type) {
 }
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = get_correct_answer(correct_values, id, type);
+  console.log(id, value, type, input_value, correct_value)
   if (type == "radio") {
-    correct_value = (correct_value == 1) ? "true" : "false";
-    // console.log(correct_value)
     if (correct_value == value && input_value == true) {
       return true;
     } else {
       return undefined;
     }
-  } else if (type == 'text') {
+  }
+  else if (type == 'text') {
     // if the answer can be multiple options then devide them by column
     correct_value = correct_value.split(";");
     for (const correct_option of correct_value) {
@@ -196,9 +197,7 @@ function submit_form(event) {
   if (data == undefined) {
     console.log("Data wasn't loaded");
   } else {
-    // console.log(data);
     data = convert_to_array(data);
-    // console.log(data);
     var correct_values = extract_correct_answers(data);
 
     // meow
@@ -231,7 +230,6 @@ function submit_form(event) {
         continue;
       }
 
-      // var parent = input.parentElement.parentElement.parentElement;
       var parent = input.parentElement.parentElement;
       var classes = parent.getAttribute("class");
       if (is_correct(id_number, value, type, input_value, correct_values)) {
@@ -252,10 +250,6 @@ function submit_form(event) {
           }
         }
       }
-
-      // console.log(
-      //     `ID: ${id}, Value: ${value}, Type: ${type}, Checked:
-      //     ${checked}`);
     };
     const pathHash = String(window.location).split("#");
     // I will assume that no one is playing around with the url
@@ -274,11 +268,69 @@ function submit_form(event) {
     });
   }
 }
+class MultipleChoice {
+  constructor() { this.number_of_columns = 0; }
+  initiate_top_row(column_names, parent_Element) {
+    var columns = column_names.split(";");
+    const table_row = document.createElement("tr");
+    table_row.appendChild(document.createElement("td"))
+    parent_Element.appendChild(table_row)
+    columns.forEach(element => {
+      const text_wrapper = document.createElement("td");
+      table_row.appendChild(text_wrapper)
+      const column_text = document.createElement("span");
+      column_text.innerText = element;
+      text_wrapper.appendChild(column_text);
+      this.number_of_columns++;
+    });
+  }
+  add_row(option, parent_element) {
+    const table_row = document.createElement("tr");
+    parent_element.appendChild(table_row);
+    const text_row_indicator_wrapper = document.createElement("td");
+    table_row.appendChild(text_row_indicator_wrapper);
+    const text_row_indicator = document.createElement("span");
+    text_row_indicator.innerText = option.option_text;
+    text_row_indicator_wrapper.appendChild(text_row_indicator);
+    for (let index = 0; index < this.number_of_columns; index++) {
+      const button_wrapper = document.createElement("td");
+      table_row.appendChild(button_wrapper);
+      const radio_button = document.createElement("input");
+      button_wrapper.appendChild(radio_button);
+      radio_button.setAttribute("type", "radio");
+      radio_button.setAttribute("id", "option_" + option.options_id);
+      radio_button.setAttribute("name", "option_" + option.options_id);
+      radio_button.setAttribute("value", index);
+    }
+  }
+  display_question(data, parent_element) {
+    // question text
+    const table_question_wrapper = document.createElement("div");
+    parent_element.append(table_question_wrapper);
+    const question_text = document.createElement('pre');
+
+    table_question_wrapper.append(question_text);
+    question_text.textContent = data.question;
+    if (data.question_image != "NULL") {
+      const test_image = document.createElement("img");
+      test_image.setAttribute("src", "../resources/test_images/" +
+                                         data.question_image);
+      parent_element.appendChild(test_image);
+    }
+
+    const all_options_wrapper = document.createElement('table');
+    parent_element.append(all_options_wrapper);
+    all_options_wrapper.setAttribute("class", "block");
+    this.initiate_top_row(data.question_extras, all_options_wrapper)
+    data.options.forEach(individual_option => {this.add_row(
+                             individual_option, all_options_wrapper)});
+  }
+}
 document.getElementById("my_button")
     .addEventListener("click", function(event) { load_questions(event) });
 
 function display_questions(received_data) {
-  console.log(data);
+  // console.log(data);
   data = received_data;
 
   // console.log(data);
@@ -293,7 +345,8 @@ function display_questions(received_data) {
   // Loop through the data and display each question - I will not be putting
   // this into multiple functions bcs it's funky already
   let question_index = 1;
-  data.forEach(function(element) {
+  for (const element of data) {
+
     // console.log(element);
     //  question row
     const table_row = document.createElement('tr');
@@ -303,11 +356,19 @@ function display_questions(received_data) {
     const table_number = document.createElement("span");
     table_number.textContent = question_index;
     table_number_cell.appendChild(table_number);
+    table_row.appendChild(table_number_cell);
     question_index++;
 
     // question text
     const table_question_cell = document.createElement('td');
     table_question_cell.classList.add("question_cell");
+    table_row.appendChild(table_question_cell);
+    table.appendChild(table_row);
+    if (element.question_type === "multiple-choice") {
+      var multiple_choice_object = new MultipleChoice();
+      multiple_choice_object.display_question(element, table_question_cell)
+      continue;
+    }
     const table_question_wrapper = document.createElement("div");
     table_question_cell.append(table_question_wrapper);
     const question_text = document.createElement('pre');
@@ -362,11 +423,7 @@ function display_questions(received_data) {
       option_wrapper.appendChild(option_field_set);
       all_options_wrapper.appendChild(option_wrapper);
     });
-    table_row.appendChild(table_number_cell);
-    table_row.appendChild(table_question_cell);
-
-    table.appendChild(table_row);
-  });
+  }
   const submit_button = document.createElement("input");
   submit_button.setAttribute("type", "submit");
   submit_button.setAttribute("value", "submit");

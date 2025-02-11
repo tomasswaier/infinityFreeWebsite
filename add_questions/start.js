@@ -33,7 +33,8 @@ function display_test_selector() {
 }
 
 function update_url(event) {
-  /* The load test button takes inputs from the url and not the user:q
+  /* The load test button takes inputs from the url if it's in my (pretty dumb)
+   * format
    */
   event.preventDefault();
   const test_id_object = document.getElementById("test_number");
@@ -47,4 +48,25 @@ function update_url(event) {
 
   window.location.hash = url_addition;
   load_input_field(event)
+}
+function add_test_options(parent, data) {
+  // adds test optinos
+  myObj = JSON.parse(data);
+  myObj.forEach(test_option => {
+    option = document.createElement("option");
+    option.innerText =
+        test_option['test_name'] + "/" + test_option['test_author'];
+    option.setAttribute("value", test_option['test_id']);
+    option.setAttribute("id", "test_option_" + test_option['test_id']);
+    parent.appendChild(option);
+  });
+}
+function get_test_options(parent) {
+  $.ajax({
+    url : "load_data.php",
+    mothod : "GET",
+    // dataTypep : 'json',
+    success : function(data) { add_test_options(parent, data); },
+    error : function() { alert("error :<"); }
+  });
 }
