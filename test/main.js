@@ -3,58 +3,6 @@
  * (the above was written before addition of another 6 functions :p
  * :p sry for variable names being inconsistant
  */
-function create_child_option(type, fieldset, options_id, option_text,
-                             option_number) {
-  const element_id = "option_" + options_id;
-  // console.log(type);
-  if (type == 'boolean-choice') {
-
-    const cell_true = document.createElement("td");
-    cell_true.classList.add("radio_button_margin");
-    const answer_true = document.createElement("input");
-    answer_true.setAttribute("type", "radio");
-    answer_true.setAttribute("value", "1");
-    answer_true.setAttribute("id", element_id);
-    answer_true.setAttribute("name", element_id);
-    cell_true.appendChild(answer_true);
-
-    const cell_false = document.createElement("td");
-    cell_false.classList.add("radio_button_margin");
-    const answer_false = document.createElement("input");
-    answer_false.setAttribute("type", "radio");
-    answer_false.setAttribute("value", "0");
-    answer_false.setAttribute("id", element_id);
-    answer_false.setAttribute("name", element_id);
-    cell_false.appendChild(answer_false);
-    // text
-
-    const option = document.createElement("td");
-    const option_text_element = document.createElement("span");
-    option_text_element.textContent = option_text;
-    option.appendChild(option_text_element);
-
-    // append all children
-    fieldset.appendChild(cell_true);
-    fieldset.appendChild(cell_false);
-    fieldset.appendChild(option);
-    return;
-  } else if (type == "write-in") {
-    const input_cell = document.createElement("td");
-    const option_number_indicator = document.createElement("span")
-    option_number_indicator.innerText = option_number + ")"
-    input_cell.appendChild(option_number_indicator)
-    const input_element = document.createElement("input");
-    input_element.setAttribute("type", "text");
-    input_element.setAttribute("id", element_id);
-    input_element.setAttribute("name", element_id);
-    input_cell.appendChild(input_element);
-    fieldset.appendChild(input_cell);
-    return;
-  } else {
-    console.error("INVALID TYPE OF VARIABLE");
-    return;
-  }
-}
 var data;
 function load_questions(event) {
   if (event) {
@@ -270,11 +218,11 @@ function submit_form(event) {
 }
 class MultipleChoice {
   constructor() { this.number_of_columns = 0; }
-  initiate_top_row(column_names, parent_Element) {
+  initiate_top_row(column_names, parent_element) {
     var columns = column_names.split(";");
     const table_row = document.createElement("tr");
     table_row.appendChild(document.createElement("td"))
-    parent_Element.appendChild(table_row)
+    parent_element.appendChild(table_row)
     columns.forEach(element => {
       const text_wrapper = document.createElement("td");
       table_row.appendChild(text_wrapper)
@@ -326,6 +274,147 @@ class MultipleChoice {
                              individual_option, all_options_wrapper)});
   }
 }
+class BooleanChoice {
+  constructor() {}
+  display_question(question, parent_element) {
+
+    this.display_question_text(question.question, parent_element);
+    if (question.question_image != "NULL") {
+      this.display_image(question.question_image, parent_element);
+    }
+    this.display_top_row_indicator(parent_element);
+
+    const all_options_wrapper = document.createElement('div');
+    parent_element.append(all_options_wrapper);
+    all_options_wrapper.setAttribute("class", "block");
+    var grey_background_index = 0;
+    for (const option of question.options) {
+
+      this.display_row(option, grey_background_index % 2 == 1,
+                       all_options_wrapper);
+      grey_background_index++;
+    }
+  }
+  display_row(option, grey_background, parent_element) {
+    const option_wrapper = document.createElement('div');
+    parent_element.appendChild(option_wrapper);
+    option_wrapper.setAttribute("class", "block");
+    // fieldset to make sure only one is true
+    const option_field_set = document.createElement('fieldset');
+    option_wrapper.appendChild(option_field_set);
+    if (grey_background) {
+      option_field_set.classList.add("grey_background");
+    }
+    const element_id = "option_" + option.options_id;
+    const cell_true = document.createElement("td");
+    cell_true.classList.add("radio_button_margin");
+    const answer_true = document.createElement("input");
+    answer_true.setAttribute("type", "radio");
+    answer_true.setAttribute("value", "1");
+    answer_true.setAttribute("id", element_id);
+    answer_true.setAttribute("name", element_id);
+    cell_true.appendChild(answer_true);
+
+    const cell_false = document.createElement("td");
+    cell_false.classList.add("radio_button_margin");
+    const answer_false = document.createElement("input");
+    answer_false.setAttribute("type", "radio");
+    answer_false.setAttribute("value", "0");
+    answer_false.setAttribute("id", element_id);
+    answer_false.setAttribute("name", element_id);
+    cell_false.appendChild(answer_false);
+    // text
+
+    const option_text_wrapper = document.createElement("td");
+    const option_text_element = document.createElement("span");
+    option_text_element.textContent = option.option_text;
+    option_text_wrapper.appendChild(option_text_element);
+
+    // append all children
+    option_field_set.appendChild(cell_true);
+    option_field_set.appendChild(cell_false);
+    option_field_set.appendChild(option_text_wrapper);
+  }
+  display_top_row_indicator(parent_element) {
+    const indicator = document.createElement("fieldset");
+    parent_element.appendChild(indicator);
+
+    // the indicator has grey background :3
+    indicator.classList.add("grey_background");
+    const true_indicator = document.createElement("td");
+    true_indicator.classList.add("radio_button_margin")
+    true_indicator.classList.add("red_text")
+    true_indicator.innerText = "True";
+    indicator.appendChild(true_indicator);
+    const false_indicator = document.createElement("td");
+    false_indicator.innerText = "False";
+    false_indicator.classList.add("radio_button_margin")
+    false_indicator.classList.add("red_text")
+    indicator.appendChild(false_indicator);
+  }
+  display_question_text(question_text, parent_element) {
+    const table_question_wrapper = document.createElement("div");
+    parent_element.append(table_question_wrapper);
+    const question_text_element = document.createElement('pre');
+    table_question_wrapper.append(question_text_element);
+    question_text_element.textContent = question_text;
+  }
+  display_image(question_image, parent_element) {
+    const test_image = document.createElement("img");
+    test_image.setAttribute("src",
+                            "../resources/test_images/" + question_image);
+    parent_element.appendChild(test_image);
+  }
+}
+class WriteIn {
+  constructor() {}
+  display_row(option_id, parent_element, i) {
+    const input_cell = document.createElement("td");
+    const option_number_indicator = document.createElement("span")
+    option_number_indicator.innerText = i + ")"
+    input_cell.appendChild(option_number_indicator)
+    const input_element = document.createElement("input");
+    input_element.setAttribute("type", "text");
+    input_element.setAttribute("id", "option_" + option_id);
+    input_element.setAttribute("name", "option_" + option_id);
+    input_cell.appendChild(input_element);
+    parent_element.appendChild(input_cell);
+  }
+  display_question_text(question_text, parent_element) {
+    const table_question_wrapper = document.createElement("div");
+    parent_element.append(table_question_wrapper);
+    const question_text_element = document.createElement('pre');
+    table_question_wrapper.append(question_text_element);
+    question_text_element.textContent = question_text;
+  }
+  display_image(question_image, parent_element) {
+    const test_image = document.createElement("img");
+    test_image.setAttribute("src",
+                            "../resources/test_images/" + question_image);
+    parent_element.appendChild(test_image);
+  }
+  display_question(data, parent_element) {
+    console.log(data);
+    this.display_question_text(data.question, parent_element);
+    if (data.question_image != "NULL") {
+      this.display_image(data.question_image, parent_element)
+    }
+
+    const question_table_wrapper = document.createElement("div");
+    parent_element.appendChild(question_table_wrapper);
+    question_table_wrapper.classList.add("block");
+    var i = 1;
+    data.options.forEach(option => {
+      const individual_option_wrapper = document.createElement("div");
+      question_table_wrapper.appendChild(individual_option_wrapper);
+      individual_option_wrapper.classList.add("block");
+      const fieldset = document.createElement("fieldset");
+      individual_option_wrapper.appendChild(fieldset);
+      this.display_row(option.options_id, fieldset, i);
+      i++;
+    });
+  }
+}
 document.getElementById("my_button")
     .addEventListener("click", function(event) { load_questions(event) });
 
@@ -369,60 +458,16 @@ function display_questions(received_data) {
       multiple_choice_object.display_question(element, table_question_cell)
       continue;
     }
-    const table_question_wrapper = document.createElement("div");
-    table_question_cell.append(table_question_wrapper);
-    const question_text = document.createElement('pre');
-
-    table_question_wrapper.append(question_text);
-    question_text.textContent = element.question;
-    if (element.question_image != "NULL") {
-      const test_image = document.createElement("img");
-      test_image.setAttribute("src", "../resources/test_images/" +
-                                         element.question_image);
-      table_question_cell.appendChild(test_image);
+    if (element.question_type === "boolean-choice") {
+      var boolean_choice_object = new BooleanChoice();
+      boolean_choice_object.display_question(element, table_question_cell)
+      continue;
     }
-
-    const all_options_wrapper = document.createElement('div');
-    table_question_cell.append(all_options_wrapper);
-    all_options_wrapper.setAttribute("class", "block");
-    if (element.question_type == "boolean-choice") {
-      const indicator = document.createElement("fieldset");
-      all_options_wrapper.appendChild(indicator);
-      // the indicator has grey background :3
-      indicator.classList.add("grey_background");
-      const true_indicator = document.createElement("td");
-      true_indicator.classList.add("radio_button_margin")
-      true_indicator.classList.add("red_text")
-      true_indicator.innerText = "True";
-      indicator.appendChild(true_indicator);
-      const false_indicator = document.createElement("td");
-      false_indicator.innerText = "False";
-      false_indicator.classList.add("radio_button_margin")
-      false_indicator.classList.add("red_text")
-      indicator.appendChild(false_indicator);
+    if (element.question_type === "write-in") {
+      var write_in_object = new WriteIn();
+      write_in_object.display_question(element, table_question_cell)
+      continue;
     }
-    var grey_background_index = 0;
-    // add option
-    element.options.forEach(function(options) {
-      // window around one option
-      const option_wrapper = document.createElement('div');
-      option_wrapper.setAttribute("class", "block");
-      // fieldset to make sure only one is true
-      const option_field_set = document.createElement('fieldset');
-      // grey backgorund like in ais
-      if (grey_background_index % 2 == 1 &&
-          element.question_type == "boolean-choice") {
-        option_field_set.classList.add("grey_background");
-      }
-      grey_background_index++;
-      create_child_option(element.question_type, option_field_set,
-                          options.options_id, options.option_text,
-                          grey_background_index);
-
-      // true and false buttons
-      option_wrapper.appendChild(option_field_set);
-      all_options_wrapper.appendChild(option_wrapper);
-    });
   }
   const submit_button = document.createElement("input");
   submit_button.setAttribute("type", "submit");
