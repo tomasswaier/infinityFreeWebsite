@@ -1,4 +1,12 @@
 th {
-        border: 1px solid #000;
-        width: 90px;
+  border: 1px solid #000;
+  width: 90px;
+}
+
+input[type="number"] {
+  width: 35px;
+}
+
+.class_time_border {
+  border: 1px solid #000;
 }
