@@ -1,5 +1,15 @@
+:root {
+  --background_color: #000000;
+  --text_color: #ffffff;
+}
+
+body {
+  background: var(--background_color);
+  color: var(--text_color);
+}
+
 th {
-  border: 1px solid #000;
+  border: 1px solid var(--text_color);
   width: 90px;
 }
 
@@ -8,5 +18,16 @@ input[type="number"] {
 }
 
 .class_time_border {
-  border: 1px solid #000;
+  border: 1px solid var(--text_color);
+  margin: 5px;
+}
+
+fieldset {
+  padding: 0px;
+  border: 0px;
+}
+
+.class_row {
+  display: flex;
+  flex-flow: row wrap;
 }
