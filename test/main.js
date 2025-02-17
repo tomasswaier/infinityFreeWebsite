@@ -4,6 +4,7 @@
  * :p sry for variable names being inconsistant
  */
 var data;
+
 function load_questions(event) {
   if (event) {
     event.preventDefault();
@@ -56,6 +57,10 @@ function load_questions(event) {
 
 // part for confirming
 function convert_to_array(data) {
+  /*
+   * I really am not sure why this exists ... can't i iterate over objects the
+   * same way as array ? why would I need this
+   */
   if (typeof data === "object" && !Array.isArray(data) && data) {
     data = Object.entries(data);
   }
@@ -67,6 +72,7 @@ function convert_to_array(data) {
   }
   return data;
 }
+
 function extract_correct_answers(data) {
   /*
    * Iterate over every option in the multidimensional array that we received
@@ -95,6 +101,7 @@ function extract_correct_answers(data) {
   console.log(result);
   return result;
 }
+
 function get_correct_answer(data, id, type) {
   /*
    * I will not be sorting the array and doing binary search because im not a
@@ -115,6 +122,7 @@ function get_correct_answer(data, id, type) {
   console.error("ERROR ID NOT FOUND :" + id);
   return undefined;
 }
+
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = get_correct_answer(correct_values, id, type);
   console.log(id, value, type, input_value, correct_value)

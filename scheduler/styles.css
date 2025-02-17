@@ -31,3 +31,23 @@ fieldset {
   display: flex;
   flex-flow: row wrap;
 }
+
+
+input::-webkit-outer-spin-button.invisible_input,
+input::-webkit-inner-spin-button.invisible_input {
+  -webkit-appearance: none;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: 0;
+  color: var(--text_color);
+}
+
+input[type=number].invisible_input {
+  -moz-appearance: textfield;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: 0;
+  color: var(--text_color);
+}
