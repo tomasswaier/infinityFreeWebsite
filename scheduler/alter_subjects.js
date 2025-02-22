@@ -17,7 +17,7 @@ class Subject {
     const wrapper = document.createElement("td");
     this.parent_element.appendChild(wrapper);
     const lectures_wrapper = document.createElement("td");
-    lectures_wrapper.classList.add("border");
+    lectures_wrapper.classList.add("border", "w200");
     this.parent_element.appendChild(lectures_wrapper);
     this.prev_element = lectures_wrapper;
     // add button for lectures
@@ -77,9 +77,11 @@ class Subject {
         this.change_time(event, time_input, time_end);
   }
   add_class(event, parent_element, name) {
+    // change_interface_colors();
     event.preventDefault();
     const class_wrapper = document.createElement("td");
     class_wrapper.classList.add("class_time_border");
+    class_wrapper.classList.add("w200");
     const class_wrapper_fieldset = document.createElement("fieldset");
     class_wrapper.appendChild(class_wrapper_fieldset);
     parent_element.insertBefore(
@@ -124,7 +126,9 @@ document.getElementById("add_subject_button")
     .addEventListener("click", function(event) { add_subject(event); });
 
 function change_interface_colors(event) {
-  event.preventDefault()
+  if (event) {
+    event.preventDefault()
+  }
 
   var r = document.querySelector(':root');
   if (getComputedStyle(r).getPropertyValue('--background_color') == "#000000") {

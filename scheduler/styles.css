@@ -9,7 +9,14 @@ body {
 }
 
 th {
+  width: 90px;
+}
+
+.brd {
   border: 1px solid var(--text_color);
+}
+
+td {
   width: 90px;
 }
 
@@ -50,4 +57,23 @@ input[type=number].invisible_input {
   padding: 0;
   background: 0;
   color: var(--text_color);
+}
+
+
+.w90 {
+  width: 90px;
+}
+
+.w200 {
+  width: 200px;
+}
+
+.lecture_background {
+  background: lightgreen;
+  color: darkgreen;
+}
+
+.class_background {
+  background: lightcyan;
+  color: darkcyan;
 }
