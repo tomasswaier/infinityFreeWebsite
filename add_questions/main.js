@@ -175,6 +175,69 @@ class WriteIn {
     option_number++;
   }
 }
+class OneFromMany {
+  constructor(event, button) {
+    var self = this;
+    button.onclick = function(event) { self.create_new_select_tag(event) };
+  }
+  add_child_type_one_from_many(event, parent_element, select_element) {
+    if (event) {
+      event.preventDefault();
+    }
+    const example_option = document.createElement("option");
+    select_element.appendChild(example_option);
+    const table_row = document.createElement("tr");
+    parent_element.appendChild(table_row);
+    const fieldset = document.createElement("fieldset");
+    table_row.appendChild(fieldset);
+    const user_input_field = document.createElement("input");
+    fieldset.appendChild(user_input_field);
+    user_input_field.setAttribute("type", "text");
+    user_input_field.setAttribute("placeholder", "option text ...");
+    user_input_field.setAttribute("id", "option_number_" + option_number);
+    user_input_field.setAttribute("name", "option_number_" + option_number);
+    user_input_field.required = true;
+    user_input_field.onchange = function() {
+      let newText = user_input_field.value;
+      example_option.innerText = newText;
+    };
+
+    const is_correct_field = document.createElement("input");
+    fieldset.appendChild(is_correct_field);
+    is_correct_field.setAttribute("type", "checkbox");
+    is_correct_field.setAttribute("id", "correct_option_one_from_many_" +
+                                            option_number);
+    is_correct_field.setAttribute("name", "correct_option_one_from_many_" +
+                                              option_number);
+    option_number++;
+  }
+  create_new_select_tag(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    const wrapper = document.getElementById("options_table");
+    const table_row = document.createElement("tr");
+    wrapper.appendChild(table_row);
+    table_row.classList.add("small_border");
+    const example_selector = document.createElement("select");
+    table_row.appendChild(example_selector);
+    const hint_text = document.createElement("span");
+    table_row.appendChild(hint_text);
+    hint_text.innerText = "How the selector will look like in test";
+    const options_wrapper = document.createElement("div");
+    table_row.appendChild(options_wrapper);
+    const new_select_option_button = document.createElement("button");
+    table_row.appendChild(new_select_option_button);
+    new_select_option_button.innerText = "+";
+    var self = this;
+    new_select_option_button.onclick = function(event) {
+      self.add_child_type_one_from_many(event, options_wrapper,
+                                        example_selector)
+    };
+    this.add_child_type_one_from_many(event, options_wrapper, example_selector);
+  }
+}
+
 function display_option_type(event, user_option) {
   // reset the number counter
   option_number = 1;
@@ -208,8 +271,16 @@ function display_option_type(event, user_option) {
     multiple_choice_object.add_table_column()
     // option_input_creator.onclick = add_child_type_multiple_choice;
     // add_child_type_write_in(event);
+  } else if (user_option == "one-from-many") {
+    // function that initiates
+    var one_from_many_object =
+        new OneFromMany(event, option_input_creator, options_table)
+    one_from_many_object.create_new_select_tag()
+    // option_input_creator.onclick = add_child_type_multiple_choice;
+    // add_child_type_write_in(event);
   }
 }
+
 function load_input_field(event) {
   if (event) {
     event.preventDefault();
@@ -251,7 +322,8 @@ function load_input_field(event) {
   // options but idc i want it to work + it wouldn't work half the time bcs
   // webhosting issues
   // append options to selector
-  const question_types = [ "boolean-choice", "write-in", "multiple-choice" ];
+  const question_types =
+      [ "boolean-choice", "write-in", "multiple-choice", "one-from-many" ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
     question_type_option.setAttribute("value", question_type);
@@ -268,11 +340,6 @@ function load_input_field(event) {
   test_submit_button.setAttribute("value", "submit");
   document.body.appendChild(test_submit_button);
 }
-
-/*
-document.getElementById("my_button")
-    .addEventListener("click", load_input_field);
-    */
 
 function send_form_data(event) {
   const path_hash = String(window.location).split("#");
@@ -292,20 +359,15 @@ function send_form_data(event) {
   form_data.append("test_number", path_hash[2]);
   console.log(form_data);
   $.ajax({
-    url : "send_data.php",
-    method : "POST",
-    data : (form_data),
-    processData : false,
-    contentType : false,
-    success : function(data) {
+  url: "send_data.php", method: "POST", data: (form_data), processData: false,
+      contentType: false, success: function(data) {
       console.log("success");
       console.log(data);
       const server_response = document.createElement("span");
       server_response.innerHTML = data;
-
       document.body.appendChild(server_response);
     },
-    error : function() {
+    error: function() {
       console.log("error");
       /*alert(
           "reload the page to fix Error fetching data pls report it to me

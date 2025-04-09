@@ -76,6 +76,14 @@ class Subject {
     time_input.onchange = (event) =>
         this.change_time(event, time_input, time_end);
   }
+  add_remove_button(parent_element) {
+    const button = document.createElement("button");
+    button.innerText = "x";
+
+    button.onclick = function() { parent_element.remove(); };
+
+    parent_element.appendChild(button);
+  }
   add_class(event, parent_element, name) {
     // change_interface_colors();
     event.preventDefault();
@@ -89,7 +97,8 @@ class Subject {
         parent_element.childNodes[parent_element.childNodes.length - 1]);
     // dont ask why one is called and the other has return ...
     class_wrapper_fieldset.appendChild(this.add_day_picker(name, false));
-    this.add_time_input(class_wrapper_fieldset, name)
+    this.add_time_input(class_wrapper_fieldset, name);
+    this.add_remove_button(class_wrapper);
   }
   add_lecture(event, parent_element, name) {
     event.preventDefault()
@@ -97,6 +106,7 @@ class Subject {
     parent_element.appendChild(fieldset);
     fieldset.appendChild(this.add_day_picker(name, true));
     this.add_time_input(fieldset, name);
+    this.add_remove_button(fieldset);
   }
   change_time(event, time_input, end_time_element) {
     event.preventDefault()

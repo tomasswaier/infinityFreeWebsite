@@ -1,40 +1,49 @@
-:root{
-        --stu_red:#A33155;
-        --stu_pointless_grey:#e7ebed;
+:root {
+  --stu_red: #A33155;
+  --stu_pointless_grey: #e7ebed;
 }
+
 .main_table {
-        width:100%;
-        max-width:min(1000px,100%);
-}
-img{
-        max-width:min(80vw,800px);
-}
-pre{
-        width:100%;
-        white-space: pre-wrap
+  width: 100%;
+  max-width: min(1000px, 100%);
 }
 
-tr{
+img {
+  max-width: min(80vw, 800px);
+}
 
-	vertical-align:text-top;
+pre {
+  width: 100%;
+  white-space: pre-wrap
 }
-ul{
-	list-style-type:none;
+
+tr {
+
+  vertical-align: text-top;
 }
-.block{
-	width:100%;
-        overflow: hidden;
+
+ul {
+  list-style-type: none;
 }
-.green_background{
-	background-color:green;
+
+.block {
+  width: 100%;
+  overflow: hidden;
 }
-.red_background{
-	background-color:red;
+
+.green_background {
+  background-color: green;
 }
-html{
-        background-color:white;
+
+.red_background {
+  background-color: red;
+}
+
+html {
+  background-color: white;
 
 }
+
 /*
 input:is([type="text"],[type="number"]){
 
@@ -42,97 +51,107 @@ input:is([type="text"],[type="number"]){
         background-color:var(--input_field_blue);
 }
 */
-input:is([type="radio"]){
-        margin:0;
-        /*position:absolute;
+input:is([type="radio"]) {
+  margin: 0;
+  /*position:absolute;
          */
 }
-table{
-        border-width:0;
-}
-fieldset{
-        padding:0;
-        display: flex;
-        flex-wrap:nowrap;
-        position:block;
-        border-width:0;
 
-}
-.radio_button_margin{
-        width:40px;
-        min-width:42;
-        display: flex;
-        flex-shrink:0;
-        flex-wrap:nowrap;
-        justify-content:center;
-        position:block;
-}
-.red_text{
-        color:var(--stu_red);
-}
-.stu_header{
-        color:white;
-        height:max(15vh,120px);
-}
-.stu_bg{
-        background-color:var(--stu_red);
-}
-.logo{
-        font-size:max(6vh,30px);
+table {
+  border-width: 0;
 }
 
-.stu_header_2{
-        text-align:right;
-        font-size:max(3vh,20px);        
-        padding-right:max(10px,4vh);
-}
-.stu_header_3{
-        margin:2px;
-        text-align:right;
+fieldset {
+  padding: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  position: block;
+  border-width: 0;
+
 }
 
-body{
-        margin:0;
+.radio_button_margin {
+  width: 40px;
+  min-width: 42;
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  justify-content: center;
+  position: block;
 }
 
-.grey_background{
-        background-color:var(--stu_pointless_grey);
+.red_text {
+  color: var(--stu_red);
 }
-.f20{
-        font-size:20px;
+
+.stu_header {
+  color: white;
+  height: max(15vh, 120px);
 }
-.left_block{
-        width:min(100px,10vw);
-        min-width:60px;
-        float:left;
-        font-size:1rem;
-        font-weight:bold;
-        border-right:2px solid white;
+
+.stu_bg {
+  background-color: var(--stu_red);
 }
-.question_cell{
-        width:min(90vw,900px);
-        max-width:90vw;
+
+.logo {
+  font-size: max(6vh, 30px);
 }
-.number_indicator{
-        width:min(100px,10vw);
-        min-width:60px;
-        /*max-width:min(100px,10vw);
+
+.stu_header_2 {
+  text-align: right;
+  font-size: max(3vh, 20px);
+  padding-right: max(10px, 4vh);
+}
+
+.stu_header_3 {
+  margin: 2px;
+  text-align: right;
+}
+
+body {
+  margin: 0;
+}
+
+.grey_background {
+  background-color: var(--stu_pointless_grey);
+}
+
+.f20 {
+  font-size: 20px;
+}
+
+.left_block {
+  width: min(100px, 10vw);
+  min-width: 60px;
+  float: left;
+  font-size: 1rem;
+  font-weight: bold;
+  border-right: 2px solid white;
+}
+
+.question_cell {
+  width: min(90vw, 900px);
+  max-width: 90vw;
+}
+
+.number_indicator {
+  width: min(100px, 10vw);
+  min-width: 60px;
+  /*max-width:min(100px,10vw);
          */
 }
-.enforce_same_size{
-        display:flex;
-        flex-wrap:nowrap;
-}
-table{
-        flex-direction:column;
-        table-layout: fixed;
 
+.enforce_same_size {
+  display: flex;
+  flex-wrap: nowrap;
 }
 
+table {
+  flex-direction: column;
+  table-layout: fixed;
 
+}
 
-
-
-
-
-
+.w220 {
+  width: 220px;
+}
