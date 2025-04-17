@@ -1,4 +1,50 @@
 <?php
+/*
+ * THIS CODE IS INSANELY ASS. EVERY TYPE OF QUESTION SHOULD HAVE IT'S OWN FUNCTION BUT
+ * I COULD NOT FORSEE THIS ISSUE WHEN FIRST WRITING THIS CODE... PLEASE SOMEONE REWRITE IT
+ * i CAN'T LOOK AT THIS NO MORE
+ */
+
+class OneFromMany{
+	function execute_class($connection){
+
+		//echo "<hr><pre>";
+		//print_r($_POST);
+		//echo "<pre><hr>";
+		$last_id=get_highest_id($connection);
+		$option_number=0;
+		
+		$flag='0';
+		foreach ($_POST as $key => $val) {
+		  $key = mysqli_real_escape_string($connection, $key);
+		  $val = mysqli_real_escape_string($connection, $val);
+		  if (strpos($key, "option_number_") !== false) {
+				$arr=explode('_',$key);
+				$curr_num=(int)end($arr);
+				if ($curr_num==0) {
+					$option_number++;
+				}
+		  	$query = "INSERT INTO options (question_id, option_text, is_correct,belongs_to) VALUES (?, ?, ?,?)";
+				$stmt=mysqli_prepare($connection,$query);
+				mysqli_stmt_bind_param($stmt, "isii", $last_id,$val,$flag,$option_number);
+  	  	    
+		  	  	//echo "<br>$query";
+				if (mysqli_stmt_execute($stmt)){
+		  	  echo "Option inserted successfully<br>";
+		  	} else {
+		  	  echo "Problem with option insertion: " . mysqli_error($connection) . "<br>";
+		  	}
+				$flag='0';
+		  }elseif (strpos($key, "correct_option_one_from_many_") !== false) {
+		  	$flag='1';
+		  }
+		}
+		
+	}
+
+
+}
+
 function get_highest_id($con){
 	ini_set('display_errors', 1);
 	ini_set('display_startup_errors', 1);
@@ -35,7 +81,7 @@ function get_key_flag($key,$val){
 	    return ($val === 'true' || $val == 1)? '1':'0'; 
 	}elseif (strpos($key, "correct_option_multiple_choice_") !== false) {
 	    return $val;
-	}
+	}	
 	return 1;
 }
 function get_extras(){
@@ -108,6 +154,8 @@ if ($_POST['submit']){
 		$question_type="boolean-choice";
 	}elseif (isset($_POST['correct_option_multiple_choice_0'])) {
 		$question_type="multiple-choice";
+	}elseif (isset($_POST['correct_option_one_from_many_0'])) {
+		$question_type="one-from-many";
 	}else{
 		$question_type="write-in";
 	}
@@ -131,32 +179,45 @@ if ($_POST['submit']){
 	else{
 		echo"<br>Question insertion failed<br>";
 	}
-	$flag = '1';
-	//we ask for the highes id again which should be our question_num
-	$last_id=get_highest_id($connection);
-	
-	foreach ($_POST as $key => $val) {
-	    $key = mysqli_real_escape_string($connection, $key);
-	    $val = mysqli_real_escape_string($connection, $val);
-	
-		// I did not write this and i kinda have no idea why it's doing what it's doing
-	    if (strpos($key, "option_number_") !== false) {
-	    	$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES (?, ?, ?)";
-	    	//$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES ('$last_id', '$val', '$flag')";
-		$stmt=mysqli_prepare($connection,$query);
-		mysqli_stmt_bind_param($stmt, "isi", $last_id,$val,$flag);
-        
-	    	//echo "<br>$query";
-		if (mysqli_stmt_execute($stmt)){
-	    	    echo "Option inserted successfully<br>";
-	    	} else {
-	    	    echo "Problem with option insertion: " . mysqli_error($connection) . "<br>";
-	    	}
-	    	$flag = '1';
-	
-	    }elseif (strpos($key, "correct_option_") !== false) {
-	    	$flag=get_key_flag($key,$val);	
-	    }
+	if ($question_type=="one-from-many") {
+		$object=new OneFromMany();
+		$object->execute_class($connection);
+		
+	}else {
+		$flag = '1';
+		//we ask for the highes id again which should be our question_num
+		
+		$last_id=get_highest_id($connection);
+		
+		
+		foreach ($_POST as $key => $val) {
+		    $key = mysqli_real_escape_string($connection, $key);
+		    $val = mysqli_real_escape_string($connection, $val);
+		
+		    if (strpos($key, "option_number_") !== false) {
+					if ($question_type=="one-from-many") {
+		    	  $query = "INSERT INTO options (question_id, option_text, is_correct,belongs_to) VALUES (?, ?, ?,?)";
+		    	  //$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES ('$last_id', '$val', '$flag')";
+					  $stmt=mysqli_prepare($connection,$query);
+					  mysqli_stmt_bind_param($stmt, "isii", $last_id,$val,$flag,);
+					}
+		    	$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES (?, ?, ?)";
+		    	//$query = "INSERT INTO options (question_id, option_text, is_correct) VALUES ('$last_id', '$val', '$flag')";
+					$stmt=mysqli_prepare($connection,$query);
+					mysqli_stmt_bind_param($stmt, "isi", $last_id,$val,$flag);
+  	  		    
+		  		  	//echo "<br>$query";
+					if (mysqli_stmt_execute($stmt)){
+		  		  	    echo "Option inserted successfully<br>";
+		  		  	} else {
+		  		  	    echo "Problem with option insertion: " . mysqli_error($connection) . "<br>";
+		  		  	}
+		  		  	$flag = '1';
+		
+		  	}elseif (strpos($key, "correct_option_") !== false) {
+		  		$flag=get_key_flag($key,$val);	
+		  	}
+		}
 	}
 
 

@@ -81,24 +81,28 @@ function extract_correct_answers(data) {
    * since im not looking at the value but instead just blindly appending where
    * value should be
    */
-  console.log(data);
+  // console.log(data);
   var result = [];
-  for (const question_wraper of data) {
+  for (let j = 0; j < data.length; j++) {
+    const question_wraper = data[j];
+
     //[5] is always the ['options'] section of the array (ik it's icky)
-    for (const options of question_wraper[5]) {
-      // when converting array of objects of arrays of objects of arrays to an
-      // array something went wrong this fixes it :3
-      if (!options || typeof options == "string") {
+
+    let options_object = question_wraper.options;
+    for (let i = 0; i < options_object.length; i++) {
+      const option = options_object[i];
+      // console.log("meow");
+      //  when converting array of objects of arrays of objects of arrays to an
+      //  array something went wrong this fixes it :3
+      if (!option || typeof option == "string") {
         continue;
       }
-      for (const option of options) {
-        // in most cases you would only need the option[2][1] but in write in
-        // questions you need [1][1]
-        result.push([ option[0][1], option[2][1], option[1][1] ]);
-      }
+      // in most cases you would only need the option[2][1] but in write in
+      // questions you need [1][1]
+      result.push([ option.options_id, option.is_correct, option.option_text ]);
     }
   }
-  console.log(result);
+  // console.log(result);
   return result;
 }
 
@@ -107,6 +111,9 @@ function get_correct_answer(data, id, type) {
    * I will not be sorting the array and doing binary search because im not a
    * nerd
    * note : add binary search
+   * 0:id
+   * 1:value
+   * 2:text val
    */
   for (const id_option of data) {
     if (id_option[0] == id) {
@@ -114,6 +121,8 @@ function get_correct_answer(data, id, type) {
         return id_option[1];
       } else if (type == "text") {
         return id_option[2];
+      } else if (type == "option") {
+        return id_option[1];
       } else {
         return false;
       }
@@ -125,15 +134,14 @@ function get_correct_answer(data, id, type) {
 
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = get_correct_answer(correct_values, id, type);
-  console.log(id, value, type, input_value, correct_value)
-  if (type == "radio") {
+  // console.log(id, value, type, input_value, correct_value)
+  if (type == "radio" || type == "option") {
     if (correct_value == value && input_value == true) {
       return true;
     } else {
       return undefined;
     }
-  }
-  else if (type == 'text') {
+  } else if (type == 'text') {
     // if the answer can be multiple options then devide them by column
     correct_value = correct_value.split(";");
     for (const correct_option of correct_value) {
@@ -148,65 +156,90 @@ function is_correct(id, value, type, input_value, correct_values) {
   return undefined;
 }
 
+function function_input(input) {
+  // ... it does look funny doesnt it
+  return input;
+}
+
+function function_select(input) { return input.selectedOptions[0]; }
+
+function evaluate_elements(inputs, correct_values, select_function) {
+  // Iterate through the inputs and log their values and IDs/names
+  for (var input of inputs) {
+    input = select_function(input);
+    // console.log(input);
+    //  type is important to check what value it's expectin
+    const id = input.id;
+    const id_number = parseInt(id.split("_")[1]);
+    const value = input.value;
+    if (value == 'submit') {
+      continue;
+    }
+    var type = input.type;
+    if (type == undefined) {
+      type = input.localName;
+    }
+    var input_value;
+    if (type == "radio") {
+      input_value = input.checked;
+    } else if (type == "text") {
+      input_value = input.value;
+    } else if (type == "option") {
+      input_value = 1;
+    }
+
+    // console.log(id_number, value, type, input_value);
+    if (!id_number) {
+      console.log("Element Doesnt Exist");
+      console.log(`ID: ${id_number}, Value: ${value}, Type: ${type}, Checked: ${
+          input_value}`);
+      continue;
+    }
+
+    var parent = input.parentElement.parentElement;
+    var classes = parent.getAttribute("class");
+    if (is_correct(id_number, value, type, input_value, correct_values)) {
+      if (classes && classes.includes("red_background")) {
+      }
+
+      parent.setAttribute("class", "green_background");
+      // console.log("correct");
+    } else {
+      if (!classes || !classes.includes("green_background")) {
+        parent.setAttribute("class", "red_background");
+        // console.log("incorrect");
+        if (type == "text") {
+          const correct_value_hint = document.createElement("span");
+          correct_value_hint.innerText =
+              get_correct_answer(correct_values, id_number, type);
+          input.parentElement.appendChild(correct_value_hint);
+        }
+      }
+    }
+  };
+}
+
 function submit_form(event) {
   event.preventDefault();
   if (data == undefined) {
     console.log("Data wasn't loaded");
   } else {
-    data = convert_to_array(data);
+    // console.log(data);
+    //  data = convert_to_array(data);
     var correct_values = extract_correct_answers(data);
+    console.log(correct_values);
 
     // meow
     const form = document.getElementById(
         "user-list"); // or "main_form" for the main form
 
     // Get all input elements in the form
-    const inputs = form.querySelectorAll("input");
+    var inputs = form.querySelectorAll("input");
+    evaluate_elements(inputs, correct_values, function_input);
+    inputs = form.querySelectorAll("select");
+    // console.log(inputs);
+    evaluate_elements(inputs, correct_values, function_select);
 
-    // Iterate through the inputs and log their values and IDs/names
-    for (const input of inputs) {
-      // type is important to check what value it's expectin
-      const id = input.id;
-      const id_number = parseInt(id.split("_")[1]);
-      const value = input.value;
-      if (value == 'submit') {
-        continue;
-      }
-      const type = input.type;
-      var input_value;
-      if (type == "radio") {
-        input_value = input.checked;
-      } else if (type == "text") {
-        input_value = input.value;
-      }
-      if (!id_number) {
-        console.log("Element Doesnt Exist");
-        console.log(`ID: ${id_number}, Value: ${value}, Type: ${
-            type}, Checked: ${input_value}`);
-        continue;
-      }
-
-      var parent = input.parentElement.parentElement;
-      var classes = parent.getAttribute("class");
-      if (is_correct(id_number, value, type, input_value, correct_values)) {
-        if (classes && classes.includes("red_background")) {
-        }
-
-        parent.setAttribute("class", "green_background");
-        // console.log("correct");
-      } else {
-        if (!classes || !classes.includes("green_background")) {
-          parent.setAttribute("class", "red_background");
-          // console.log("incorrect");
-          if (type == "text") {
-            const correct_value_hint = document.createElement("span");
-            correct_value_hint.innerText =
-                get_correct_answer(correct_values, id_number, type);
-            input.parentElement.appendChild(correct_value_hint);
-          }
-        }
-      }
-    };
     const pathHash = String(window.location).split("#");
     // I will assume that no one is playing around with the url
     var test_id = pathHash[2];
@@ -402,7 +435,7 @@ class WriteIn {
     parent_element.appendChild(test_image);
   }
   display_question(data, parent_element) {
-    console.log(data);
+    // console.log(data);
     this.display_question_text(data.question, parent_element);
     if (data.question_image != "NULL") {
       this.display_image(data.question_image, parent_element)
@@ -420,6 +453,79 @@ class WriteIn {
       individual_option_wrapper.appendChild(fieldset);
       this.display_row(option.options_id, fieldset, i);
       i++;
+    });
+  }
+}
+class OneFromMany {
+  constructor() {}
+  /*display_row(option_id, parent_element, i) {
+    const input_cell = document.createElement("td");
+    const option_number_indicator = document.createElement("span")
+    option_number_indicator.innerText = i + ")"
+    input_cell.appendChild(option_number_indicator)
+    const input_element = document.createElement("input");
+    input_element.setAttribute("type", "text");
+    input_element.setAttribute("id", "option_" + option_id);
+    input_element.setAttribute("name", "option_" + option_id);
+    input_cell.appendChild(input_element);
+    parent_element.appendChild(input_cell);
+  }
+  */
+  create_select_element(index) {
+    const selector = document.createElement("select");
+    selector.setAttribute("id", "selector_" + index);
+    return selector;
+  }
+  create_option_element(option_id, option_text) {
+    const option_element = document.createElement("option");
+    option_element.innerText = option_text;
+    option_element.setAttribute("id", 'option_' + option_id);
+    option_element.setAttribute("name", 'option_' + option_id);
+    option_element.value = 1;
+    return option_element;
+  }
+  display_question_text(question_text, parent_element) {
+    const table_question_wrapper = document.createElement("div");
+    parent_element.append(table_question_wrapper);
+    const question_text_element = document.createElement('pre');
+    table_question_wrapper.append(question_text_element);
+    question_text_element.textContent = question_text;
+  }
+  display_image(question_image, parent_element) {
+    const test_image = document.createElement("img");
+    test_image.setAttribute("src",
+                            "../resources/test_images/" + question_image);
+    parent_element.appendChild(test_image);
+  }
+  display_question(data, parent_element) {
+    // console.log(data);
+    this.display_question_text(data.question, parent_element);
+    if (data.question_image != "NULL") {
+      this.display_image(data.question_image, parent_element)
+    }
+
+    const question_table_wrapper = document.createElement("div");
+    parent_element.appendChild(question_table_wrapper);
+    question_table_wrapper.classList.add("block");
+    var i = 0;
+    var select_element;
+
+    data.options.forEach(option => {
+      if (option.belongs_to > i) {
+        const individual_option_wrapper = document.createElement("div");
+        question_table_wrapper.appendChild(individual_option_wrapper);
+        individual_option_wrapper.classList.add("block");
+        const fieldset = document.createElement("fieldset");
+        individual_option_wrapper.appendChild(fieldset);
+        select_element = this.create_select_element(i);
+        fieldset.appendChild(select_element);
+        i++;
+      }
+      const option_element =
+          this.create_option_element(option.options_id, option.option_text);
+      select_element.appendChild(option_element);
+
+      // this.display_row(option.options_id, fieldset, i);
     });
   }
 }
@@ -474,6 +580,11 @@ function display_questions(received_data) {
     if (element.question_type === "write-in") {
       var write_in_object = new WriteIn();
       write_in_object.display_question(element, table_question_cell)
+      continue;
+    }
+    if (element.question_type === "one-from-many") {
+      var one_from_many_object = new OneFromMany();
+      one_from_many_object.display_question(element, table_question_cell)
       continue;
     }
   }

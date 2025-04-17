@@ -180,7 +180,8 @@ class OneFromMany {
     var self = this;
     button.onclick = function(event) { self.create_new_select_tag(event) };
   }
-  add_child_type_one_from_many(event, parent_element, select_element) {
+  add_child_type_one_from_many(event, parent_element, select_element,
+                               my_option_number) {
     if (event) {
       event.preventDefault();
     }
@@ -190,26 +191,31 @@ class OneFromMany {
     parent_element.appendChild(table_row);
     const fieldset = document.createElement("fieldset");
     table_row.appendChild(fieldset);
+
+    const private_option_num = parent_element.children.length - 1;
+    const is_correct_field = document.createElement("input");
+    is_correct_field.required = true;
+    fieldset.appendChild(is_correct_field);
+    is_correct_field.setAttribute("type", "radio");
+    // is_correct_field.setAttribute("id", "correct_option_one_from_many_"
+    // +private_option_num);
+    is_correct_field.setAttribute("name", "correct_option_one_from_many_" +
+                                              my_option_number);
+    is_correct_field.setAttribute("value", private_option_num);
+
     const user_input_field = document.createElement("input");
     fieldset.appendChild(user_input_field);
     user_input_field.setAttribute("type", "text");
     user_input_field.setAttribute("placeholder", "option text ...");
-    user_input_field.setAttribute("id", "option_number_" + option_number);
-    user_input_field.setAttribute("name", "option_number_" + option_number);
+    user_input_field.setAttribute("id", "option_number_" + my_option_number +
+                                            "_" + private_option_num);
+    user_input_field.setAttribute("name", "option_number_" + my_option_number +
+                                              "_" + private_option_num);
     user_input_field.required = true;
     user_input_field.onchange = function() {
       let newText = user_input_field.value;
       example_option.innerText = newText;
     };
-
-    const is_correct_field = document.createElement("input");
-    fieldset.appendChild(is_correct_field);
-    is_correct_field.setAttribute("type", "checkbox");
-    is_correct_field.setAttribute("id", "correct_option_one_from_many_" +
-                                            option_number);
-    is_correct_field.setAttribute("name", "correct_option_one_from_many_" +
-                                              option_number);
-    option_number++;
   }
   create_new_select_tag(event) {
     if (event) {
@@ -230,11 +236,14 @@ class OneFromMany {
     table_row.appendChild(new_select_option_button);
     new_select_option_button.innerText = "+";
     var self = this;
+    let current_num = option_number - 1;
     new_select_option_button.onclick = function(event) {
       self.add_child_type_one_from_many(event, options_wrapper,
-                                        example_selector)
+                                        example_selector, current_num);
     };
-    this.add_child_type_one_from_many(event, options_wrapper, example_selector);
+    this.add_child_type_one_from_many(event, options_wrapper, example_selector,
+                                      current_num);
+    option_number++;
   }
 }
 
@@ -276,8 +285,6 @@ function display_option_type(event, user_option) {
     var one_from_many_object =
         new OneFromMany(event, option_input_creator, options_table)
     one_from_many_object.create_new_select_tag()
-    // option_input_creator.onclick = add_child_type_multiple_choice;
-    // add_child_type_write_in(event);
   }
 }
 

@@ -46,7 +46,14 @@
 	    	    	while ($option= mysqli_fetch_assoc($optionsResult)) {
 	    	    	    	$options[] = $option;
 	    	    	}
+	    	}else if ($questionType === 'one-from-many') {
+	    	    	$optionsQuery = "SELECT options_id,option_text,is_correct,belongs_to FROM options WHERE question_id = $questionId ORDER BY belongs_to";
+	    	    	$optionsResult = mysqli_query($connection,$optionsQuery);
+	    	    	while ($option= mysqli_fetch_assoc($optionsResult)) {
+	    	    	    	$options[] = $option;
+	    	    	}
 	    	}
+
 	    	$question['options'] = $options;
 	    	$questions[] = $question;
 	}
