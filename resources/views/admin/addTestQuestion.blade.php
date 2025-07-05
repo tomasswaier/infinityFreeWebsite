@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -10,6 +11,8 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script src="{{ asset('js/questionCreator.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,7 +21,7 @@
             </style>
         @endif
     </head>
-    <body class="">
+    <body class=""  onload="load_input_field()">
         <header class="">
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
@@ -42,15 +45,10 @@
             @endif
         </header>
         <main class="p-10">
-            <span>available tests</span>
-            <a href="{{url('admin/testCreator')}}">create test</a>
-            <br>
-            @foreach($tests as $test)
-             <br>
-             <span class="border rounded-md p-2">Test name: "{{$test->test_name}}" id:{{$test->id}} |editbutton??|  <a href="{{url('admin/questionCreator')}}">|+|</a></span>
-             <br>
-            @endforeach
+            <h1>Question Creator . Jajo I will not be doing ur thing bcs it's too hard(/timeconsuming and i no wanna)</h1>
+            <form action="" id="user-list" method="post" enctype="multipart/form-data">
 
+            </form ">
 
         </main>
         {{--

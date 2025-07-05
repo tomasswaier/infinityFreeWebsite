@@ -21,6 +21,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('admin', [AdminController::class,'show'])->name('adminPage');
+
+    Route::get('admin/testCreator', function(){
+        return view('admin/testCreator');
+    })->name('admin/testCreator');
+    Route::post('admin/testCreator', [TestController::class,'saveTest'])->name('testCreator.store');
+
+    Route::get('admin/questionCreator', function(){
+        return view('admin/addTestQuestion');
+    })->name('admin/questionCreator');
+
 });
 
 require __DIR__.'/auth.php';
