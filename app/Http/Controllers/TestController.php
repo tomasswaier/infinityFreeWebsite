@@ -36,17 +36,27 @@ class TestController extends Controller
         try {
             //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ?
             $test_id= $request->session()->pull('test_id',0);
-            Log::info('test id:'.$test_id);
+            //Log::info('test id:'.$test_id);
             $questionType="";
+            $myClass;
             $input=$request->except('_token)');
-            Log::info($input);
+            //Log::info($input);
+            Log::info('insert into db(testId,QuestionText,Question)')
             foreach ($input as $key => $value) {
                 //will be building this with future possibility of multiple types of questions per one question
                 if (str_contains($key,'preceding')) {
-                    $questionType=substr($key,0,strlen($key)-2);
-                    $questionType=substr($questionType,15,strlen($questionType)-15);
-                    Log::info($questionType);
+                    $questionId=1;//todo : figure out how to get the id
+                    $myClass=$this->initQuestionTypeClass($key,$questionId);
+                    if (!$myClass) {
+                        exit;
+                    }else {
+                        //Log::info("I am class:".$myClass." with:Id".$myClass->questionId." num:".$myClass->questionNumber);
+                        $myClass.
+
+
+                    }
                 }else{
+
 
                 }
                 /*
@@ -70,8 +80,66 @@ class TestController extends Controller
         }
 
     }
-    private function getQuestionType(String $string){
-        return;
+    private function initQuestionTypeClass($key,$questionId){
+        Log::info($questionId);
+        $questionType=substr($key,0,strlen($key)-2);
+        $questionType=substr($questionType,15,strlen($questionType)-15);
+        Log::info($questionType);
+        switch ($questionType) {
+            case "boolean_choice":
+                $questionNumber=substr($key,30,strlen($key));
+                return new BooleanChoice($questionNumber,$questionId);
+            case "write_in":
+                $questionNumber=substr($key,24,strlen($key));
+                return new WriteIn($questionNumber,$questionId);
+            case "multiple_choice":
+                $questionNumber=substr($key,31,strlen($key));
+                return new MultipleChoice($questionNumber,$questionId);
+            case "one_from_many":
+                $questionNumber=substr($key,29,strlen($key));
+                return new OneFromMany($questionNumber,$questionId);
+            default:
+                Log::error("unknown question type:".$questionType);
+                break;
+        }
+
+        return null;
     }
 
+}
+
+//move this somewhere ?
+class QuestionType{
+    public $questionNumber;
+    public $questionId;
+    function __construct($questionNumber,$questionId){
+        $this->questionNumber=$questionNumber;
+        $this->questionId=$questionId;
+    }
+    function _toString(){
+        return "QuestionTypeClass";
+    }
+    public function readOption
+}
+
+
+class BooleanChoice extends QuestionType{
+    public function __toString(){
+        return "BooleanChoiceClass";
+    }
+}
+class WriteIn extends QuestionType{
+    public function __toString(){
+        return "WriteInClass";
+    }
+}
+class MultipleChoice extends QuestionType{
+    public function __toString(){
+        return "MultipleChoiceClass";
+    }
+}
+class OneFromMany extends QuestionType{
+    public function __toString(){
+        return "OneFromManyClass";
+    }
 }

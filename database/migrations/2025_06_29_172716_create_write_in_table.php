@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('write_in', function (Blueprint $table) {
-            $table->unsignedBigInteger('questions_id');
-            $table->foreign('questions_id')->references('id')->on('questions')->onDelete('cascade');
-            $table->text('preceding_text');
+            $table->id()->primary();
+            $table->unsignedBigInteger('options_id');
+            $table->foreign('options_id')->references('id')->on('options')->onDelete('cascade');
             $table->string('correct_answer');
             $table->timestamps();
         });
