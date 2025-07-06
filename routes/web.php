@@ -25,11 +25,22 @@ Route::middleware('auth')->group(function () {
     Route::get('admin/testCreator', function(){
         return view('admin/testCreator');
     })->name('admin/testCreator');
-    Route::post('admin/testCreator', [TestController::class,'saveTest'])->name('testCreator.store');
+    Route::post('admin/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
 
-    Route::get('admin/questionCreator', function(){
-        return view('admin/addTestQuestion');
-    })->name('admin/questionCreator');
+    Route::get('admin/questionCreator/{test_id}', function($test_id)
+    {
+        session(['test_id' => $test_id]);
+        return view('admin/addTestQuestion',[
+            'test_id'=>$test_id,
+        ]);
+    });
+
+    //Route::get('productDetail/{id}', function ($id) {
+    //    return view('productDetail', ['productId' => $id]);
+    //});
+
+
+    Route::post('admin/questionCreator', [TestController::class,'addQuestion'])->name('createQuestion.store');
 
 });
 

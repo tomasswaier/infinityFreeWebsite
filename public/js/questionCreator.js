@@ -21,6 +21,7 @@ class MultipleChoice {
   constructor(event, button, options_table) {
     var self = this;
     this.parent = options_table;
+    this.column_number = 0;
     this.initialize_column_row();
     this.newOptionFieldButton = button;
     button.setAttribute("title", "add row");
@@ -28,20 +29,29 @@ class MultipleChoice {
         event) { self.add_child_type_multiple_choice(event) };
   }
   add_child_type_multiple_choice(event) {
+    this.column_number = 0;
     var self = this;
+    const new_option_number = option_number;
     this.initialize_column_row();
     const wrapper = document.createElement("tr");
-
+    const preceding_text_input_field = document.createElement("textarea");
+    wrapper.appendChild(preceding_text_input_field);
+    preceding_text_input_field.required = true;
+    preceding_text_input_field.setAttribute("cols", "50");
+    preceding_text_input_field.setAttribute("rows", "2");
+    preceding_text_input_field.setAttribute(
+        "name", "preceding_text_multiple_choice_" + new_option_number);
+    preceding_text_input_field.setAttribute(
+        "placeholder", "Here goes preceding text(can be left blank)");
     const table = document.createElement("table");
     this.table = table;
     wrapper.appendChild(table);
     this.parent.appendChild(wrapper);
-    this.table.appendChild(this.initialize_column_row());
-    this.add_column();
-    this.add_column();
+    this.table.appendChild(this.initialize_column_row(new_option_number));
+    this.add_column(event, new_option_number, this.columns);
+    this.add_column(event, new_option_number, this.columns);
     const button_add_row = document.createElement("button");
     this.table.parentElement.appendChild(button_add_row);
-    const new_option_number = option_number;
     button_add_row.onclick = function(
         event) { self.add_row(event, table, new_option_number) };
     button_add_row.innerText = "+";
@@ -51,7 +61,7 @@ class MultipleChoice {
                                            this.newOptionFieldButton);
     option_number += 1;
   }
-  initialize_column_row() {
+  initialize_column_row(new_option_number) {
     var self = this;
     const table_head = document.createElement("thead");
     const column_names_row = document.createElement("tr");
@@ -62,7 +72,7 @@ class MultipleChoice {
     const button_add_columns = document.createElement("button");
     button_add_columns.setAttribute("type", "button");
     button_add_columns.setAttribute("title", "Add column");
-    button_add_columns.setAttribute("id", "button_add_columns");
+    button_add_columns.setAttribute("name", "button_add_columns");
     self.button_add_columns = button_add_columns;
     button_add_columns.classList.add(
         "border",
@@ -71,7 +81,9 @@ class MultipleChoice {
         "border-black",
     );
     button_add_columns.innerHTML = "+";
-    button_add_columns.onclick = function(event) { self.add_column(event) };
+    const columns = this.columns;
+    button_add_columns.onclick = function(
+        event) { self.add_column(event, new_option_number, columns) };
     column_names_row.appendChild(button_add_columns)
     return table_head;
   }
@@ -85,15 +97,15 @@ class MultipleChoice {
       event.preventDefault();
     }
     // bad
-    if (this.button_add_columns) {
+    var button = parent.children[0].children[0].children[0];
+    if (button.name == "button_add_columns") {
       // if this is first time we are adding rows this removes the button for
       // adding columns + adds blank cell
       //;j
-      this.button_add_columns.remove();
-      this.button_add_columns = null;
-      const column_row = this.columns;
+      button.remove();
+      const column_row = parent.children[0].children[0];
       const empty_cell = document.createElement("td");
-      empty_cell.classList.add("w-30")
+      empty_cell.classList.add("w-30");
       column_row.appendChild(empty_cell)
     }
     const new_options_row = document.createElement("tr");
@@ -106,9 +118,8 @@ class MultipleChoice {
       const radio_button_option = document.createElement("input");
       radio_button_option.setAttribute("type", "radio");
       radio_button_option.setAttribute("value", i);
-      radio_button_option.setAttribute("name",
-                                       "correct_option_multiple_choice_" +
-                                           option_number + "_" + row_number);
+      radio_button_option.setAttribute(
+          "name", "option_number_" + option_number + "_" + row_number);
 
       option_wrapper.appendChild(radio_button_option);
     }
@@ -117,34 +128,32 @@ class MultipleChoice {
     input_wrapper.classList.add("w-30")
     const input_field = document.createElement("input");
     input_wrapper.appendChild(input_field)
-    input_field.setAttribute("id", "option_number_" + option_number + "_" +
-                                       row_number);
-    input_field.setAttribute("name", "option_number_" + option_number + "_" +
-                                         row_number);
+    input_field.setAttribute("id",
+                             "row_number_" + option_number + "_" + row_number);
+    input_field.setAttribute("name",
+                             "row_number_" + option_number + "_" + row_number);
     input_field.classList.add("w-30");
   }
-  add_column(event) {
+  add_column(event, new_option_number, column_row) {
     // collumns at the top providing description for columns
     if (event) {
       event.preventDefault();
     }
+    const column_number = column_row.children.length - 1;
     const new_column = document.createElement("td");
 
-    const column_row = this.columns;
     column_row.appendChild(new_column);
-    new_column.setAttribute("id", "column_name_" + this.column_number);
+    new_column.setAttribute("name", "column_name_" + column_number);
     new_column.classList.add("w-30");
     const data_fieldset = document.createElement("fieldset")
 
     new_column.appendChild(data_fieldset);
     const column_input_area = document.createElement("input");
     data_fieldset.appendChild(column_input_area)
-    column_input_area.setAttribute("id", "multiple_choice_option_name_" +
-                                             option_number + "_" +
-                                             this.column_number);
-    column_input_area.setAttribute("name", "multiple_choice_option_name_" +
-                                               option_number + "_" +
-                                               this.column_number);
+    column_input_area.setAttribute("id", "column_number_" + new_option_number +
+                                             "_" + column_number);
+    column_input_area.setAttribute(
+        "name", "column_number_" + new_option_number + "_" + column_number);
 
     column_input_area.classList.add("w-30");
     column_input_area.setAttribute("type", "text");
@@ -178,22 +187,18 @@ class BooleanChoiceClass {
     answer_true.setAttribute("value", "true");
 
     // we should ask for grand grand parent
-    answer_true.setAttribute("id", "correct_option_boolean_choice_" +
-                                       my_option_number + "_" +
+    answer_true.setAttribute("id", "option_number_" + my_option_number + "_" +
                                        specific_option_number);
-    answer_true.setAttribute("name", "correct_option_boolean_choice_" +
-                                         my_option_number + "_" +
+    answer_true.setAttribute("name", "option_number_" + my_option_number + "_" +
                                          specific_option_number);
     const answer_false = document.createElement("input");
     fieldset.appendChild(answer_false);
     answer_false.setAttribute("type", "radio");
     answer_false.setAttribute("value", "false");
-    answer_false.setAttribute("id", "correct_option_boolean_choice_" +
-                                        my_option_number + "_" +
+    answer_false.setAttribute("id", "option_number_" + my_option_number + "_" +
                                         specific_option_number);
-    answer_false.setAttribute("name", "correct_option_boolean_choice_" +
-                                          my_option_number + "_" +
-                                          specific_option_number);
+    answer_false.setAttribute("name", "option_number_" + my_option_number +
+                                          "_" + specific_option_number);
     answer_false.checked = true;
     // answer_false.checked = true;
 
@@ -217,13 +222,12 @@ class BooleanChoiceClass {
     const preceding_text_input_field = document.createElement("textarea");
     wrapper.appendChild(preceding_text_input_field);
     const new_option_number = option_number;
-    preceding_text_input_field.required = true;
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("rows", "2");
-    preceding_text_input_field.setAttribute("name", "option_number_" +
-                                                        new_option_number);
-    preceding_text_input_field.setAttribute("placeholder",
-                                            "Here goes preceding text");
+    preceding_text_input_field.setAttribute(
+        "name", "preceding_text_boolean_choice_" + new_option_number);
+    preceding_text_input_field.setAttribute(
+        "placeholder", "Here goes preceding text(can be left blank)");
     const input_table = document.createElement('table');
     wrapper.appendChild(input_table);
     const indicator = document.createElement("tr");
@@ -266,8 +270,9 @@ class WriteIn {
     preceding_text.setAttribute("cols", "50");
     preceding_text.setAttribute("rows", "2");
     preceding_text.setAttribute("name",
-                                "preceding_text_number_" + option_number);
-    preceding_text.setAttribute("placeholder", "preceding text ...");
+                                "preceding_text_write_in_" + option_number);
+    preceding_text.setAttribute("placeholder",
+                                "preceding text ...(can be left blank)");
     const user_input_field = document.createElement("input");
     fieldset.appendChild(user_input_field);
     user_input_field.setAttribute("type", "text");
@@ -303,8 +308,7 @@ class OneFromMany {
     is_correct_field.required = true;
     fieldset.appendChild(is_correct_field);
     is_correct_field.setAttribute("type", "radio");
-    is_correct_field.setAttribute("name", "correct_option_one_from_many_" +
-                                              my_option_number);
+    is_correct_field.setAttribute("name", "option_number_" + my_option_number);
     is_correct_field.setAttribute("value", private_option_num);
 
     const user_input_field = document.createElement("input");
@@ -325,10 +329,21 @@ class OneFromMany {
     if (event) {
       event.preventDefault();
     }
+    const new_option_number = option_number;
     const wrapper = document.getElementById("options_table");
     const table_row = document.createElement("tr");
     wrapper.appendChild(table_row);
+
     table_row.classList.add("small_border");
+    const preceding_text_input_field = document.createElement("textarea");
+    table_row.appendChild(preceding_text_input_field);
+    preceding_text_input_field.required = true;
+    preceding_text_input_field.setAttribute("cols", "50");
+    preceding_text_input_field.setAttribute("rows", "2");
+    preceding_text_input_field.setAttribute(
+        "name", "preceding_text_one_from_many_" + new_option_number);
+    preceding_text_input_field.setAttribute(
+        "placeholder", "Here goes preceding text(can be left blank)");
     const example_selector = document.createElement("select");
     table_row.appendChild(example_selector);
     const hint_text = document.createElement("span");
@@ -346,7 +361,6 @@ class OneFromMany {
     table_row.appendChild(new_select_option_button);
     new_select_option_button.innerText = "+";
     var self = this;
-    let new_option_number = option_number;
     new_select_option_button.onclick = function(event) {
       self.add_child_type_one_from_many(event, options_wrapper,
                                         example_selector, new_option_number);
@@ -409,8 +423,8 @@ function load_input_field(event) {
   }
   // load and clear everything
   const form_element = document.getElementById("user-list");
-  form_element.innerHTML = "";
-  // apend field for question text input
+  // form_element.innerHTML = "";
+  //  apend field for question text input
   const question_name_wrapper = document.createElement("div");
   question_name_wrapper.setAttribute("class", "block");
   const question_name_input = document.createElement("textarea");
@@ -447,18 +461,29 @@ function load_input_field(event) {
   const question_types =
       [ "boolean-choice", "write-in", "multiple-choice", "one-from-many" ];
   for (const question_type of question_types) {
-        const question_type_option = document.createElement("option");
-        question_type_option.setAttribute("value", question_type);
-        question_type_option.innerHTML = question_type;
-        question_type_selector.appendChild(question_type_option);
-    }
-    // append default option(boolean-choice) to form
-    display_option_type(event, "boolean-choice");
+    const question_type_option = document.createElement("option");
+    question_type_option.setAttribute("value", question_type);
+    question_type_option.innerHTML = question_type;
+    question_type_selector.appendChild(question_type_option);
+  }
+
+  // append default option(boolean-choice) to form
+  display_option_type(event, "boolean-choice");
+  form_element.appendChild(document.createElement("br"));
+  const explenation_input = document.createElement("textarea");
+  form_element.appendChild(explenation_input);
+    explenation_input.setAttribute("rows", "4");
+    explenation_input.setAttribute("cols", "50");
+    explenation_input.setAttribute("name", "question_explenation");
+    explenation_input.setAttribute("placeholder",
+        "Explenation:No one has dog with 4 eyes because dogs have 2 eyes");
+    form_element.appendChild(document.createElement("br"));
+
     // append final button
     const test_submit_button = document.createElement("button");
     test_submit_button.setAttribute("type", "submit");
     test_submit_button.setAttribute("name", "submit");
     test_submit_button.innerHTML = "submit";
     test_submit_button.classList.add("border", "border-black");
-    document.body.appendChild(test_submit_button);
+    form_element.appendChild(test_submit_button);
 }

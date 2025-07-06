@@ -47,7 +47,7 @@
             <br>
             @foreach($tests as $test)
              <br>
-             <span class="border rounded-md p-2">Test name: "{{$test->test_name}}" id:{{$test->id}} |editbutton??|  <a href="{{url('admin/questionCreator')}}">|+|</a></span>
+             <span class="border rounded-md p-2">Test name: "{{$test->test_name}}" id:"{{$test->id}}" |editbutton??|  <a href="{{url('admin/questionCreator/'.$test->id)}}">|+|</a></span>
              <br>
             @endforeach
 
