@@ -38,25 +38,33 @@ class TestController extends Controller
             $test_id= $request->session()->pull('test_id',0);
             //Log::info('test id:'.$test_id);
             $questionType="";
-            $myClass;
-            $input=$request->except('_token)');
-            //Log::info($input);
-            Log::info('insert into db(testId,QuestionText,Question)')
+            $myClass=null;
+            $input=$request->except('_token','submit');
+            Log::info($input);
+            Log::info('insert into db(testId,QuestionText,Explenation) values'.$test_id.$input['question_text'].$input['question_explenation']);
             foreach ($input as $key => $value) {
                 //will be building this with future possibility of multiple types of questions per one question
+                if ($key=="question_text") {
+                    continue;
+                }
                 if (str_contains($key,'preceding')) {
                     $questionId=1;//todo : figure out how to get the id
-                    $myClass=$this->initQuestionTypeClass($key,$questionId);
+                    $myClass=$this->initQuestionTypeClass($key,$questionId,$value,$input);
                     if (!$myClass) {
+                        Log::error("myClass doesn't exist.Exiting");
                         exit;
                     }else {
-                        //Log::info("I am class:".$myClass." with:Id".$myClass->questionId." num:".$myClass->questionNumber);
-                        $myClass.
-
-
+                        //Log::info($myClass);
                     }
-                }else{
-
+                }elseif (str_contains($key,'explenation')) {
+                    continue;
+                }
+                else{
+                    if (!$myClass) {
+                        Log::error('myClass not initiated. Most probable cause is that ');
+                        break;
+                    }
+                    $myClass->readOption($key,$value);
 
                 }
                 /*
@@ -80,24 +88,22 @@ class TestController extends Controller
         }
 
     }
-    private function initQuestionTypeClass($key,$questionId){
-        Log::info($questionId);
+    private function initQuestionTypeClass($key,$questionId,$precedingText,$inputs){
         $questionType=substr($key,0,strlen($key)-2);
         $questionType=substr($questionType,15,strlen($questionType)-15);
-        Log::info($questionType);
         switch ($questionType) {
             case "boolean_choice":
                 $questionNumber=substr($key,30,strlen($key));
-                return new BooleanChoice($questionNumber,$questionId);
+                return new BooleanChoice($questionNumber,$questionId,$precedingText,$inputs);
             case "write_in":
                 $questionNumber=substr($key,24,strlen($key));
-                return new WriteIn($questionNumber,$questionId);
+                return new WriteIn($questionNumber,$questionId,$precedingText,$inputs);
             case "multiple_choice":
                 $questionNumber=substr($key,31,strlen($key));
-                return new MultipleChoice($questionNumber,$questionId);
+                return new MultipleChoice($questionNumber,$questionId,$precedingText,$inputs);
             case "one_from_many":
                 $questionNumber=substr($key,29,strlen($key));
-                return new OneFromMany($questionNumber,$questionId);
+                return new OneFromMany($questionNumber,$questionId,$precedingText,$inputs);
             default:
                 Log::error("unknown question type:".$questionType);
                 break;
@@ -111,15 +117,25 @@ class TestController extends Controller
 //move this somewhere ?
 class QuestionType{
     public $questionNumber;
+    public $precedingText;
     public $questionId;
-    function __construct($questionNumber,$questionId){
+    public $optionId;
+    public $input;
+
+    function __construct($questionNumber,$questionId,$precedingText,$input){
         $this->questionNumber=$questionNumber;
+        $this->precedingText=$precedingText;
         $this->questionId=$questionId;
+        $this->optionId=null;
+        $this->input=$input;
     }
     function _toString(){
         return "QuestionTypeClass";
     }
-    public function readOption
+    function readOption($key,$val){
+
+
+    }
 }
 
 
@@ -127,10 +143,45 @@ class BooleanChoice extends QuestionType{
     public function __toString(){
         return "BooleanChoiceClass";
     }
+    private function getSpecificOptionNumber($key){
+        return intval(substr($key,16,strlen($key)));
+    }
+    private function getOptionNumber($key){
+        //we assume that there will be less than 11 boolean choice tables
+        if (substr($key,0,19)=='option_text_number_') {
+            return intval(substr($key,19,20));
+        }
+        return intval(substr($key,14,15));
+    }
+    public function readOption($key,$val){
+        //Log::info('logging this optionId:'.$this->optionId.' new option num'.$this->getOptionNumber($key));
+        if (!isset($this->optionId) || $this->getOptionNumber($key)!=$this->optionId) {
+            //Log::info($key);
+
+            $this->optionId=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
+            Log::info('I create a new Options table entry with Id:'.($this->optionId).' Precceding Text'.$this->precedingText);
+            Log::info('I create a new BooleanChoice table entry with FK:'.$this->optionId);
+        }
+        if (str_contains($key,"option_number_")) {
+           $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
+           Log::info("inserting into BooleanChoiceOptions IsCorrect:".$val." Option Text:".$this->input['option_text_number_'.substr($key,14,strlen($key))]);
+        }
+        return;
+    }
+
 }
 class WriteIn extends QuestionType{
     public function __toString(){
         return "WriteInClass";
+    }
+    public function readOption($key,$val){
+        if (str_contains($key,"option_number_")) {
+            Log::info('I create a new Options table entry with Id:imaginenumber Precceding Text'.$this->precedingText);
+            Log::info("inserting into WriteIn FK:imaginenumber CorrectAnswer:".$val);
+        }else {
+            Log::error('$key does not contain option_number_ .Error in input key ');
+        }
+        return;
     }
 }
 class MultipleChoice extends QuestionType{

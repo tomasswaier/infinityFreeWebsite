@@ -206,8 +206,9 @@ class BooleanChoiceClass {
     user_input_field.required = true;
     user_input_field.setAttribute("cols", "50");
     user_input_field.setAttribute("rows", "2");
-    user_input_field.setAttribute("name", "option_number_" + my_option_number +
-                                              "_" + specific_option_number);
+    user_input_field.setAttribute("name", "option_text_number_" +
+                                              my_option_number + "_" +
+                                              specific_option_number);
     user_input_field.setAttribute("placeholder", "option text ...");
     fieldset.appendChild(user_input_field);
   }
