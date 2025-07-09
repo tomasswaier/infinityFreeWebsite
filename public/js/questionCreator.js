@@ -475,7 +475,7 @@ function load_input_field(event) {
   form_element.appendChild(explenation_input);
     explenation_input.setAttribute("rows", "4");
     explenation_input.setAttribute("cols", "50");
-    explenation_input.setAttribute("name", "question_explenation");
+    explenation_input.setAttribute("name", "question_explanation");
     explenation_input.setAttribute("placeholder",
         "Explenation:No one has dog with 4 eyes because dogs have 2 eyes");
     form_element.appendChild(document.createElement("br"));
