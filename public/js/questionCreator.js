@@ -1,9 +1,8 @@
+// I am not changing kinda dumb logic begind option_number_x_y to
+// option_number_x[] because it's already working and I don't see reason why . I
+// konw it's an option just don't see much use in it
 if (!document) {
-
   const {document} = require("postcss");
-  // I hate this shit so much why am I so stupid like actual braindamaged
-  // individual I knew the cause of the problem and decided to do everything
-  // except thjis
 }
 
 function display_input_image() {
@@ -119,7 +118,7 @@ class MultipleChoice {
       radio_button_option.setAttribute("type", "radio");
       radio_button_option.setAttribute("value", i);
       radio_button_option.setAttribute(
-          "name", "option_number_" + option_number + "_" + row_number);
+          "name", "correct_option_" + option_number + "_" + row_number);
 
       option_wrapper.appendChild(radio_button_option);
     }
@@ -129,9 +128,9 @@ class MultipleChoice {
     const input_field = document.createElement("input");
     input_wrapper.appendChild(input_field)
     input_field.setAttribute("id",
-                             "row_number_" + option_number + "_" + row_number);
+                             "row_text_" + option_number + "_" + row_number);
     input_field.setAttribute("name",
-                             "row_number_" + option_number + "_" + row_number);
+                             "row_text_" + option_number + "_" + row_number);
     input_field.classList.add("w-30");
   }
   add_column(event, new_option_number, column_row) {
@@ -309,7 +308,8 @@ class OneFromMany {
     is_correct_field.required = true;
     fieldset.appendChild(is_correct_field);
     is_correct_field.setAttribute("type", "radio");
-    is_correct_field.setAttribute("name", "option_number_" + my_option_number);
+    is_correct_field.setAttribute("name",
+                                  "correct_option_index_" + my_option_number);
     is_correct_field.setAttribute("value", private_option_num);
 
     const user_input_field = document.createElement("input");

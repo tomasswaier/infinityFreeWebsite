@@ -43,7 +43,7 @@ class TestController extends Controller
             $test_id= $request->session()->get('test_id',-1);
 
             $myClass=null;
-            $input=$request->except('_token','submit');
+            $input=$request->except('_token','submit','question_explanation');
             Log::info($input);
             //Log::info('insert into db(testId,QuestionText,Explenation) values'.$test_id.$input['question_text'].$input['question_explenation']);
             if ($test_id==-1) {
@@ -53,7 +53,7 @@ class TestController extends Controller
             $question= Question::create([
                 'tests_id'=>$test_id,
                 'question_text'=>$input['question_text'],
-                'explanation_text'=>$input['question_explanation']
+                'explanation_text'=>$request['question_explanation']
             ]);
             Log::info($question);
 
@@ -148,12 +148,12 @@ class QuestionType{
         $this->input=$input;
         $this->data=collect();
     }
-    function _toString(){
-        return "QuestionTypeClass";
+    function __toString(){
+        return "question-type";
     }
     function __destruct()
     {
-        $this->optionId=$this->createQuestion('boolean-choice');
+        $this->optionId=$this->createQuestion($this->__toString());
     }
     function createQuestion($option_type){
         $option = Option::create([
@@ -174,27 +174,23 @@ class QuestionType{
 class BooleanChoice extends QuestionType{
     public $specificOptioNumber;
     public function __toString(){
-        return "BooleanChoiceClass";
+        return "boolean_choice";
     }
     private function getSpecificOptionNumber($key){
         return intval(substr($key,16,strlen($key)));
     }
     private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables
+        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs
         if (substr($key,0,19)=='option_text_number_') {
             return intval(substr($key,19,20));
         }
         return intval(substr($key,14,15));
     }
     public function readOption($key,$val){
-        //Log::info('logging this optionId:'.$this->optionId.' new option num'.$this->getOptionNumber($key));
         if (str_contains($key,"option_number_")) {
             if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
-                //Log::info($key);
 
                 $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
-                //Log::info('I create a new Options table entry with Id:'.($this->optionId).' Precceding Text'.$this->precedingText);
-                //Log::info('I create a new BooleanChoice table entry with FK:'.$this->optionId);
             }
             if ($val!='true' && $val!='false') {
                 Log::error('Bad boolean choice input');
@@ -202,16 +198,6 @@ class BooleanChoice extends QuestionType{
             }
             $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
             $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
-            //Log::info($this->data);
-
-            /*
-            $response=BooleanChoice::create([
-                'options_id'=>$this->optionId,
-                'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))],
-                'is_correct'=>boolval($val)
-            ]);
-             */
-           //Log::info("inserting into BooleanChoiceOptions IsCorrect:".$val." Option Text:".$this->input['option_text_number_'.substr($key,14,strlen($key))]);
 
         }
         return;
@@ -220,25 +206,57 @@ class BooleanChoice extends QuestionType{
 }
 class WriteIn extends QuestionType{
     public function __toString(){
-        return "WriteInClass";
+        return "write_in";
     }
     public function readOption($key,$val){
         if (str_contains($key,"option_number_")) {
-            Log::info('I create a new Options table entry with Id:imaginenumber Precceding Text'.$this->precedingText);
-            Log::info("inserting into WriteIn FK:imaginenumber CorrectAnswer:".$val);
+            $this->data['correct_answer']=$val;
         }else {
-            Log::error('$key does not contain option_number_ .Error in input key ');
+            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
         }
         return;
     }
 }
 class MultipleChoice extends QuestionType{
     public function __toString(){
-        return "MultipleChoiceClass";
+        return "multiple_choice";
+    }
+    public function readOption($key,$val){
+
+        if (!isset($this->data['column_names'])) {
+            $this->data['column_names']=collect();
+            $this->data['row_array']=collect();
+        }
+        if (str_contains($key,"column_number_")) {
+            $this->data['column_names']->push($val);
+        }else if (str_contains($key,"correct_option_")) {
+            $rowName=$this->input['row_text_'.substr($key,15,strlen($key))];
+            $this->data['row_array']->push(['row_name'=>$rowName,'correct_answer'=>$val]);
+        }else if (str_contains($key,"row_text_")) {
+            return;
+        }else {
+            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
+        }
+        return;
     }
 }
 class OneFromMany extends QuestionType{
     public function __toString(){
-        return "OneFromManyClass";
+        return "one_from_many";
+    }
+    public function readOption($key,$val){
+        if (!isset($this->data['option_array'])) {
+            $this->data['option_array']=collect();
+        }
+        if (str_contains($key,"option_number_")) {
+            $this->data['option_array']->push($val);
+        }else if (str_contains($key,"correct_option_index_")) {
+
+            //we assume that the user will not fuck with the html..(and that the json data will be in order but i do that quite a bit here bcs i dont see reason why na) like yes you could do it very easily but omg woow gj you did something on a student for fun project ur so kewl
+            $this->data['correct_option']=intval($val);
+        }else{
+            Log::error('$key does not contain option_number_ .Error in input key ');
+        }
+        return;
     }
 }
