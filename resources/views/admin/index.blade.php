@@ -24,8 +24,12 @@
                 <nav class="flex items-center justify-end gap-4">
                     @auth
                         <a
+                            href="{{ Route('testPage') }}"
+                        >
+                           TestPage
+                        </a>
+                        <a
                             href="{{ url('admin') }}"
-                            class=""
                         >
                             MainPage
                         </a>
@@ -45,11 +49,21 @@
             <span>available tests</span>
             <a href="{{url('admin/testCreator')}}">create test</a>
             <br>
+            <table class="border">
+                <thead>
+                <td class="w-60">Test name</td>
+                <td class="w-20">id</td>
+                <td class="w-40">edit button?</td>
+                <td class="w-40">add question</td>
+                <td class="w-40">delte text</td>
+                </thead>
             @foreach($tests as $test)
-             <br>
-             <span class="border rounded-md p-2">Test name: "{{$test->test_name}}" id:"{{$test->id}}" |editbutton??|  <a href="{{url('admin/questionCreator/'.$test->id)}}">|+|</a></span>
-             <br>
+                <tr>
+                 <td>{{$test->test_name}}</td> <td>{{$test->id}}</td> <td>im a button</td>  <td><a  href="{{url('admin/questionCreator/'.$test->id)}}">|+|</a></span></td><td><button type="submit" title="heh lmao never gonna implement this">X</button></td>
+                 <td></td>
+                </tr>
             @endforeach
+            </table>
 
 
         </main>

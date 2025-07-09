@@ -35,7 +35,6 @@ class MultipleChoice {
     const wrapper = document.createElement("tr");
     const preceding_text_input_field = document.createElement("textarea");
     wrapper.appendChild(preceding_text_input_field);
-    preceding_text_input_field.required = true;
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("rows", "2");
     preceding_text_input_field.setAttribute(
@@ -266,7 +265,6 @@ class WriteIn {
     table_row.appendChild(fieldset);
     const preceding_text = document.createElement("textarea");
     fieldset.appendChild(preceding_text);
-    preceding_text.required = true;
     preceding_text.setAttribute("cols", "50");
     preceding_text.setAttribute("rows", "2");
     preceding_text.setAttribute("name",
@@ -338,7 +336,6 @@ class OneFromMany {
     table_row.classList.add("small_border");
     const preceding_text_input_field = document.createElement("textarea");
     table_row.appendChild(preceding_text_input_field);
-    preceding_text_input_field.required = true;
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("rows", "2");
     preceding_text_input_field.setAttribute(
