@@ -9,6 +9,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//example of old urls
+// http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
+//im thinking that if something like this comes I extract it with js and add link with
+
+Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
 Route::get('test', [TestController::class,'show'])->name('testPage');
 
 Route::get('/dashboard', function () {
@@ -34,10 +39,6 @@ Route::middleware('auth')->group(function () {
             'test_id'=>$test_id,
         ]);
     });
-
-    //Route::get('productDetail/{id}', function ($id) {
-    //    return view('productDetail', ['productId' => $id]);
-    //});
 
 
     Route::post('admin/questionCreator', [TestController::class,'addQuestion'])->name('createQuestion.store');

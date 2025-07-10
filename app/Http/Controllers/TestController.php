@@ -21,6 +21,19 @@ class TestController extends Controller
     {
         return view('test/index',['tests'=>Test::all()]);
     }
+    public function loadTest($feelings,$test_id,$number_of_questions){
+        if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
+            return view('test/index',['tests'=>Test::all()]);
+        }
+        $data = Question::query()->where('tests_id','=',intval($test_id))->inRandomOrder()->limit($number_of_questions)->get();
+        foreach($data as $question){
+            $question['options']=Option::query()->where('questions_id','=',$question->id)->get();
+        }
+        return view('test/index',[
+            'tests'=>Test::all(),
+            'data'=>$data]
+        );
+    }
     //
     public function createTest(Request $request) {
         try {
