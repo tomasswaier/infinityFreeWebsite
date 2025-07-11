@@ -72,8 +72,9 @@
         --}}
         <main class="p-10">
         @if(isset($data))
-            <form>
-            <h1>Test Site</h1>
+            <form id='testForm'>
+            <h1 class="">Test Site</h1>
+
             <table>
                 <th>
                 <tr>
@@ -92,7 +93,7 @@
                                         <table>
                                         <th><tr><td>true</td><td>false</td><td class="px-2">question test</td></tr></th>
                                         @foreach($option->data as $boolean_option)
-                                            <tr><td><input type="radio"  name="boolean_choice_option_{{$optionIndex}}" value="1"></td><td>
+                                            <tr><td><input type="radio"  name="{{$optionIndex}}" value="1"></td><td>
                                                 <input type="radio" name="{{$optionIndex}}" value="0">
                                                 </td>
                                                 <td>
@@ -108,7 +109,6 @@
                                     @elseif($option->option_type =='write_in')
                                         <div>
                                             <input type="text" name="{{$optionIndex}}">
-                                            <span>$correctOptions[$optionIndex]={{$option['data']['correct_answer']}}</span>
                                         </div>
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['correct_answer'];
@@ -129,8 +129,8 @@
                                             @php
                                             $i=0;
                                             @endphp
-                                            <th>
-                                            <tr>
+                                            <th >
+                                            <tr >
                                             @foreach($option->data['column_names'] as $colname)
                                                 <td class="min-w-10"><span>{{$colname}}</span></td>
                                                 @php
@@ -147,7 +147,7 @@
                                             @foreach($option->data['row_array'] as $rowData)
                                                 <tr>
                                                 @for($j=0;$j<$i;$j++)
-                                                    <td><input type="radio" name="{{$optionIndex}}" value="$j" ></td>
+                                                    <td><input type="radio" name="{{$optionIndex}}" value="{{$j}}" ></td>
                                                 @endfor
                                                 @php
                                                     $correctOptions[$optionIndex]=$option['data']['row_array'][$rowArrayIndex]['correct_answer'];
@@ -171,7 +171,7 @@
             @endforeach
             </table>
             <br><br><br>
-            <button type="button" class="border border-black p-2 rounded-md">submit todo:add js for it to mark the stuff and api to track number of submits</button>
+            <input type="submit" id='testSubmitButton' class="border border-black p-2 rounded-md">submit todo:add js for it to mark the stuff and api to track number of submits</button>
             </form>
             <br><br>
         @endif
@@ -198,11 +198,12 @@
         @endif
         --}}
         <script>
+        //it's intended for the user to have full access to correct asnwers ,. hell i'd give everyone access to db if ash wash here. I am doing rthis with js because it's easier than submitting everyhting with laravel trying to recreate the test ,build completely new blade file  for this shi ... I dont need to info of what the user had correct or didnt so why send it over :3
             var correctOptions={};
             @foreach($correctOptions as $number=>$val)
                 correctOptions[{{$number}}]="{{$val}}";
             @endforeach
-            console.log(correctOptions);
         </script>
     </body>
 </html>
+<script src="{{ asset('js/testEvaluator.js') }}"></script>
