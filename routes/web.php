@@ -15,6 +15,7 @@ Route::get('/', function () {
 
 Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
 Route::get('test', [TestController::class,'show'])->name('testPage');
+Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

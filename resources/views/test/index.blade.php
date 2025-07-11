@@ -1,3 +1,7 @@
+@php
+    $correctOptions=array();
+    $optionIndex=0;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -88,25 +92,37 @@
                                         <table>
                                         <th><tr><td>true</td><td>false</td><td class="px-2">question test</td></tr></th>
                                         @foreach($option->data as $boolean_option)
-                                            <tr><td><input type="radio" name="somename[]" value="1"></td><td>
-                                                <input type="radio" name="somename[]" value="0">
+                                            <tr><td><input type="radio"  name="boolean_choice_option_{{$optionIndex}}" value="1"></td><td>
+                                                <input type="radio" name="{{$optionIndex}}" value="0">
                                                 </td>
                                                 <td>
                                                 <span>{{$boolean_option['option_text']}}</span>
                                                 </td>
                                             </tr>
+                                            @php
+                                                $correctOptions[$optionIndex]=$boolean_option['is_correct']==true?1:0;
+                                                $optionIndex++;
+                                            @endphp
                                         @endforeach
                                         </table>
                                     @elseif($option->option_type =='write_in')
                                         <div>
-                                            <input type="text" name="idkyet">
+                                            <input type="text" name="{{$optionIndex}}">
+                                            <span>$correctOptions[$optionIndex]={{$option['data']['correct_answer']}}</span>
                                         </div>
-
+                                            @php
+                                                $correctOptions[$optionIndex]=$option['data']['correct_answer'];
+                                                $optionIndex++;
+                                            @endphp
                                     @elseif($option->option_type =='one_from_many')
                                         <select>
                                             @for($i=0;$i<count($option->data['option_array']);$i++)
-                                            <option value="{{$i}}">{{$option->data['option_array'][$i]}}</option>
+                                            <option value="{{$i}}" name="{{$optionIndex}}">{{$option->data['option_array'][$i]}}</option>
                                             @endfor
+                                            @php
+                                                $correctOptions[$optionIndex]=$option['data']['correct_option'];
+                                                $optionIndex++;
+                                            @endphp
                                         </select>
                                     @elseif($option->option_type =='multiple_choice')
                                         <table>
@@ -124,12 +140,20 @@
                                             <td class='w-20'></td>
                                             </tr>
                                             </th>
+                                            @php
+                                                $rowArrayIndex=0;
+                                            @endphp
 
                                             @foreach($option->data['row_array'] as $rowData)
                                                 <tr>
                                                 @for($j=0;$j<$i;$j++)
-                                                    <td><input type="radio" name="something[]" value="$j" ></td>
+                                                    <td><input type="radio" name="{{$optionIndex}}" value="$j" ></td>
                                                 @endfor
+                                                @php
+                                                    $correctOptions[$optionIndex]=$option['data']['row_array'][$rowArrayIndex]['correct_answer'];
+                                                    $optionIndex++;
+                                                    $rowArrayIndex++;
+                                                @endphp
                                                 <td>
                                                     <span>{{$rowData['row_name']}}</span>
                                                 </td>
@@ -147,12 +171,13 @@
             @endforeach
             </table>
             <br><br><br>
-            <button type="submit" class="border border-black p-2 rounded-md">submit</button>
+            <button type="button" class="border border-black p-2 rounded-md">submit todo:add js for it to mark the stuff and api to track number of submits</button>
             </form>
             <br><br>
         @endif
         @if(isset($tests))
-	        <form id='main_form' onkeydown="if(event.keycode === 13) {/*alert('you have pressed enter key, use submit button instead');*/ return false;}" >
+	        <form id='main_form' action="{{route('displayTest')}}" method="post" enctype="multipart/form-data" >
+                @csrf
                 <span>Select Test</span>
                 <select id="test_selector" class="rounded-md" name="test_selector">
                    @foreach($tests as $test)
@@ -162,7 +187,7 @@
 
                 </select>
                 <br>
-		        <span>number of questions:</span><input type="number" class="border w-20  rounded-md "id="number_of_questions" value='30'><br>
+		        <span>number of questions:</span><input name='number_of_questions' type="number" class="border w-20  rounded-md "id="number_of_questions" value='30'><br>
 		        <button id="my_button" name="submit" class="border-black border p-2 rounded-md" ><u>Display test</u></button>
             </form>
         @endif
@@ -172,5 +197,12 @@
             <div class="h-14.5 hidden lg:block"></div>
         @endif
         --}}
+        <script>
+            var correctOptions={};
+            @foreach($correctOptions as $number=>$val)
+                correctOptions[{{$number}}]="{{$val}}";
+            @endforeach
+            console.log(correctOptions);
+        </script>
     </body>
 </html>

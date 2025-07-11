@@ -34,6 +34,12 @@ class TestController extends Controller
             'data'=>$data]
         );
     }
+    public function getTest(Request $request){
+        Log::info($request->all());
+
+        return redirect('test/idonlikeppi/'.$request['test_selector'].'/'.$request['number_of_questions']);
+        //todo : learn routes
+    }
     //
     public function createTest(Request $request) {
         try {
