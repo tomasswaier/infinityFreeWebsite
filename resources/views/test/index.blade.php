@@ -23,42 +23,49 @@
         @endif
     </head>
     <body class="">
-        {{--
         <header class="">
-            @if (Route::has('login'))
-                <nav class="flex items-center justify-end gap-4">
-                    @auth
-                        <a
-                            href="{{ url('admin') }}"
-                            class=""
-                        >
-                            Dashboard
-                        </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class=""
-                        >
-                            Log in
-                        </a>
-
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="inline-block px-5 py-1.5  border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
-                                Register
-                            </a>
-                        @endif
-                    @endauth
-                </nav>
-            @endif
             <div class="">
                     <div class="bg-[#A33155] h-30 text-white text-8xl">
                             <span class="logo">Fiitsa joke</span>
                     </div>
                     <div id="ais_text" class="bg-[#A33155] text-white text-2xl text-right">text on right</div>
-                    <div class="bg-[#A33155] mt-1 text-white text-right">|meow|meow|meow|meow|meow
+                    <div class="bg-[#A33155] mt-1 text-white text-right">
+                        <nav class="flex items-center justify-end ">
+                    @if (Route::has('login'))
+                            @if (Route::has('adminPage'))
+                            <span>
+                                <a
+                                    href="{{ url('admin') }}"
+                                    class=""
+                                >meowboard</a></span>
+                            @else
+                                <a
+                                    href="{{ route('login') }}"
+                                    class=""
+                                >
+                                    meow in
+                                </a>
 
+                                @if (Route::has('register'))
+                                    <a
+                                        href="{{ route('register') }}"
+                                        class="inline-block px-5 py-1.5  border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
+                                        Register
+                                    </a>
+                                @endif
+                            @endauth
+                    @endif
+                    <span>
+                        |meow|meow|meow|meow|
+                    </span>
+                    @if(Auth::check())
+                     <form method="post" action="{{route("logout")}}">
+                         @csrf
+                         <button type="submit" class="">meow out</button>
+                     </form>
+                    @endif
+
+                        </nav>
                     </div>
 
             </div>
@@ -69,11 +76,13 @@
 
             </div>
         </header>
-        --}}
         <main class="p-10">
         @if(isset($data))
             <form id='testForm'>
             <h1 class="">Test Site</h1>
+            @if($displayCorrectAnswers==true)
+                <h1>corect answers are</h1>
+            @endif
 
             <table>
                 <th>
@@ -93,8 +102,17 @@
                                         <table>
                                         <th><tr><td>true</td><td>false</td><td class="px-2">question test</td></tr></th>
                                         @foreach($option->data as $boolean_option)
-                                            <tr><td><input type="radio"  name="{{$optionIndex}}" value="1"></td><td>
-                                                <input type="radio" name="{{$optionIndex}}" value="0">
+
+                                            <tr><td><input type="radio"  name="{{$optionIndex}}" value="1"
+                                            @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==true)
+                                                checked
+                                            @endif
+                                            ></td><td>
+                                                <input type="radio"  name="{{$optionIndex}}" value="0"
+                                            @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==false)
+                                                checked
+                                            @endif
+                                                >
                                                 </td>
                                                 <td>
                                                 <span>{{$boolean_option['option_text']}}</span>
@@ -108,22 +126,34 @@
                                         </table>
                                     @elseif($option->option_type =='write_in')
                                         <div>
-                                            <input type="text" name="{{$optionIndex}}">
+                                            <input type="text" name="{{$optionIndex}}"
+                                            @if( $displayCorrectAnswers==true )
+                                                value="{{$option['data']['correct_answer']}}"
+                                            @endif
+                                            >
                                         </div>
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['correct_answer'];
                                                 $optionIndex++;
                                             @endphp
                                     @elseif($option->option_type =='one_from_many')
+                                        <br>
+                                        <div>
+
                                         <select>
                                             @for($i=0;$i<count($option->data['option_array']);$i++)
-                                            <option value="{{$i}}" name="{{$optionIndex}}">{{$option->data['option_array'][$i]}}</option>
+                                            <option value="{{$i}}" name="{{$optionIndex}}"
+                                            @if( $displayCorrectAnswers==true && $option['data']['correct_option']==$i )
+                                            selected
+                                            @endif
+                                            >{{$option->data['option_array'][$i]}}</option>
                                             @endfor
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['correct_option'];
                                                 $optionIndex++;
                                             @endphp
                                         </select>
+                                        </div>
                                     @elseif($option->option_type =='multiple_choice')
                                         <table>
                                             @php
@@ -147,7 +177,11 @@
                                             @foreach($option->data['row_array'] as $rowData)
                                                 <tr>
                                                 @for($j=0;$j<$i;$j++)
-                                                    <td><input type="radio" name="{{$optionIndex}}" value="{{$j}}" ></td>
+                                                    <td><input type="radio" name="{{$optionIndex}}" value="{{$j}}"
+                                                        @if( $displayCorrectAnswers==true && $rowData['correct_answer']==$j )
+                                                            checked
+                                                        @endif
+                                                    ></td>
                                                 @endfor
                                                 @php
                                                     $correctOptions[$optionIndex]=$option['data']['row_array'][$rowArrayIndex]['correct_answer'];
@@ -166,6 +200,13 @@
                                     @endif
                                 @endforeach
                             </div>
+                            <div class="p-2">
+                                <span class="text-slate-500">
+                                @if( $displayCorrectAnswers==true)
+                                   {{$question['explanation_text']}}
+                                @endif
+                                </span>
+                            </div>
                         </td>
                     </tr>
             @endforeach
@@ -183,11 +224,10 @@
                    @foreach($tests as $test)
                     <option value="{{$test->id}}">{{$test->test_name}}</option>
                    @endforeach
-
-
                 </select>
                 <br>
 		        <span>number of questions:</span><input name='number_of_questions' type="number" class="border w-20  rounded-md "id="number_of_questions" value='30'><br>
+                <span>Display all correct options:<input type="checkbox" name="displayCorrectAnswers" value="1"> </span><br>
 		        <button id="my_button" name="submit" class="border-black border p-2 rounded-md" ><u>Display test</u></button>
             </form>
         @endif

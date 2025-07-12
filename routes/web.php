@@ -17,9 +17,9 @@ Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestControlle
 Route::get('test', [TestController::class,'show'])->name('testPage');
 Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+//Route::get('/dashboard', function () {
+//    return view('dashboard');
+//})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -21,7 +21,7 @@ class TestController extends Controller
     {
         return view('test/index',['tests'=>Test::all()]);
     }
-    public function loadTest($feelings,$test_id,$number_of_questions){
+    public function loadTest($feelings,$test_id,$number_of_questions,Request $request){
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
@@ -29,14 +29,20 @@ class TestController extends Controller
         foreach($data as $question){
             $question['options']=Option::query()->where('questions_id','=',$question->id)->get();
         }
+        $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
+
         return view('test/index',[
             'tests'=>Test::all(),
-            'data'=>$data]
+            'data'=>$data,
+            'displayCorrectAnswers'=>$loadCorrectOptions
+        ]
         );
     }
     public function getTest(Request $request){
         Log::info($request->all());
-
+        if ($request['displayCorrectAnswers']==1) {
+            session(['displayCorrectAnswers' => true]);
+        }
         return redirect('test/idonlikeppi/'.$request['test_selector'].'/'.$request['number_of_questions']);
         //todo : learn routes
     }
