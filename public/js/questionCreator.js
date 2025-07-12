@@ -16,6 +16,23 @@ function display_input_image() {
       reader.readAsDataURL(image);
 }
 var option_number = 0;
+
+class OpenAnswer {
+  constructor(event, button, options_table) { this.parent = options_table; }
+  add_child_type_open_answer(event) {
+    const preceding_text_input_field = document.createElement("textarea");
+    const new_option_number = option_number;
+    this.parent.appendChild(preceding_text_input_field);
+    preceding_text_input_field.setAttribute("cols", "50");
+    preceding_text_input_field.setAttribute("hidden", "true");
+    preceding_text_input_field.setAttribute("rows", "2");
+    preceding_text_input_field.setAttribute(
+        "name", "preceding_text_open_answer_" + new_option_number);
+    preceding_text_input_field.setAttribute(
+        "placeholder", "Here goes preceding text(can be left blank)");
+  }
+}
+
 class MultipleChoice {
   constructor(event, button, options_table) {
     var self = this;
@@ -412,6 +429,9 @@ function display_option_type(event, user_option) {
     var one_from_many_object =
         new OneFromMany(event, option_input_creator, options_table)
     one_from_many_object.create_new_select_tag()
+  } else if (user_option == 'open-answer') {
+    var open_answer = new OpenAnswer(event, option_input_creator, options_table)
+    open_answer.add_child_type_open_answer()
   }
 }
 
@@ -456,8 +476,10 @@ function load_input_field(event) {
   // options but idc i want it to work + it wouldn't work half the time bcs
   // webhosting issues
   // append options to selector
-  const question_types =
-      [ "boolean-choice", "write-in", "multiple-choice", "one-from-many" ];
+  const question_types = [
+    "boolean-choice", "write-in", "multiple-choice", "one-from-many",
+    "open-answer"
+  ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
     question_type_option.setAttribute("value", question_type);
@@ -467,9 +489,9 @@ function load_input_field(event) {
 
   // append default option(boolean-choice) to form
   display_option_type(event, "boolean-choice");
-  form_element.appendChild(document.createElement("br"));
-  const explenation_input = document.createElement("textarea");
-  form_element.appendChild(explenation_input);
+    form_element.appendChild(document.createElement("br"));
+    const explenation_input = document.createElement("textarea");
+    form_element.appendChild(explenation_input);
     explenation_input.setAttribute("rows", "4");
     explenation_input.setAttribute("cols", "50");
     explenation_input.setAttribute("name", "question_explanation");

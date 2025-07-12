@@ -13,7 +13,11 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <!--cdn because hosting is php only... no vite sadly-->
+
+        <script src="https://cdn.tailwindcss.com"></script>
+
+
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -32,7 +36,7 @@
                     <div class="bg-[#A33155] mt-1 text-white text-right">
                         <nav class="flex items-center justify-end ">
                     @if (Route::has('login'))
-                            @if (Route::has('adminPage'))
+                            @if (Route::has('adminPage') && Auth::check())
                             <span>
                                 <a
                                     href="{{ url('admin') }}"
@@ -46,13 +50,6 @@
                                     meow in
                                 </a>
 
-                                @if (Route::has('register'))
-                                    <a
-                                        href="{{ route('register') }}"
-                                        class="inline-block px-5 py-1.5  border-[#19140035] hover:border-[#1915014a] border text-[#1b1b18] dark:border-[#3E3E3A] dark:hover:border-[#62605b] rounded-sm text-sm leading-normal">
-                                        Register
-                                    </a>
-                                @endif
                             @endauth
                     @endif
                     <span>
@@ -63,6 +60,8 @@
                          @csrf
                          <button type="submit" class="">meow out</button>
                      </form>
+                    @else
+                        <span>meow</span>
                     @endif
 
                         </nav>
@@ -103,7 +102,7 @@
                                         <th><tr><td>true</td><td>false</td><td class="px-2">question test</td></tr></th>
                                         @foreach($option->data as $boolean_option)
 
-                                            <tr><td><input type="radio"  name="{{$optionIndex}}" value="1"
+                                            <tr><td><input type="radio" name="{{$optionIndex}}"  value="1"
                                             @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==true)
                                                 checked
                                             @endif
@@ -140,7 +139,7 @@
                                         <br>
                                         <div>
 
-                                        <select>
+                                        <select class="appearance-auto bg-none">
                                             @for($i=0;$i<count($option->data['option_array']);$i++)
                                             <option value="{{$i}}" name="{{$optionIndex}}"
                                             @if( $displayCorrectAnswers==true && $option['data']['correct_option']==$i )
@@ -195,16 +194,23 @@
                                             @endforeach
 
                                         </table>
+                                    @elseif($option->option_type =='open_answer')
+                                    <br>
+                                    <div>
+                                        <textarea rows="4" cols="40" placeholder="this type of question has no answer checking and serves only as practice for what might be on an actual exam"></textarea>
+                                    </div>
                                     @else
                                         <span>Something went very very very very wrong please contact .maryann</span>
                                     @endif
                                 @endforeach
                             </div>
-                            <div class="p-2">
-                                <span class="text-slate-500">
-                                @if( $displayCorrectAnswers==true)
-                                   {{$question['explanation_text']}}
+                            <div class="p-2" name='explanation'
+                                @if( !$displayCorrectAnswers==true)
+                                hidden
                                 @endif
+                            >
+                                <span class="text-slate-500">
+                                   {{$question['explanation_text']}}
                                 </span>
                             </div>
                         </td>
@@ -220,7 +226,7 @@
 	        <form id='main_form' action="{{route('displayTest')}}" method="post" enctype="multipart/form-data" >
                 @csrf
                 <span>Select Test</span>
-                <select id="test_selector" class="rounded-md" name="test_selector">
+                <select id="test_selector" class="rounded-md appearance-auto bg-none p-2" name="test_selector">
                    @foreach($tests as $test)
                     <option value="{{$test->id}}">{{$test->test_name}}</option>
                    @endforeach

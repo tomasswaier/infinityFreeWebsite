@@ -4,9 +4,9 @@ if (!document) {
 
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = correct_values[id];
-  console.log(correct_values);
+  // console.log(correct_values);
   if (type == "radio" || type == "option") {
-    console.log(input_value + correct_value);
+    // console.log(input_value + correct_value);
     if (correct_value == value) {
       return true;
     } else {
@@ -52,9 +52,16 @@ function submitForm(event) {
 
   // Get all input elements in the form
   var inputs = form.querySelectorAll("input");
+  // console.log(inputs);
   evaluateOptions(inputs, correctOptions, function_input);
   inputs = form.querySelectorAll("select");
   evaluateOptions(inputs, correctOptions, function_select);
+
+  var expalnations = document.getElementsByName('explanation');
+  expalnations.forEach(explanation => {
+    console.log(explanation);
+    explanation.removeAttribute('hidden');
+  });
 }
 
 function evaluateOptions(inputs, correctValues, selectedFunction) {
@@ -69,27 +76,21 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
     const value = input.value;
     var type = input.type;
     if (type == 'submit') {
-      console.log('error with input :');
       continue;
     }
     var input_value;
     if (type == "radio") {
-      if (!input.checked) {
-        if (!parent.getAttribute("class") ||
-            !parent.getAttribute("class").includes("bg-green-700")) {
-          parent.classList.add("bg-red-500");
-        }
-        continue;
-      }
-      input_value = parseInt(input.value);
+      evaluateRadioBox(input, name_id, parent);
+      continue;
     } else if (type == "text") {
       parent = input.parentElement;
-      input_value = input.value;
+      evaluateWriteIn(input, name_id, parent);
+      continue;
     } else if (input.localName == "option") {
       type = 'option';
-      console.log(input);
-      input_value = input.value;
       name_id = input.attributes['name'].value;
+      evaluateSelect(input, name_id, parent);
+      // console.log(input);
       // todo:this
     } else {
     }
@@ -106,18 +107,88 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       if (!parent.getAttribute("class") ||
           !parent.getAttribute("class").includes("bg-green-700")) {
         parent.classList.add("bg-red-500");
-        /*
-if (type == "text") {
-const correct_value_hint = document.createElement("span");
-correct_value_hint.innerText =
-get_correct_answer(correct_values, name_id, type);
-input.parentElement.appendChild(correct_value_hint);
-}
-*/
       }
     }
   };
 }
 
+function evaluateSelect(input, id, grandParent) {
+
+  if (input.value == correctOptions[id]) {
+    if (grandParent.getAttribute("class") &&
+        grandParent.getAttribute("class").includes("bg-red-500")) {
+      grandParent.classList.remove("bg-red-500")
+    }
+
+    grandParent.classList.add("bg-green-700");
+    // console.log("correct");
+  } else {
+    if (!grandParent.getAttribute("class") ||
+        !grandParent.getAttribute("class").includes("bg-green-700")) {
+      grandParent.classList.add("bg-red-500");
+    }
+    // console.log(grandParent.lastChild);
+    if (!(grandParent.lastChild.localName == 'span')) {
+      const explanation = document.createElement('span');
+      // console.log(input.parentElement.children[correctOptions[id]].innerText);
+      explanation.innerText =
+
+          input.parentElement.children[correctOptions[id]].innerText;
+      grandParent.appendChild(explanation);
+    }
+  }
+}
+
+function evaluateWriteIn(input, id, grandParent) {
+
+  if (input.value == correctOptions[id]) {
+    if (grandParent.getAttribute("class") &&
+        grandParent.getAttribute("class").includes("bg-red-500")) {
+      grandParent.classList.remove("bg-red-500")
+    }
+
+    grandParent.classList.add("bg-green-700");
+    // console.log("correct");
+  } else {
+    if (!grandParent.getAttribute("class") ||
+        !grandParent.getAttribute("class").includes("bg-green-700")) {
+      grandParent.classList.add("bg-red-500");
+    }
+    // console.log(grandParent.lastChild);
+    if (!(grandParent.lastChild.localName == 'span')) {
+      const explanation = document.createElement('span');
+      explanation.innerText = correctOptions[id];
+      grandParent.appendChild(explanation);
+    }
+  }
+}
+
+function evaluateRadioBox(input, id, grandParent) {
+  const value = parseInt(input.value);
+  if (!input.checked) {
+    // console.log(input);
+    if (grandParent.getAttribute("class") &&
+        !grandParent.getAttribute("class").includes("bg-green-700")) {
+      grandParent.classList.add("bg-red-500");
+    }
+    if (correctOptions[id] == value) {
+      input.classList.add('bg-green-200');
+      grandParent.classList.add("bg-red-500");
+    }
+    return;
+  }
+  var parent_classes = grandParent.getAttribute("class");
+  if (correctOptions[id] == value) {
+    if (parent_classes && parent_classes.includes("bg-red-500")) {
+      grandParent.classList.remove("bg-red-500")
+    }
+    input.classList.add('bg-green-200');
+    grandParent.classList.add("bg-green-700");
+  } else {
+    if (!parent_classes || !parent_classes.includes("bg-green-700")) {
+      grandParent.classList.add("bg-red-500");
+    }
+  }
+}
 
 document.getElementById('testSubmitButton').addEventListener("click", submitForm);

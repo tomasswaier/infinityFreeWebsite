@@ -144,6 +144,9 @@ class TestController extends Controller
             case "one_from_many":
                 $questionNumber=substr($key,29,strlen($key));
                 return new OneFromMany($questionNumber,$questionId,$precedingText,$inputs);
+            case "open_answer":
+                $questionNumber=substr($key,27,strlen($key));
+                return new OpenAnswer($questionNumber,$questionId,$precedingText,$inputs);
             default:
                 Log::error("unknown question type:".$questionType);
                 break;
@@ -282,6 +285,14 @@ class OneFromMany extends QuestionType{
         }else{
             Log::error('$key does not contain option_number_ .Error in input key ');
         }
+        return;
+    }
+}
+class OpenAnswer extends QuestionType{
+    public function __toString(){
+        return "open_answer";
+    }
+    public function readOption($key,$val){
         return;
     }
 }
