@@ -29,13 +29,6 @@
                         >
                             Dashboard
                         </a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class=""
-                        >
-                            Log in
-                        </a>
 
                         @if (Route::has('register'))
                             <a
@@ -44,6 +37,13 @@
                                 Register
                             </a>
                         @endif
+                    @else
+                        <a
+                            href="{{ route('login') }}"
+                            class=""
+                        >
+                            Log in
+                        </a>
                     @endauth
                 </nav>
             @endif

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('question_images_migration', function (Blueprint $table) {
+        Schema::create('question_images', function (Blueprint $table) {
             $table->unsignedBigInteger('questions_id');
             $table->foreign('questions_id')->references('id')->on('questions')->onDelete('cascade');
             $table->string('image_name');

@@ -9,9 +9,8 @@ use App\Models\Option;
 use App\Models\Question;
 use App\Models\Test;
 //use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\Reflection\Types\Boolean;
+use App\Http\Controllers\ImageController;
 
 //use app\Models\Question;
 
@@ -28,6 +27,7 @@ class TestController extends Controller
         $data = Question::query()->where('tests_id','=',intval($test_id))->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
             $question['options']=Option::query()->where('questions_id','=',$question->id)->get();
+            $question['image']=(new ImageController)->show($question->id);
         }
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
 

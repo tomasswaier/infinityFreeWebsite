@@ -16,6 +16,8 @@
         <!--cdn because hosting is php only... no vite sadly-->
 
         <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Load Tailwind via CDN -->
+        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
 
         <!-- Styles / Scripts -->
@@ -92,6 +94,11 @@
                         <td class="border py-2">
                             <div>
                             <span>{{$question->question_text}}</span>
+                            <div>
+                            @foreach($question->image as $image)
+                                <img src="{{asset('storage/test_images/'.$image->image_name)}}" alt="">
+                            @endforeach
+                            </div>
                             <br>
                                 @foreach($question->options as $option)
                                     @if(isset($option->preceding_text))
