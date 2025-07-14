@@ -4,7 +4,7 @@ namespace app\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-//use Illuminate\View\View;
+use Illuminate\View\View;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Test;
@@ -19,6 +19,20 @@ class TestController extends Controller
     public function show()
     {
         return view('test/index',['tests'=>Test::all()]);
+    }
+    public function showTestQuestionNames($testId)
+    {
+        return view('admin/allTestQuestions',['data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()]);
+    }
+    public function editQuestion($questionId)
+    {
+        return view('admin/editTestQuestion',['question'=>Question::all()->where('id','=',$questionId),'options'=>Option::all()->where('questions_id','=',$questionId)]);
+    }
+    public function deleteQuestion($questionId,Request $request){
+        $testId=Question::select('tests_id')->where('id','=',$questionId)->get();
+        Question::select('tests_id')->where('id','=',$questionId)->delete();
+        //Log::info(json_decode($testId,true)[0]['tests_id']);
+        return redirect('admin/questionDisplay/'.json_decode($testId,true)[0]['tests_id']);
     }
     public function loadTest($feelings,$test_id,$number_of_questions,Request $request){
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
@@ -39,7 +53,7 @@ class TestController extends Controller
         );
     }
     public function getTest(Request $request){
-        Log::info($request->all());
+        //Log::info($request->all());
         if ($request['displayCorrectAnswers']==1) {
             session(['displayCorrectAnswers' => true]);
         }
@@ -69,8 +83,6 @@ class TestController extends Controller
 
             $myClass=null;
             $input=$request->except('_token','submit','question_explanation');
-            Log::info($input);
-            //Log::info('insert into db(testId,QuestionText,Explenation) values'.$test_id.$input['question_text'].$input['question_explenation']);
             if ($test_id==-1) {
                 Log::error('test id is invalid');
                 exit;
@@ -80,7 +92,16 @@ class TestController extends Controller
                 'question_text'=>$input['question_text'],
                 'explanation_text'=>$request['question_explanation']
             ]);
-            Log::info($question);
+
+            if (isset($request['user_image'])) {
+                    $response=(new ImageController)->upload($request['user_image'],$question->id);
+                    if ($response==1) {
+                            Log::info('Image saved');
+                    }
+                    else{
+                        Log::info('Image did not get saved');
+                    }
+            }
 
             foreach ($input as $key => $value) {
                 //will be building this with future possibility of multiple types of questions per one question
@@ -107,17 +128,6 @@ class TestController extends Controller
                     $myClass->readOption($key,$value);
 
                 }
-                /*
-                switch ($key) {
-                    case "preceding_text_boolean_choice_0":
-                        $questionType="boolean-choice";
-                        Log::info('insert into Questions:question_text:'.$input['question_text']);
-                        break;
-                    default:
-                        # code...
-                        break;
-                }
-                 */
             }
 
 

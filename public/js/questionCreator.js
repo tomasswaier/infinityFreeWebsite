@@ -489,8 +489,8 @@ function load_input_field(event) {
 
   // append default option(boolean-choice) to form
   display_option_type(event, "boolean-choice");
-    form_element.appendChild(document.createElement("br"));
-    const explenation_input = document.createElement("textarea");
+  form_element.appendChild(document.createElement("br"));
+  const explenation_input = document.createElement("textarea");
     form_element.appendChild(explenation_input);
     explenation_input.setAttribute("rows", "4");
     explenation_input.setAttribute("cols", "50");
@@ -507,3 +507,5 @@ function load_input_field(event) {
     test_submit_button.classList.add("border", "border-black");
     form_element.appendChild(test_submit_button);
 }
+
+function displayEditedQuestion() {}

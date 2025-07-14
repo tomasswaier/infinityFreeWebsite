@@ -27,7 +27,7 @@
                             href="{{ url('admin') }}"
                             class=""
                         >
-                            Dashboard
+                            AdminPage
                         </a>
 
                         @if (Route::has('register'))

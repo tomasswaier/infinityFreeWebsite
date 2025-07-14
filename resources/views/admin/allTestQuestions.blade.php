@@ -24,12 +24,8 @@
                 <nav class="flex items-center justify-end gap-4">
                     @auth
                         <a
-                            href="{{ Route('testPage') }}"
-                        >
-                           TestPage
-                        </a>
-                        <a
                             href="{{ url('admin') }}"
+                            class=""
                         >
                             MainPage
                         </a>
@@ -46,27 +42,20 @@
             @endif
         </header>
         <main class="p-10">
-            <span>available tests</span>
-            <a href="{{url('admin/testCreator')}}">create test</a>
-            <br>
-            <table class="border">
-                <thead>
-                <td class="w-60">Test name</td>
-                <td class="w-20">id</td>
-                <td class="w-40">edit button?</td>
-                <td class="w-40">add question</td>
-                <td class="w-40">delte text</td>
-                </thead>
-            @foreach($tests as $test)
-                <tr class="border">
-                 <td>{{$test->test_name}}</td> <td>{{$test->id}}</td> <td><a  href="{{url('admin/questionDisplay/'.$test->id)}}">|?|</a></td>  <td><a  href="{{url('admin/questionCreator/'.$test->id)}}">|+|</a></td><td><button type="submit" title="heh lmao never gonna implement this">X</button></td>
-                 <td></td>
-
-                </tr>
+        @if($data)
+        <table>
+            <th><tr ><td class="p-4">id</td><td>question</td><td class="p-4">edit</td> <td>delete</td></tr></th>
+            @foreach($data as $question)
+            <div>
+            <tr class="border">
+                <td>{{$question['id']}}</td>
+                <td class="w-50"><span maxlength='30'>{{$question['question_text']}}</span></td>
+                <td><a href="{{url('admin/questionEditor/'.$question['id'])}}">edt</a></td>
+                <td><a href="{{url('admin/questionDelete/'.$question['id'])}}" title="heh like im ever gonna implement that">del</a</td>
+            </tr>
             @endforeach
-            </table>
-
-
+        </table>
+        @endif
         </main>
         {{--
         @if (Route::has('login'))
@@ -75,4 +64,6 @@
         --}}
     </body>
 </html>
+
+
 

@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
     Route::post('admin/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
 
     Route::get('admin/questionDisplay/{test_id}',[TestController::class,'showTestQuestionNames']);
-    Route::get('admin/questionDelete/{questionId}',[TestController::class,'deleteQuestion']);
+    Route::post('admin/questionDisplay/{questionId}',[TestController::class,'deleteTestQuestion']);
 
     Route::get('admin/questionCreator/{test_id}', function($test_id)
     {
