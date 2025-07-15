@@ -26,7 +26,7 @@ class TestController extends Controller
     }
     public function editQuestion($questionId)
     {
-        return view('admin/editTestQuestion',['question'=>Question::all()->where('id','=',$questionId),'options'=>Option::all()->where('questions_id','=',$questionId)]);
+        return view('admin/editTestQuestion',['question'=>Question::query()->where('id','=',$questionId)->get(),'options'=>Option::where('questions_id','=',$questionId)->get()]);
     }
     public function deleteQuestion($questionId,Request $request){
         $testId=Question::select('tests_id')->where('id','=',$questionId)->get();

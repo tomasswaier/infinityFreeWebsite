@@ -1,6 +1,11 @@
 // I am not changing kinda dumb logic begind option_number_x_y to
 // option_number_x[] because it's already working and I don't see reason why . I
 // konw it's an option just don't see much use in it
+//
+// One might ask themself "why are there so many event in here ? in half the
+// places they dont need to be. I do not know myself and I'm not going to
+// rewrite it if it works. it's not too unreadable so few random events won't
+// hurt
 if (!document) {
   const {document} = require("postcss");
 }
@@ -19,7 +24,7 @@ var option_number = 0;
 
 class OpenAnswer {
   constructor(event, button, options_table) { this.parent = options_table; }
-  add_child_type_open_answer(event) {
+  add_child_option(event) {
     const preceding_text_input_field = document.createElement("textarea");
     const new_option_number = option_number;
     this.parent.appendChild(preceding_text_input_field);
@@ -41,10 +46,9 @@ class MultipleChoice {
     this.initialize_column_row();
     this.newOptionFieldButton = button;
     button.setAttribute("title", "add row");
-    button.onclick = function(
-        event) { self.add_child_type_multiple_choice(event) };
+    button.onclick = function(event) { self.add_child_option(event) };
   }
-  add_child_type_multiple_choice(event) {
+  add_child_option(event) {
     this.column_number = 0;
     var self = this;
     const new_option_number = option_number;
@@ -181,10 +185,9 @@ class BooleanChoiceClass {
     var self = this;
     self.parent = parent;
     self.createNewButton = button;
-    button.onclick = function(
-        event) { self.add_child_type_boolean_choice(event) };
+    button.onclick = function(event) { self.add_child_option(event) };
   }
-  add_option_boolean_choice(event, parent, my_option_number) {
+  add_option_boolean_choice(event, parent, my_option_number, choice = null) {
     if (event) {
       event.preventDefault();
     }
@@ -200,6 +203,9 @@ class BooleanChoiceClass {
     answer_true.setAttribute("type", "radio");
     // Ill fix it some other time
     answer_true.setAttribute("value", "true");
+    if (choice && choice['is_correct'] == true) {
+      answer_true.checked = true;
+    }
 
     // we should ask for grand grand parent
     answer_true.setAttribute("id", "option_number_" + my_option_number + "_" +
@@ -214,8 +220,11 @@ class BooleanChoiceClass {
                                         specific_option_number);
     answer_false.setAttribute("name", "option_number_" + my_option_number +
                                           "_" + specific_option_number);
-    answer_false.checked = true;
-    // answer_false.checked = true;
+    if (choice && choice['is_correct'] == false) {
+      answer_false.checked = true;
+    } else if (!choice) {
+      answer_false.checked = true;
+    }
 
     const user_input_field = document.createElement("textarea");
     user_input_field.required = true;
@@ -225,10 +234,13 @@ class BooleanChoiceClass {
                                               my_option_number + "_" +
                                               specific_option_number);
     user_input_field.setAttribute("placeholder", "option text ...");
+    if (choice) {
+      user_input_field.innerText = choice['option_text'];
+    }
     fieldset.appendChild(user_input_field);
   }
 
-  add_child_type_boolean_choice(event) {
+  add_child_option(event, option = null) {
     if (event) {
       event.preventDefault();
     }
@@ -244,6 +256,10 @@ class BooleanChoiceClass {
         "name", "preceding_text_boolean_choice_" + new_option_number);
     preceding_text_input_field.setAttribute(
         "placeholder", "Here goes preceding text(can be left blank)");
+    if (option) {
+
+      preceding_text_input_field.innerText = option['preceding_text'];
+    }
     const input_table = document.createElement('table');
     wrapper.appendChild(input_table);
     const indicator = document.createElement("tr");
@@ -251,7 +267,14 @@ class BooleanChoiceClass {
     const true_indicator = document.createElement("td");
     indicator.appendChild(true_indicator);
     true_indicator.innerText = "true/false";
-    this.add_option_boolean_choice(null, input_table, new_option_number);
+    if (option) {
+      for (var choice of option['data']) {
+        this.add_option_boolean_choice(null, input_table, new_option_number,
+                                       choice = choice);
+      }
+    } else {
+      this.add_option_boolean_choice(null, input_table, new_option_number);
+    }
     var self = this;
     option_number++;
 
@@ -268,10 +291,10 @@ class BooleanChoiceClass {
 class WriteIn {
   constructor(event, button) {
     var self = this;
-    button.onclick = function(event) { self.add_child_type_write_in(event) };
+    button.onclick = function(event) { self.add_child_option(event) };
   }
 
-  add_child_type_write_in(event) {
+  add_child_option(event, option = null) {
     if (event) {
       event.preventDefault();
     }
@@ -280,6 +303,7 @@ class WriteIn {
     wrapper.appendChild(table_row);
     const fieldset = document.createElement("fieldset");
     table_row.appendChild(fieldset);
+
     const preceding_text = document.createElement("textarea");
     fieldset.appendChild(preceding_text);
     preceding_text.setAttribute("cols", "50");
@@ -288,6 +312,7 @@ class WriteIn {
                                 "preceding_text_write_in_" + option_number);
     preceding_text.setAttribute("placeholder",
                                 "preceding text ...(can be left blank)");
+
     const user_input_field = document.createElement("input");
     fieldset.appendChild(user_input_field);
     user_input_field.setAttribute("type", "text");
@@ -295,6 +320,12 @@ class WriteIn {
     user_input_field.setAttribute("name", "option_number_" + option_number);
     user_input_field.setAttribute("placeholder", "expected answer");
     user_input_field.required = true;
+
+    if (option) {
+      console.log(option['data']['correct_answer']);
+      preceding_text.innerText = option['preceding_text'];
+      user_input_field.value = option['data']['correct_answer'];
+    }
     option_number++;
   }
 }
@@ -304,10 +335,9 @@ class OneFromMany {
   // design todo:redo classes
   constructor(event, button) {
     var self = this;
-    button.onclick = function(event) { self.create_new_select_tag(event) };
+    button.onclick = function(event) { self.add_child_option(event) };
   }
-  add_child_type_one_from_many(event, parent_element, select_element,
-                               my_option_number) {
+  add_select_option(event, parent_element, select_element, my_option_number) {
     if (event) {
       event.preventDefault();
     }
@@ -341,7 +371,7 @@ class OneFromMany {
       example_option.innerText = newText;
     };
   }
-  create_new_select_tag(event) {
+  add_child_option(event) {
     if (event) {
       event.preventDefault();
     }
@@ -377,16 +407,28 @@ class OneFromMany {
     new_select_option_button.innerText = "+";
     var self = this;
     new_select_option_button.onclick = function(event) {
-      self.add_child_type_one_from_many(event, options_wrapper,
-                                        example_selector, new_option_number);
+      self.add_select_option(event, options_wrapper, example_selector,
+                             new_option_number);
     };
-    this.add_child_type_one_from_many(event, options_wrapper, example_selector,
-                                      new_option_number);
+    this.add_select_option(event, options_wrapper, example_selector,
+                           new_option_number);
     option_number++;
   }
 }
 
-function display_option_type(event, user_option) {
+function display_option(event, used_class, options = null, input_button,
+                        options_table) {
+  var myClass = new used_class(event, input_button, options_table);
+  if (options) {
+    for (var option of options) {
+      myClass.add_child_option(event, option);
+    }
+  } else {
+    myClass.add_child_option(event);
+  }
+}
+
+function process_option_type(event, user_option, question = null) {
   // reset the number counter
   option_number = 0;
   // remove every previous option
@@ -408,34 +450,48 @@ function display_option_type(event, user_option) {
   option_input_creator.innerHTML = "+";
   question_type_user_input_wrapper.appendChild(option_input_creator);
   if (user_option == "boolean-choice") {
+    display_option(event, BooleanChoiceClass, question['options'],
+                   option_input_creator, options_table, options_table);
+    // var boolean_choice_object =
+    //     new BooleanChoiceClass(event, option_input_creator, options_table);
 
-    var boolean_choice_object =
-        new BooleanChoiceClass(event, option_input_creator, options_table);
-    boolean_choice_object.add_child_type_boolean_choice();
+    // if (question) {
+
+    //  for (var option of question['options']) {
+    //    boolean_choice_object.add_child_option(option = option);
+    //  }
+    //} else {
+    //  boolean_choice_object.add_child_option();
+    //}
 
   } else if (user_option == "write-in") {
-    var write_in_object =
-        new WriteIn(event, option_input_creator, options_table)
-    write_in_object.add_child_type_write_in(event)
+
+    display_option(event, WriteIn, question['options'], option_input_creator,
+                   options_table, options_table);
+    // var write_in_object =
+    //     new WriteIn(event, option_input_creator, options_table)
+    // write_in_object.add_child_option(event)
   } else if (user_option == "multiple-choice") {
     // function that initiates
     var multiple_choice_object =
         new MultipleChoice(event, option_input_creator, options_table)
-    multiple_choice_object.add_child_type_multiple_choice();
-    // option_input_creator.onclick = add_child_type_multiple_choice;
-    // add_child_type_write_in(event);
+    multiple_choice_object.add_child_option();
+    // option_input_creator.onclick = add_child_option;
+    // add_child_option(event);
   } else if (user_option == "one-from-many") {
     // function that initiates
     var one_from_many_object =
         new OneFromMany(event, option_input_creator, options_table)
-    one_from_many_object.create_new_select_tag()
+    one_from_many_object.add_child_option()
   } else if (user_option == 'open-answer') {
     var open_answer = new OpenAnswer(event, option_input_creator, options_table)
-    open_answer.add_child_type_open_answer()
+    open_answer.add_child_option()
   }
 }
 
-function load_input_field(event) {
+function load_input_field(
+    question = null,
+    event) { // question which is inserted when editing question
   if (event) {
     event.preventDefault();
   }
@@ -452,6 +508,9 @@ function load_input_field(event) {
   question_name_input.setAttribute("name", "question_text");
   question_name_input.setAttribute("placeholder",
                                    "Question : who has dog with 4 eyes?");
+  if (question) {
+    question_name_input.innerText = question['question_text'];
+  }
   question_name_wrapper.appendChild(question_name_input);
   form_element.appendChild(question_name_wrapper);
   // append field for optional user image
@@ -466,7 +525,7 @@ function load_input_field(event) {
   question_type_selector_wrapper.appendChild(question_type_selector);
   question_type_selector.setAttribute("id", "question_type_selector");
   question_type_selector.setAttribute("onChange",
-                                      "display_option_type(event,this.value)");
+                                      "process_option_type(event,this.value)");
   const question_type_user_input_wrapper = document.createElement("div");
   question_type_user_input_wrapper.classList.add("main_table");
   question_type_user_input_wrapper.setAttribute(
@@ -486,16 +545,30 @@ function load_input_field(event) {
     question_type_option.innerHTML = question_type;
     question_type_selector.appendChild(question_type_option);
   }
+  if (question) {
+    question_type_selector.value =
+        question['options'][0]['option_type'].replace('_', '-');
+  }
 
   // append default option(boolean-choice) to form
-  display_option_type(event, "boolean-choice");
+  if (question) {
+
+    process_option_type(event,
+                        question['options'][0]['option_type'].replace('_', '-'),
+                        question = question);
+  } else {
+    process_option_type(event, "boolean-choice");
+  }
   form_element.appendChild(document.createElement("br"));
-  const explenation_input = document.createElement("textarea");
-    form_element.appendChild(explenation_input);
-    explenation_input.setAttribute("rows", "4");
-    explenation_input.setAttribute("cols", "50");
-    explenation_input.setAttribute("name", "question_explanation");
-    explenation_input.setAttribute("placeholder",
+  const explanation_input = document.createElement("textarea");
+  form_element.appendChild(explanation_input);
+    explanation_input.setAttribute("rows", "4");
+    if (question) {
+        explanation_input.innerText = question['explanation_text'];
+    }
+    explanation_input.setAttribute("cols", "50");
+    explanation_input.setAttribute("name", "question_explanation");
+    explanation_input.setAttribute("placeholder",
         "Explenation:No one has dog with 4 eyes because dogs have 2 eyes");
     form_element.appendChild(document.createElement("br"));
 
@@ -507,5 +580,3 @@ function load_input_field(event) {
     test_submit_button.classList.add("border", "border-black");
     form_element.appendChild(test_submit_button);
 }
-
-function displayEditedQuestion() {}

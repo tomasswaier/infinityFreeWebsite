@@ -21,7 +21,7 @@
             </style>
         @endif
     </head>
-    <body class=""  onload="load_input_field()">
+    <body class=""  onload="load_input_field(data=question_data)">
         <header class="">
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
@@ -49,20 +49,13 @@
             <form action="{{route('createQuestion.store')}}"  method="post" enctype="multipart/form-data">
                 @csrf
                 <div id="user-list">
-
                 </div>
-
             </form ">
-            @if($question && $options)
-                <span>{{$question}}</span>
-                @foreach($options as $option)
-                <div>
-                    <span>{{$option}}</span>
-                </div>
-                @endforeach
-            @endif
-
-
+            <span>{{$options}}</span>
+            <script>
+                let question_data=@json($question[0]);
+                question_data['options']=@json($options);
+            </script>
         </main>
     </body>
 </html>
