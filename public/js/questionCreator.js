@@ -2,10 +2,13 @@
 // option_number_x[] because it's already working and I don't see reason why . I
 // konw it's an option just don't see much use in it
 //
-// One might ask themself "why are there so many event in here ? in half the
+// One might ask themself "why are there so many events in here ? in half the
 // places they dont need to be. I do not know myself and I'm not going to
 // rewrite it if it works. it's not too unreadable so few random events won't
 // hurt
+// one default class who the others would inherit from would solve SO MANY
+// THINGS IN THIS CODE. like at first it was fine no class needed but now it
+// kinda is needed and bcs the insides of classes are SO MESSY
 if (!document) {
   const {document} = require("postcss");
 }
@@ -23,11 +26,12 @@ function display_input_image() {
 var option_number = 0;
 
 class OpenAnswer {
-  constructor(event, button, options_table) { this.parent = options_table; }
+  constructor(event, button) {}
   add_child_option(event) {
     const preceding_text_input_field = document.createElement("textarea");
     const new_option_number = option_number;
-    this.parent.appendChild(preceding_text_input_field);
+    const parent = document.getElementById("options_table");
+    parent.appendChild(preceding_text_input_field);
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("hidden", "true");
     preceding_text_input_field.setAttribute("rows", "2");
@@ -39,16 +43,15 @@ class OpenAnswer {
 }
 
 class MultipleChoice {
-  constructor(event, button, options_table) {
+  constructor(event, button) {
     var self = this;
-    this.parent = options_table;
     this.column_number = 0;
     this.initialize_column_row();
     this.newOptionFieldButton = button;
     button.setAttribute("title", "add row");
     button.onclick = function(event) { self.add_child_option(event) };
   }
-  add_child_option(event) {
+  add_child_option(event, option = null) {
     this.column_number = 0;
     var self = this;
     const new_option_number = option_number;
@@ -65,10 +68,9 @@ class MultipleChoice {
     const table = document.createElement("table");
     this.table = table;
     wrapper.appendChild(table);
-    this.parent.appendChild(wrapper);
+    const parent = document.getElementById("options_table");
+    parent.appendChild(wrapper);
     this.table.appendChild(this.initialize_column_row(new_option_number));
-    this.add_column(event, new_option_number, this.columns);
-    this.add_column(event, new_option_number, this.columns);
     const button_add_row = document.createElement("button");
     this.table.parentElement.appendChild(button_add_row);
     button_add_row.onclick = function(
@@ -76,9 +78,22 @@ class MultipleChoice {
     button_add_row.innerText = "+";
     button_add_row.setAttribute('title', 'Add row');
 
-    this.parent.parentElement.insertBefore(document.createElement("br"),
-                                           this.newOptionFieldButton);
+    parent.parentElement.insertBefore(document.createElement("br"),
+                                      this.newOptionFieldButton);
     option_number += 1;
+    if (option) {
+      preceding_text_input_field.value = option['preceding_text'];
+      for (var column_name of option['data']['column_names']) {
+        this.add_column(event, new_option_number, this.columns, column_name);
+      }
+
+      for (var row_data of option['data']['row_array']) {
+        this.add_row(event, table, new_option_number, row_data);
+      }
+    } else {
+      this.add_column(event, new_option_number, this.columns);
+      this.add_column(event, new_option_number, this.columns);
+    }
   }
   initialize_column_row(new_option_number) {
     var self = this;
@@ -107,7 +122,7 @@ class MultipleChoice {
     return table_head;
   }
 
-  add_row(event, parent, option_number) {
+  add_row(event, parent, option_number, row_data = null) {
     // adds one row with this.column_number number of radio buttons + input
     const column_number = parent.children[0].children[0].children.length - 1
     const row_number = parent.children.length - 1;
@@ -141,6 +156,9 @@ class MultipleChoice {
           "name", "correct_option_" + option_number + "_" + row_number);
 
       option_wrapper.appendChild(radio_button_option);
+      if (i == row_data['correct_answer']) {
+        radio_button_option.checked = true;
+      }
     }
     const input_wrapper = document.createElement("td")
     new_options_row.appendChild(input_wrapper);
@@ -152,8 +170,11 @@ class MultipleChoice {
     input_field.setAttribute("name",
                              "row_text_" + option_number + "_" + row_number);
     input_field.classList.add("w-30");
+    if (row_data) {
+      input_field.value = row_data['row_name'];
+    }
   }
-  add_column(event, new_option_number, column_row) {
+  add_column(event, new_option_number, column_row, column_name = null) {
     // collumns at the top providing description for columns
     if (event) {
       event.preventDefault();
@@ -171,6 +192,7 @@ class MultipleChoice {
     data_fieldset.appendChild(column_input_area)
     column_input_area.setAttribute("id", "column_number_" + new_option_number +
                                              "_" + column_number);
+    column_input_area.value = column_name;
     column_input_area.setAttribute(
         "name", "column_number_" + new_option_number + "_" + column_number);
 
@@ -181,9 +203,8 @@ class MultipleChoice {
   }
 }
 class BooleanChoiceClass {
-  constructor(event, button, parent) {
+  constructor(event, button) {
     var self = this;
-    self.parent = parent;
     self.createNewButton = button;
     button.onclick = function(event) { self.add_child_option(event) };
   }
@@ -245,8 +266,9 @@ class BooleanChoiceClass {
       event.preventDefault();
     }
     // create div with preceding text and one option
+    const parent = document.getElementById("options_table");
     const wrapper = document.createElement("div");
-    this.parent.appendChild(wrapper);
+    parent.appendChild(wrapper);
     const preceding_text_input_field = document.createElement("textarea");
     wrapper.appendChild(preceding_text_input_field);
     const new_option_number = option_number;
@@ -337,7 +359,8 @@ class OneFromMany {
     var self = this;
     button.onclick = function(event) { self.add_child_option(event) };
   }
-  add_select_option(event, parent_element, select_element, my_option_number) {
+  add_select_option(event, parent_element, select_element, my_option_number,
+                    option = null, is_correct = null) {
     if (event) {
       event.preventDefault();
     }
@@ -370,8 +393,14 @@ class OneFromMany {
       let newText = user_input_field.value;
       example_option.innerText = newText;
     };
+    if (option) {
+      if (is_correct == private_option_num) {
+        is_correct_field.checked = true;
+      }
+      user_input_field.value = option;
+    }
   }
-  add_child_option(event) {
+  add_child_option(event, select = null) {
     if (event) {
       event.preventDefault();
     }
@@ -410,15 +439,24 @@ class OneFromMany {
       self.add_select_option(event, options_wrapper, example_selector,
                              new_option_number);
     };
-    this.add_select_option(event, options_wrapper, example_selector,
-                           new_option_number);
+    if (select) {
+      for (var option of select['data']['option_array']) {
+        this.add_select_option(event, options_wrapper, example_selector,
+                               new_option_number, option,
+                               select['data']['correct_option']);
+      }
+      preceding_text_input_field.value = select['preceding_text'];
+    } else {
+      this.add_select_option(event, options_wrapper, example_selector,
+                             new_option_number);
+    }
     option_number++;
   }
 }
 
 function display_option(event, used_class, options = null, input_button,
                         options_table) {
-  var myClass = new used_class(event, input_button, options_table);
+  var myClass = new used_class(event, input_button);
   if (options) {
     for (var option of options) {
       myClass.add_child_option(event, option);
@@ -449,9 +487,11 @@ function process_option_type(event, user_option, question = null) {
   option_input_creator.setAttribute("type", "button");
   option_input_creator.innerHTML = "+";
   question_type_user_input_wrapper.appendChild(option_input_creator);
+
+  var options = !question ? null : question['options'];
   if (user_option == "boolean-choice") {
-    display_option(event, BooleanChoiceClass, question['options'],
-                   option_input_creator, options_table, options_table);
+    display_option(event, BooleanChoiceClass, options, option_input_creator,
+                   options_table, options_table);
     // var boolean_choice_object =
     //     new BooleanChoiceClass(event, option_input_creator, options_table);
 
@@ -466,26 +506,32 @@ function process_option_type(event, user_option, question = null) {
 
   } else if (user_option == "write-in") {
 
-    display_option(event, WriteIn, question['options'], option_input_creator,
-                   options_table, options_table);
+    display_option(event, WriteIn, options, option_input_creator, options_table,
+                   options_table);
     // var write_in_object =
     //     new WriteIn(event, option_input_creator, options_table)
     // write_in_object.add_child_option(event)
   } else if (user_option == "multiple-choice") {
     // function that initiates
-    var multiple_choice_object =
-        new MultipleChoice(event, option_input_creator, options_table)
-    multiple_choice_object.add_child_option();
-    // option_input_creator.onclick = add_child_option;
-    // add_child_option(event);
+    display_option(event, MultipleChoice, options, option_input_creator,
+                   options_table, options_table);
+    // var multiple_choice_object =
+    //     new MultipleChoice(event, option_input_creator, options_table)
+    // multiple_choice_object.add_child_option();
+    //  option_input_creator.onclick = add_child_option;
+    //  add_child_option(event);
   } else if (user_option == "one-from-many") {
     // function that initiates
-    var one_from_many_object =
-        new OneFromMany(event, option_input_creator, options_table)
-    one_from_many_object.add_child_option()
+    display_option(event, OneFromMany, options, option_input_creator,
+                   options_table, options_table);
+    // var one_from_many_object =
+    //     new OneFromMany(event, option_input_creator, options_table)
+    // one_from_many_object.add_child_option()
   } else if (user_option == 'open-answer') {
-    var open_answer = new OpenAnswer(event, option_input_creator, options_table)
-    open_answer.add_child_option()
+    display_option(event, OpenAnswer, options, option_input_creator,
+                   options_table, options_table);
+    // var open_answer = new OpenAnswer(event, option_input_creator,
+    // options_table) open_answer.add_child_option()
   }
 }
 
@@ -514,10 +560,12 @@ function load_input_field(
   question_name_wrapper.appendChild(question_name_input);
   form_element.appendChild(question_name_wrapper);
   // append field for optional user image
-  const has_image = document.createElement("div");
-  has_image.innerHTML =
-      '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
-  form_element.appendChild(has_image);
+  if (!document.getElementById('user_image')) {
+    const has_image = document.createElement("div");
+    has_image.innerHTML =
+        '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
+    form_element.appendChild(has_image);
+  }
   // apend options select element
   const question_type_selector_wrapper = document.createElement("div");
   form_element.append(question_type_selector_wrapper);
@@ -547,23 +595,23 @@ function load_input_field(
   }
   if (question) {
     question_type_selector.value =
-        question['options'][0]['option_type'].replace('_', '-');
+        question['options'][0]['option_type'].replaceAll('_', '-');
   }
 
   // append default option(boolean-choice) to form
   if (question) {
 
-    process_option_type(event,
-                        question['options'][0]['option_type'].replace('_', '-'),
-                        question = question);
+    process_option_type(
+        event, question['options'][0]['option_type'].replaceAll('_', '-'),
+        question = question);
   } else {
     process_option_type(event, "boolean-choice");
   }
   form_element.appendChild(document.createElement("br"));
   const explanation_input = document.createElement("textarea");
   form_element.appendChild(explanation_input);
-    explanation_input.setAttribute("rows", "4");
-    if (question) {
+  explanation_input.setAttribute("rows", "4");
+  if (question) {
         explanation_input.innerText = question['explanation_text'];
     }
     explanation_input.setAttribute("cols", "50");

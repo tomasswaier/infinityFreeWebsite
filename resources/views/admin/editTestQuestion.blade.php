@@ -48,6 +48,9 @@
             <h1>Question Creator . Jajo I will not be doing ur thing bcs it's too hard(/timeconsuming and i no wanna)</h1>
             <form action="{{route('createQuestion.store')}}"  method="post" enctype="multipart/form-data">
                 @csrf
+                <input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br>
+                <img id="display_image"src="{{ isset($images[0]['image_name']) ? asset('storage/test_images/' . $images[0]['image_name']): ""  }}"alt="Uploaded Image" />
+
                 <div id="user-list">
                 </div>
             </form ">
