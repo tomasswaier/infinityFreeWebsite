@@ -51,7 +51,7 @@
                 @csrf
                 <input name="question_id" type="hidden" value="{{$question['id']}}"/>
                 <input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br>
-                <img id="display_image"src="{{ isset($images[0]['image_name']) ? asset('storage/test_images/' . $images[0]['image_name']): ""  }}"alt="Uploaded Image" />
+                <img id="display_image" src="{{ isset($images[0]['image_name']) ? asset('storage/test_images/' . $images[0]['image_name']): ""  }}"alt="Uploaded Image" />
 
                 <div id="user-list">
                 </div>

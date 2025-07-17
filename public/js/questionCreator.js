@@ -22,7 +22,14 @@ var option_number = 0;
 
 class OpenAnswer {
   constructor(event, button) {}
-  add_child_option(event) {
+  add_child_option(event, option = null) {
+    if (option) {
+      const id = document.createElement('input');
+      parent.appendChild(id);
+      id.name = "option_id_" + option_number;
+      id.type = "hidden";
+      id.value = option['id'];
+    }
     const preceding_text_input_field = document.createElement("textarea");
     const new_option_number = option_number;
     const parent = document.getElementById("options_table");
@@ -54,6 +61,7 @@ class MultipleChoice {
     const wrapper = document.createElement("tr");
     if (option) {
       const id = document.createElement('input');
+      id.name = "option_id_" + option_number;
       wrapper.appendChild(id);
       id.type = "hidden";
       id.value = option['id'];
@@ -273,6 +281,7 @@ class BooleanChoiceClass {
     if (option) {
       const id = document.createElement('input');
       wrapper.appendChild(id);
+      id.name = "option_id_" + option_number;
       id.type = "hidden";
       id.value = option['id'];
     }
@@ -334,6 +343,7 @@ class WriteIn {
     table_row.appendChild(fieldset);
     if (option) {
       const id = document.createElement('input');
+      id.name = "option_id_" + option_number;
       fieldset.appendChild(id);
       id.type = "hidden";
       id.value = option['id'];
@@ -428,6 +438,7 @@ class OneFromMany {
       const id = document.createElement('input');
       table_row.appendChild(id);
       id.type = "hidden";
+      id.name = "option_id_" + option_number;
       id.value = select['id'];
     }
     const preceding_text_input_field = document.createElement("textarea");

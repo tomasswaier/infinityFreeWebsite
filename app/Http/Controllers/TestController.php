@@ -80,20 +80,30 @@ class TestController extends Controller
         return redirect('admin')->with('success', 'owo created!');
     }
     public function updateQuestion(Request $request){
-        $input=$request->except('_token','submit','question_id');
-        Log::info($request->all());
         $questionId=$request['question_id'];
         $question= Question::find($questionId);
+        $question->question_text=$request['question_text'];
+        $question->explanation_text=$request['question_explanation'];
+        $question->save();
         $images=(new ImageController)->show($questionId);
+        // this is a prototype function that works only for one image and should be changed .
+        if (isset($request['user_image']) || $images!=[]) {
+            $this->updateImages([$request['user_image']],$images);
+
+        }
+        $inputs=$request->except('_token','submit','question_id','question_explanation','user_image');
+        $this->insertOptionsFromArray($inputs,$questionId);
 
         return redirect('admin')->with('success');
+    }
+    private  function updateImages($userImages,$savedImages){
+        // ... imma do this later bcs itll need more than few minutes
     }
     public function addQuestion(Request $request){
         try {
             //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ?
             $test_id= $request->session()->get('test_id',-1);
 
-            $myClass=null;
             $input=$request->except('_token','submit','question_explanation');
             if ($test_id==-1) {
                 Log::error('test id is invalid');
@@ -115,14 +125,31 @@ class TestController extends Controller
                     }
             }
 
+            $questionId=$question['id'];
+            $this->insertOptionsFromArray($input,$questionId);
+
+
+            return redirect('admin/questionCreator/'.$test_id);
+        } catch (\Exception $e) {
+            Log::error('Something bad failed: '.$e->getMessage());
+            return response()->json(['success' => false], 500);
+        }
+
+    }
+    private function insertOptionsFromArray($input,$questionId){
+            $myClass=null;
+            $optionId=null;
             foreach ($input as $key => $value) {
                 //will be building this with future possibility of multiple types of questions per one question
+                if (substr($key,0,10)=='option_id_') {
+                    $optionId=$value;
+                    continue;
+                }
                 if ($key=="question_text") {
                     continue;
                 }
                 if (str_contains($key,'preceding')) {
-                    $questionId=$question['id'];
-                    $myClass=$this->initQuestionTypeClass($key,$questionId,$value,$input);
+                    $myClass=$this->initQuestionTypeClass($key,$questionId,$value,$input,$optionId);
                     if (!$myClass) {
                         Log::error("myClass doesn't exist.Exiting");
                         exit;
@@ -141,34 +168,28 @@ class TestController extends Controller
 
                 }
             }
-
-
-            return redirect('admin/questionCreator/'.$test_id);
-        } catch (\Exception $e) {
-            Log::error('Something bad failed: '.$e->getMessage());
-            return response()->json(['success' => false], 500);
-        }
-
     }
-    private function initQuestionTypeClass($key,$questionId,$precedingText,$inputs){
+
+
+    private function initQuestionTypeClass($key,$questionId,$precedingText,$inputs,$optionId){
         $questionType=substr($key,0,strlen($key)-2);
         $questionType=substr($questionType,15,strlen($questionType)-15);
         switch ($questionType) {
             case "boolean_choice":
                 $questionNumber=substr($key,30,strlen($key));
-                return new BooleanChoice($questionNumber,$questionId,$precedingText,$inputs);
+                return new BooleanChoice($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             case "write_in":
                 $questionNumber=substr($key,24,strlen($key));
-                return new WriteIn($questionNumber,$questionId,$precedingText,$inputs);
+                return new WriteIn($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             case "multiple_choice":
                 $questionNumber=substr($key,31,strlen($key));
-                return new MultipleChoice($questionNumber,$questionId,$precedingText,$inputs);
+                return new MultipleChoice($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             case "one_from_many":
                 $questionNumber=substr($key,29,strlen($key));
-                return new OneFromMany($questionNumber,$questionId,$precedingText,$inputs);
+                return new OneFromMany($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             case "open_answer":
                 $questionNumber=substr($key,27,strlen($key));
-                return new OpenAnswer($questionNumber,$questionId,$precedingText,$inputs);
+                return new OpenAnswer($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             default:
                 Log::error("unknown question type:".$questionType);
                 break;
@@ -185,16 +206,16 @@ class QuestionType{
     public $questionNumber;
     public $precedingText;
     public $questionId; // questionId is needed for inserting optionId
-    public $optionId;//id of CREATED option
+    public $optionId;//id of CREATED option or of UPDATED option
     public $optionNumber; // number read from the option_number_  key
     public $input; // input with all data from request
     public $data;
 
-    function __construct($questionNumber,$questionId,$precedingText,$input){
+    function __construct($questionNumber,$questionId,$precedingText,$input,$optionId=null){
         $this->questionNumber=$questionNumber;
         $this->precedingText=$precedingText;
         $this->questionId=$questionId;
-        $this->optionId=null;
+        $this->optionId=$optionId;
         $this->input=$input;
         $this->data=collect();
     }
@@ -206,13 +227,26 @@ class QuestionType{
         $this->optionId=$this->createQuestion($this->__toString());
     }
     function createQuestion($option_type){
-        $option = Option::create([
+        $option = Option::find($this->optionId);
+        if ($this->optionId) {
+            $option->id=$this->optionId;
+        }
+        $option->questions_id=$this->questionId;
+        $option->preceding_text=$this->precedingText;
+        $option->option_type=$option_type;
+        $option->data=$this->data;
+        $option->save();
+
+        /*
+        Option::create([
+            'id'=>$this->optionId,
             'questions_id'=>$this->questionId,
             'preceding_text'=>$this->precedingText,
             'option_type'=>$option_type,
             'data'=>$this->data
         ]);
-        return $option['id'];
+         */
+        //return $option['id'];
     }
     function readOption($key,$val){
 
