@@ -46,7 +46,7 @@
         </header>
         <main class="p-10">
             <h1>Question Creator . Jajo I will not be doing ur thing bcs it's too hard(/timeconsuming and i no wanna)</h1>
-            <form action="{{route('createQuestion.store')}}"  method="post" enctype="multipart/form-data">
+            <form action="{{route('question.store')}}"  method="post" enctype="multipart/form-data">
                 @csrf
                 <div id="user-list">
 

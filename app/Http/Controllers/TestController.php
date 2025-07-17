@@ -24,9 +24,12 @@ class TestController extends Controller
     {
         return view('admin/allTestQuestions',['data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()]);
     }
-    public function editQuestion($questionId)
+    public function getQuestion($questionId)
     {
-        return view('admin/editTestQuestion',['question'=>Question::query()->where('id','=',$questionId)->get(),'options'=>Option::where('questions_id','=',$questionId)->get(),'images'=>(new ImageController)->show($questionId)]);
+        return view('admin/editTestQuestion',[
+            'question'=>Question::find($questionId),
+            'options'=>Option::where('questions_id','=',$questionId)->get(),
+            'images'=>(new ImageController)->show($questionId)]);
     }
     public function deleteQuestion($questionId,Request $request){
         $testId=Question::select('tests_id')->where('id','=',$questionId)->get();
@@ -75,6 +78,15 @@ class TestController extends Controller
 
         }
         return redirect('admin')->with('success', 'owo created!');
+    }
+    public function updateQuestion(Request $request){
+        $input=$request->except('_token','submit','question_id');
+        Log::info($request->all());
+        $questionId=$request['question_id'];
+        $question= Question::find($questionId);
+        $images=(new ImageController)->show($questionId);
+
+        return redirect('admin')->with('success');
     }
     public function addQuestion(Request $request){
         try {

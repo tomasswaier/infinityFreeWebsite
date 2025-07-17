@@ -45,18 +45,19 @@
             @endif
         </header>
         <main class="p-10">
-            <h1>Question Creator . Jajo I will not be doing ur thing bcs it's too hard(/timeconsuming and i no wanna)</h1>
-            <form action="{{route('createQuestion.store')}}"  method="post" enctype="multipart/form-data">
+            <h1>Question Creator. </h1>
+            <br>
+            <form action="{{route('question.edit')}}"  method="post" enctype="multipart/form-data">
                 @csrf
+                <input name="question_id" type="hidden" value="{{$question['id']}}"/>
                 <input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br>
                 <img id="display_image"src="{{ isset($images[0]['image_name']) ? asset('storage/test_images/' . $images[0]['image_name']): ""  }}"alt="Uploaded Image" />
 
                 <div id="user-list">
                 </div>
             </form ">
-            <span>{{$options}}</span>
             <script>
-                let question_data=@json($question[0]);
+                let question_data=@json($question);
                 question_data['options']=@json($options);
             </script>
         </main>

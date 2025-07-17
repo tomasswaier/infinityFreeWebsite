@@ -27,4 +27,12 @@ class ImageController extends Controller
         }
         return 0;
     }
+    public function delte($imageName){
+        QuestionImage::select('tests_id')->where('image_name','=',$imageName)->delete();
+        if ('storage/'.$imageName) {
+            return 1;
+        }
+        return 0;
+
+    }
 }

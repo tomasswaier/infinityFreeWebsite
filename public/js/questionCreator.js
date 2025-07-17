@@ -2,13 +2,8 @@
 // option_number_x[] because it's already working and I don't see reason why . I
 // konw it's an option just don't see much use in it
 //
-// One might ask themself "why are there so many events in here ? in half the
-// places they dont need to be. I do not know myself and I'm not going to
-// rewrite it if it works. it's not too unreadable so few random events won't
-// hurt
-// one default class who the others would inherit from would solve SO MANY
-// THINGS IN THIS CODE. like at first it was fine no class needed but now it
-// kinda is needed and bcs the insides of classes are SO MESSY
+// I will rewrite this after finishing editing on questions
+//
 if (!document) {
   const {document} = require("postcss");
 }
@@ -57,6 +52,12 @@ class MultipleChoice {
     const new_option_number = option_number;
     this.initialize_column_row();
     const wrapper = document.createElement("tr");
+    if (option) {
+      const id = document.createElement('input');
+      wrapper.appendChild(id);
+      id.type = "hidden";
+      id.value = option['id'];
+    }
     const preceding_text_input_field = document.createElement("textarea");
     wrapper.appendChild(preceding_text_input_field);
     preceding_text_input_field.setAttribute("cols", "50");
@@ -156,7 +157,7 @@ class MultipleChoice {
           "name", "correct_option_" + option_number + "_" + row_number);
 
       option_wrapper.appendChild(radio_button_option);
-      if (i == row_data['correct_answer']) {
+      if (row_data && i == row_data['correct_answer']) {
         radio_button_option.checked = true;
       }
     }
@@ -269,6 +270,12 @@ class BooleanChoiceClass {
     const parent = document.getElementById("options_table");
     const wrapper = document.createElement("div");
     parent.appendChild(wrapper);
+    if (option) {
+      const id = document.createElement('input');
+      wrapper.appendChild(id);
+      id.type = "hidden";
+      id.value = option['id'];
+    }
     const preceding_text_input_field = document.createElement("textarea");
     wrapper.appendChild(preceding_text_input_field);
     const new_option_number = option_number;
@@ -325,6 +332,12 @@ class WriteIn {
     wrapper.appendChild(table_row);
     const fieldset = document.createElement("fieldset");
     table_row.appendChild(fieldset);
+    if (option) {
+      const id = document.createElement('input');
+      fieldset.appendChild(id);
+      id.type = "hidden";
+      id.value = option['id'];
+    }
 
     const preceding_text = document.createElement("textarea");
     fieldset.appendChild(preceding_text);
@@ -398,6 +411,7 @@ class OneFromMany {
         is_correct_field.checked = true;
       }
       user_input_field.value = option;
+      example_option.innerText = option;
     }
   }
   add_child_option(event, select = null) {
@@ -410,6 +424,12 @@ class OneFromMany {
     wrapper.appendChild(table_row);
 
     table_row.classList.add("small_border");
+    if (select) {
+      const id = document.createElement('input');
+      table_row.appendChild(id);
+      id.type = "hidden";
+      id.value = select['id'];
+    }
     const preceding_text_input_field = document.createElement("textarea");
     table_row.appendChild(preceding_text_input_field);
     preceding_text_input_field.setAttribute("cols", "50");
