@@ -1,6 +1,7 @@
 @php
     $correctOptions=array();
     $optionIndex=0;
+    $questionNumber=0;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -15,18 +16,22 @@
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
         <!--cdn because hosting is php only... no vite sadly-->
 
-        <script src="https://cdn.tailwindcss.com"></script>
+        <!--<script src="https://cdn.tailwindcss.com"></script>-->
         <!-- Load Tailwind via CDN -->
         <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 
 
         <!-- Styles / Scripts -->
-        @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            @vite(['resources/css/app.css', 'resources/js/app.js'])
-        @else
             <style>
+                th{
+                    background-color: #e0e4e5;
+                    color:#A33155;
+                    border-radius: 5px 5px 0px 0px
+                }
+                .color-separator:nth-child(even){
+                    background-color: #e0e4e5;
+                }
             </style>
-        @endif
     </head>
     <body class="">
         <header class="">
@@ -70,14 +75,14 @@
                     </div>
 
             </div>
-            <div class="text-red-600 my-2 bg-[#e7ebed]" >
+            <div class="text-red-600 my-2 bg-[#e0e4e5]" >
                     <b class="f20">
                     website
                     </b><span style="font-size:10px;">Now running laravel !!!</span>
 
             </div>
         </header>
-        <main class="p-10">
+        <main class="md:p-10 sm:p-0">
         @if(isset($data))
             <form id='testForm'>
             <h1 class="">Test Site</h1>
@@ -86,17 +91,18 @@
             @endif
 
             <table>
-                <th>
-                <tr>
-                <td>question num</td><td class="p-2">question text</td></tr></th>
+
+                <tr class=" text-[#A33155]">
+                <th class='max-w-12 text-xs'><span>question num</span></th><th class="p-2 flex justify-start">question text</th></tr>
             @foreach($data as $question)
-                    <tr><td>X.</td>
-                        <td class="border py-2">
+
+                    <tr><td class="grid grid-flow-row justify-center"><span>{{++$questionNumber}}.</span></td>
+                        <td class="py-2">
                             <div>
                             <span>{{$question->question_text}}</span>
                             <div>
                             @foreach($question->image as $image)
-                                <img src="{{asset('storage/test_images/'.$image->image_name)}}" alt="">
+                                <img src="{{asset('storage/test_images/'.$image->image_name)}}" alt="" class="md:max-w-2xl max-w-80 sm:max-w-160 w-full ">
                             @endforeach
                             </div>
                             <br>
@@ -105,15 +111,17 @@
                                         <span>{{$option->preceding_text}}</span>
                                     @endif
                                     @if($option->option_type =='boolean_choice')
-                                        <table>
-                                        <th><tr><td>true</td><td>false</td><td class="px-2">option text</td></tr></th>
+                                        <table  >
+                                        <thead><tr><th>true</th><th>false</th><th class="px-2">option text</th></tr></thead>
+                                        <tbody >
+
                                         @foreach($option->data as $boolean_option)
 
-                                            <tr><td><input type="radio" name="{{$optionIndex}}"  value="1"
+                                            <tr class="color-separator"><td ><input class="" type="radio" name="{{$optionIndex}}"  value="1"
                                             @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==true)
                                                 checked
                                             @endif
-                                            ></td><td>
+                                            ></td><td >
                                                 <input type="radio"  name="{{$optionIndex}}" value="0"
                                             @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==false)
                                                 checked
@@ -129,15 +137,15 @@
                                                 $optionIndex++;
                                             @endphp
                                         @endforeach
+                                        </tbody>
                                         </table>
                                     @elseif($option->option_type =='write_in')
-                                        <div>
-                                            <input type="text" name="{{$optionIndex}}"
+                                            <span>
+                                            <input type="text" class="rounded-lg focus:border-none focus:ring-2  focus:ring-[#A33155]" name="{{$optionIndex}}"
                                             @if( $displayCorrectAnswers==true )
                                                 value="{{$option['data']['correct_answer']}}"
                                             @endif
-                                            >
-                                        </div>
+                                            ></span>
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['correct_answer'];
                                                 $optionIndex++;
@@ -165,23 +173,25 @@
                                             @php
                                             $i=0;
                                             @endphp
-                                            <th >
                                             <tr >
+                                            <thead>
+
                                             @foreach($option->data['column_names'] as $colname)
-                                                <td class="min-w-10"><span>{{$colname}}</span></td>
+                                                <th class="min-w-10"><span>{{$colname}}</span></th>
                                                 @php
                                                 $i++;
                                                 @endphp
                                             @endforeach
-                                            <td class='w-20'></td>
+                                            <td class='max-w-80'></td>
                                             </tr>
-                                            </th>
+                                            </thead>
                                             @php
                                                 $rowArrayIndex=0;
                                             @endphp
+                                            <tbody>
 
                                             @foreach($option->data['row_array'] as $rowData)
-                                                <tr>
+                                                <tr class="color-separator">
                                                 @for($j=0;$j<$i;$j++)
                                                     <td><input type="radio" name="{{$optionIndex}}" value="{{$j}}"
                                                         @if( $displayCorrectAnswers==true && $rowData['correct_answer']==$j )
@@ -199,12 +209,13 @@
                                                 </td>
                                                 </tr>
                                             @endforeach
+                                            </tbody>
 
                                         </table>
                                     @elseif($option->option_type =='open_answer')
                                     <br>
                                     <div>
-                                        <textarea rows="4" cols="40" placeholder="this type of question has no answer checking and serves only as practice for what might be on an actual exam"></textarea>
+                                        <textarea rows="4" cols="40" class="w-60 md:w-160" placeholder="this type of question has no answer checking and serves only as practice for what might be on an actual exam"></textarea>
                                     </div>
                                     @elseif($option->option_type =='boolean_choice_one_correct')
                                         <table>
@@ -215,7 +226,6 @@
                                                 checked
                                             @endif
                                             ></td><td>
-                                                <td>
                                                 <span>{{$option->data['option_array'][$i]}}</span>
                                                 </td>
                                             </tr>

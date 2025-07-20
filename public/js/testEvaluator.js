@@ -83,8 +83,8 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       evaluateRadioBox(input, name_id, parent);
       continue;
     } else if (type == "text") {
-      parent = input.parentElement;
-      evaluateWriteIn(input, name_id, parent);
+      parent = input;
+      evaluateWriteIn(input, name_id, input.parentElement);
       continue;
     } else if (input.localName == "option") {
       type = 'option';
@@ -96,8 +96,8 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
     }
     if (is_correct(name_id, value, type, input_value, correctValues)) {
       if (parent.getAttribute("class") &&
-          parent.getAttribute("class").includes("bg-red-500")) {
-        parent.classList.remove("bg-red-500")
+          parent.getAttribute("class").includes("!bg-red-500")) {
+        parent.classList.remove("!bg-red-500")
       }
 
       parent.classList.add("bg-green-700");
@@ -105,7 +105,7 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
     } else {
       if (!parent.getAttribute("class") ||
           !parent.getAttribute("class").includes("bg-green-700")) {
-        parent.classList.add("bg-red-500");
+        parent.classList.add("!bg-red-500");
       }
     }
   };
@@ -115,8 +115,8 @@ function evaluateSelect(input, id, grandParent) {
 
   if (input.value == correctOptions[id]) {
     if (grandParent.getAttribute("class") &&
-        grandParent.getAttribute("class").includes("bg-red-500")) {
-      grandParent.classList.remove("bg-red-500")
+        grandParent.getAttribute("class").includes("!bg-red-500")) {
+      grandParent.classList.remove("!bg-red-500")
     }
 
     grandParent.classList.add("bg-green-700");
@@ -124,7 +124,7 @@ function evaluateSelect(input, id, grandParent) {
   } else {
     if (!grandParent.getAttribute("class") ||
         !grandParent.getAttribute("class").includes("bg-green-700")) {
-      grandParent.classList.add("bg-red-500");
+      grandParent.classList.add("!bg-red-500");
     }
     // console.log(grandParent.lastChild);
     if (!(grandParent.lastChild.localName == 'span')) {
@@ -140,22 +140,24 @@ function evaluateSelect(input, id, grandParent) {
 
 function evaluateWriteIn(input, id, grandParent) {
 
+  console.log(input);
   if (input.value == correctOptions[id]) {
-    if (grandParent.getAttribute("class") &&
-        grandParent.getAttribute("class").includes("bg-red-500")) {
-      grandParent.classList.remove("bg-red-500")
+    if (input.getAttribute("class") &&
+        input.getAttribute("class").includes("!bg-red-500")) {
+      input.classList.remove("!bg-red-500")
     }
 
-    grandParent.classList.add("bg-green-700");
+    input.classList.add("bg-green-700");
     // console.log("correct");
   } else {
-    if (!grandParent.getAttribute("class") ||
-        !grandParent.getAttribute("class").includes("bg-green-700")) {
-      grandParent.classList.add("bg-red-500");
+    if (!input.getAttribute("class") ||
+        !input.getAttribute("class").includes("bg-green-700")) {
+      input.classList.add("!bg-red-500");
     }
     // console.log(grandParent.lastChild);
     if (!(grandParent.lastChild.localName == 'span')) {
       const explanation = document.createElement('span');
+      explanation.classList.add('bg-red-200');
       explanation.innerText = correctOptions[id];
       grandParent.appendChild(explanation);
     }
@@ -168,24 +170,24 @@ function evaluateRadioBox(input, id, grandParent) {
     // console.log(input);
     if (grandParent.getAttribute("class") &&
         !grandParent.getAttribute("class").includes("bg-green-700")) {
-      grandParent.classList.add("bg-red-500");
+      grandParent.classList.add("!bg-red-500");
     }
     if (correctOptions[id] == value) {
       input.classList.add('bg-green-200');
-      grandParent.classList.add("bg-red-500");
+      grandParent.classList.add("!bg-red-500");
     }
     return;
   }
   var parent_classes = grandParent.getAttribute("class");
   if (correctOptions[id] == value) {
-    if (parent_classes && parent_classes.includes("bg-red-500")) {
-      grandParent.classList.remove("bg-red-500")
+    if (parent_classes && parent_classes.includes("!bg-red-500")) {
+      grandParent.classList.remove("!bg-red-500")
     }
     input.classList.add('bg-green-200');
     grandParent.classList.add("bg-green-700");
   } else {
     if (!parent_classes || !parent_classes.includes("bg-green-700")) {
-      grandParent.classList.add("bg-red-500");
+      grandParent.classList.add("!bg-red-500");
     }
   }
 }
