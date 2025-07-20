@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
             'test_id'=>$test_id,
         ]);
     });
-    Route::get('admin/questionEditor/{questionId}',[TestController::class,'getQuestion']);//edit question is used for getting data for editing the question
+    Route::get('admin/questionEditor/{questionId}',[TestController::class,'editQuestion']);//edit question is used for getting data for editing the question
 
 
     Route::post('admin/questionCreator', [TestController::class,'addQuestion'])->name('question.store');

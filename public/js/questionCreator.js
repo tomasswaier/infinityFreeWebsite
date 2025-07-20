@@ -223,6 +223,105 @@ class MultipleChoice extends Option {
     this.column_number++;
   }
 }
+class BooleanChoiceOneCorrect extends Option {
+  constructor(event, button) {
+    super();
+    var self = this;
+    self.createNewButton = button;
+    button.onclick = function(event) { self.add_child_option(event) };
+  }
+  toString() { return 'boolean_choice_one_correct'; }
+  add_option_boolean_choice_one_correct(event, parent, my_option_number,
+                                        option_text = null,
+                                        correct_index = null) {
+    if (event) {
+      event.preventDefault();
+    }
+    const table_row = document.createElement("tr");
+    parent.appendChild(table_row);
+    const fieldset = document.createElement("fieldset");
+    table_row.appendChild(fieldset);
+    const specific_option_number =
+        fieldset.parentElement.parentElement.children.length - 2;
+    const is_correct = document.createElement("input");
+    fieldset.appendChild(is_correct);
+    is_correct.setAttribute("type", "radio");
+    // Ill fix it some other time
+    is_correct.setAttribute("value", specific_option_number);
+    if (correct_index == specific_option_number) {
+      is_correct.checked = true;
+    }
+
+    // we should ask for grand grand parent
+    is_correct.setAttribute("id", "correct_option_number_" + my_option_number);
+    is_correct.setAttribute("name",
+                            "correct_option_number_" + my_option_number);
+    is_correct.required = true;
+
+    const user_input_field = document.createElement("textarea");
+    user_input_field.required = true;
+    user_input_field.setAttribute("cols", "50");
+    user_input_field.setAttribute("rows", "2");
+    user_input_field.setAttribute("name", "option_text_number_" +
+                                              my_option_number + "_" +
+                                              specific_option_number);
+    user_input_field.setAttribute("placeholder", "option text ...");
+    if (option_text) {
+      user_input_field.innerText = option_text;
+    }
+    fieldset.appendChild(user_input_field);
+  }
+
+  add_child_option(event, option = null) {
+    if (event) {
+      event.preventDefault();
+    }
+    // create div with preceding text and one option
+    const parent = document.getElementById("options_table");
+    const wrapper = document.createElement("div");
+    parent.appendChild(wrapper);
+    if (option) {
+      const id = document.createElement('input');
+      wrapper.appendChild(id);
+      id.name = "option_id_" + option_number;
+      id.type = "hidden";
+      id.value = option['id'];
+    }
+    const new_option_number = option_number;
+
+    const preceding_text_input_field =
+        this.get_preceding_text(new_option_number, option);
+    wrapper.appendChild(preceding_text_input_field);
+    const input_table = document.createElement('table');
+    wrapper.appendChild(input_table);
+    const indicator = document.createElement("tr");
+    input_table.appendChild(indicator);
+    const true_indicator = document.createElement("td");
+    indicator.appendChild(true_indicator);
+    true_indicator.innerText = "true/false";
+    if (option) {
+      for (var choice of option['data']['option_array']) {
+        this.add_option_boolean_choice_one_correct(
+            null, input_table, new_option_number, choice,
+            option['data']['correct_index']);
+      }
+    } else {
+      this.add_option_boolean_choice_one_correct(null, input_table,
+                                                 new_option_number);
+    }
+    var self = this;
+    option_number++;
+
+    var add_boolean_choice_button = document.createElement("button");
+    wrapper.appendChild(add_boolean_choice_button);
+    add_boolean_choice_button.innerText = "+";
+    // console.log(new_option_number);
+    add_boolean_choice_button.onclick = function(event) {
+      self.add_option_boolean_choice_one_correct(event, input_table,
+                                                 new_option_number);
+    };
+  }
+}
 class BooleanChoiceClass extends Option {
   constructor(event, button) {
     super();
@@ -313,7 +412,7 @@ class BooleanChoiceClass extends Option {
     if (option) {
       for (var choice of option['data']) {
         this.add_option_boolean_choice(null, input_table, new_option_number,
-                                       choice = choice);
+                                       choice);
       }
     } else {
       this.add_option_boolean_choice(null, input_table, new_option_number);
@@ -535,6 +634,9 @@ function process_option_type(event, user_option, question = null) {
   } else if (user_option == 'open-answer') {
     display_option(event, OpenAnswer, options, option_input_creator,
                    options_table, options_table);
+  } else if (user_option == 'boolean-choice-one-correct') {
+    display_option(event, BooleanChoiceOneCorrect, options,
+                   option_input_creator, options_table, options_table);
   }
 }
 
@@ -601,9 +703,8 @@ function load_input_field(
         question['options'][0]['option_type'].replaceAll('_', '-');
   }
 
-  // append default option(boolean-choice) to form
-  if (question) {
-
+    // append default option(boolean-choice) to form
+    if (question) {
         process_option_type(
             event, question['options'][0]['option_type'].replaceAll('_', '-'),
             question = question);

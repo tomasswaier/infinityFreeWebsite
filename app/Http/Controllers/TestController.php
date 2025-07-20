@@ -11,6 +11,7 @@ use App\Models\Test;
 //use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
+use PhpParser\Node\Stmt\Foreach_;
 
 //use app\Models\Question;
 
@@ -24,17 +25,19 @@ class TestController extends Controller
     {
         return view('admin/allTestQuestions',['data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()]);
     }
-    public function getQuestion($questionId)
+    public function editQuestion(Request $request,$questionId)
     {
+        $request->session()->put('editedOptions',Option::select('id')->where('questions_id','=',$questionId)->get());
         return view('admin/editTestQuestion',[
             'question'=>Question::find($questionId),
             'options'=>Option::where('questions_id','=',$questionId)->get(),
             'images'=>(new ImageController)->show($questionId)]);
     }
     public function deleteQuestion($questionId,Request $request){
+        //Log::info(json_decode($testId,true)[0]['tests_id']);
+        (new ImageController)->deleteAllQuestionImages($questionId);
         $testId=Question::select('tests_id')->where('id','=',$questionId)->get();
         Question::select('tests_id')->where('id','=',$questionId)->delete();
-        //Log::info(json_decode($testId,true)[0]['tests_id']);
         return redirect('admin/questionDisplay/'.json_decode($testId,true)[0]['tests_id']);
     }
     public function loadTest($feelings,$test_id,$number_of_questions,Request $request){
@@ -80,6 +83,7 @@ class TestController extends Controller
         return redirect('admin')->with('success', 'owo created!');
     }
     public function updateQuestion(Request $request){
+        $originalOptions=$request->session()->pull('editedOptions',[]);
         $questionId=$request['question_id'];
         $question= Question::find($questionId);
         $question->question_text=$request['question_text'];
@@ -93,7 +97,22 @@ class TestController extends Controller
         }
         $inputs=$request->except('_token','submit','question_id','question_explanation','user_image');
         $this->insertOptionsFromArray($inputs,$questionId);
+        Log::info($request);
+        Log::info($originalOptions);
 
+        //iterating trough the array and finding all options which are no longer in the request array
+        //chatgpt line... very likely a first one
+        $optionIdsInRequest = collect($request->all())->filter(function ($value, $key) {return str_starts_with($key, 'option_id');})->values()->toArray();
+
+
+        $optionsToRemove = collect($originalOptions)
+            ->reject(function ($option) use ($optionIdsInRequest) {
+                return in_array($option->id, $optionIdsInRequest);
+            });
+
+        $optionsToRemove->each(function ($option) {
+            Option::destroy($option->id);
+        });
         return redirect('admin')->with('success');
     }
     private  function updateImages($userImages,$savedImages){
@@ -180,12 +199,16 @@ class TestController extends Controller
 
 
     private function initQuestionTypeClass($key,$questionId,$precedingText,$inputs,$optionId){
+        //this could cause problems when entering more than 10 fields
         $questionType=substr($key,0,strlen($key)-2);
         $questionType=substr($questionType,15,strlen($questionType)-15);
         switch ($questionType) {
             case "boolean_choice":
                 $questionNumber=substr($key,30,strlen($key));
                 return new BooleanChoice($questionNumber,$questionId,$precedingText,$inputs,$optionId);
+            case "boolean_choice_one_correct":
+                $questionNumber=substr($key,42,strlen($key));
+                return new BooleanChoiceOneCorrect($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             case "write_in":
                 $questionNumber=substr($key,24,strlen($key));
                 return new WriteIn($questionNumber,$questionId,$precedingText,$inputs,$optionId);
@@ -302,7 +325,7 @@ class BooleanChoice extends QuestionType{
 class BooleanChoiceOneCorrect extends QuestionType{
     public $specificOptioNumber;
     public function __toString(){
-        return "boolean_choice";
+        return "boolean_choice_one_correct";
     }
     private function getSpecificOptionNumber($key){
         return intval(substr($key,16,strlen($key)));
@@ -315,19 +338,28 @@ class BooleanChoiceOneCorrect extends QuestionType{
         return intval(substr($key,14,15));
     }
     public function readOption($key,$val){
-        if (str_contains($key,"option_number_")) {
-            if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
+        //if (str_contains($key,"option_number_")) {
+        //    if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
 
-                $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
-            }
-            if ($val!='true' && $val!='false') {
-                Log::error('Bad boolean choice input');
-                exit;
-            }
-            $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
-            $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
+        //        $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
+        //    }
+        //    if ($val!='true' && $val!='false') {
+        //        Log::error('Bad boolean choice input');
+        //        exit;
+        //    }
+        //    $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
+        //    $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
 
+        //}
+        if (!isset($this->data['option_array'])) {
+            $this->data['option_array']=collect();
         }
+        if (str_contains($key,"option_text_number_")) {
+            $this->data['option_array']->push($val);
+        }else if(str_contains($key,"correct_option_")) {
+            $this->data['correct_index']=$val;
+        }
+
         return;
     }
 

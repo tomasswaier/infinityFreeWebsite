@@ -106,7 +106,7 @@
                                     @endif
                                     @if($option->option_type =='boolean_choice')
                                         <table>
-                                        <th><tr><td>true</td><td>false</td><td class="px-2">question test</td></tr></th>
+                                        <th><tr><td>true</td><td>false</td><td class="px-2">option text</td></tr></th>
                                         @foreach($option->data as $boolean_option)
 
                                             <tr><td><input type="radio" name="{{$optionIndex}}"  value="1"
@@ -206,6 +206,25 @@
                                     <div>
                                         <textarea rows="4" cols="40" placeholder="this type of question has no answer checking and serves only as practice for what might be on an actual exam"></textarea>
                                     </div>
+                                    @elseif($option->option_type =='boolean_choice_one_correct')
+                                        <table>
+                                        <tr><th>true</th><th class="px-2">option text</th></tr>
+                                        @for($i=0;$i<sizeof($option->data['option_array']);$i++)
+                                            <tr><td><input type="radio" name="{{$optionIndex}}"  value="{{$i}}"
+                                            @if( $displayCorrectAnswers==true && $option->data['correct_index']==$i)
+                                                checked
+                                            @endif
+                                            ></td><td>
+                                                <td>
+                                                <span>{{$option->data['option_array'][$i]}}</span>
+                                                </td>
+                                            </tr>
+                                        @endfor
+                                        @php
+                                                $correctOptions[$optionIndex]=$option->data['correct_index'];
+                                                $optionIndex++;
+                                        @endphp
+                                        </table>
                                     @else
                                         <span>Something went very very very very wrong please contact .maryann</span>
                                     @endif
@@ -254,8 +273,9 @@
         //it's intended for the user to have full access to correct asnwers ,. hell i'd give everyone access to db if ash wash here. I am doing rthis with js because it's easier than submitting everyhting with laravel trying to recreate the test ,build completely new blade file  for this shi ... I dont need to info of what the user had correct or didnt so why send it over :3
             var correctOptions={};
             @foreach($correctOptions as $number=>$val)
-                correctOptions[{{$number}}]="{{$val}}";
+                correctOptions[{{$number}}]=@json($val);
             @endforeach
+            console.log(correctOptions);
         </script>
     </body>
 </html>

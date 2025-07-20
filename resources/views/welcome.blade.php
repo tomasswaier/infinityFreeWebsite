@@ -22,6 +22,7 @@
         <header class="">
             @if (Route::has('login'))
                 <nav class="flex items-center justify-end gap-4">
+                    <a href="{{Route('testPage')}}">TestPage</a>
                     @auth
                         <a
                             href="{{ url('admin') }}"
@@ -52,8 +53,19 @@
             <section>
                 <h2>This is is a welcome page</h2>
                 <span>Main page of my thingy</span>
-                <a href="{{Route('testPage')}}">woooo</a>
 
+            </section>
+                <br>
+            <section>
+                <h3>help</h3>
+                <span>it would be great if someone would redraw images used on my website. I've got them all from publicly available sources like github,google forms and such but I would prefer to have them redrawn.</span>
+                <br>
+                <br>
+                <span>Tests have been reworked and so now they also contain fields like <u title="serves as indicator for the question or as another general block where you can put question description to give it a cleaner look ">"preceding text"</u> and <u title="as name implies this is a field to explain the reasoning behind the correct answer">"explanation"</u>. These fields have to be manually filled in. Since I do no particularly care any more about the already done tests I won't be doing it myself but if one of you is interested in making this website tiny bit better I can give you admin account)</span>
+                <br><br>
+                <span>will give anyone account who want's to make a test or contribute to existing test)</span>
+                <br><br>
+                <span>study guide page coming soon)</span>
             </section>
         </main>
 

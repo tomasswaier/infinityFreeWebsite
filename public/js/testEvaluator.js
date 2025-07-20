@@ -94,7 +94,6 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       // todo:this
     } else {
     }
-    var classes = parent.getAttribute("class");
     if (is_correct(name_id, value, type, input_value, correctValues)) {
       if (parent.getAttribute("class") &&
           parent.getAttribute("class").includes("bg-red-500")) {
