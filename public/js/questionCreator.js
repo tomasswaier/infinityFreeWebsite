@@ -22,7 +22,7 @@ var option_number = 0;
 
 class Option {
   constructor(event, button) {};
-  get_precceding_text(option_id, option, hidden = false) {
+  get_preceding_text(option_id, option, hidden = false) {
     const preceding_text_input_field = document.createElement("textarea");
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("rows", "2");
@@ -52,7 +52,7 @@ class OpenAnswer extends Option {
   toString() { return 'open_answer'; }
   add_child_option(event, option = null) {
     const wrapper = document.getElementById('question_type_user_input_wrapper');
-    wrapper.appendChild(this.get_precceding_text(option_number, option, true));
+    wrapper.appendChild(this.get_preceding_text(option_number, option, true));
     // since it's hidden and always will be it's fine to just put it wherever
   }
 }
@@ -85,16 +85,8 @@ class MultipleChoice extends Option {
       id.value = option['id'];
     }
     const preceding_text_input_field =
-        this.get_precceding_text(new_option_number, option);
+        this.get_preceding_text(new_option_number, option);
     wrapper.appendChild(preceding_text_input_field);
-    // const preceding_text_input_field = document.createElement("textarea");
-    // wrapper.appendChild(preceding_text_input_field);
-    // preceding_text_input_field.setAttribute("cols", "50");
-    // preceding_text_input_field.setAttribute("rows", "2");
-    // preceding_text_input_field.setAttribute(
-    //     "name", "preceding_text_multiple_choice_" + new_option_number);
-    // preceding_text_input_field.setAttribute(
-    //     "placeholder", "Here goes preceding text(can be left blank)");
     const table = document.createElement("table");
     this.table = table;
     wrapper.appendChild(table);
@@ -231,8 +223,9 @@ class MultipleChoice extends Option {
     this.column_number++;
   }
 }
-class BooleanChoiceClass {
+class BooleanChoiceClass extends Option {
   constructor(event, button) {
+    super();
     var self = this;
     self.createNewButton = button;
     button.onclick = function(event) { self.add_child_option(event) };
@@ -242,7 +235,6 @@ class BooleanChoiceClass {
     if (event) {
       event.preventDefault();
     }
-    // console.log(my_option_number);
     const table_row = document.createElement("tr");
     parent.appendChild(table_row);
     const fieldset = document.createElement("fieldset");
@@ -306,19 +298,11 @@ class BooleanChoiceClass {
       id.type = "hidden";
       id.value = option['id'];
     }
-    const preceding_text_input_field = document.createElement("textarea");
-    wrapper.appendChild(preceding_text_input_field);
     const new_option_number = option_number;
-    preceding_text_input_field.setAttribute("cols", "50");
-    preceding_text_input_field.setAttribute("rows", "2");
-    preceding_text_input_field.setAttribute(
-        "name", "preceding_text_boolean_choice_" + new_option_number);
-    preceding_text_input_field.setAttribute(
-        "placeholder", "Here goes preceding text(can be left blank)");
-    if (option) {
 
-      preceding_text_input_field.innerText = option['preceding_text'];
-    }
+    const preceding_text_input_field =
+        this.get_preceding_text(new_option_number, option);
+    wrapper.appendChild(preceding_text_input_field);
     const input_table = document.createElement('table');
     wrapper.appendChild(input_table);
     const indicator = document.createElement("tr");
@@ -347,8 +331,9 @@ class BooleanChoiceClass {
   }
 }
 
-class WriteIn {
+class WriteIn extends Option {
   constructor(event, button) {
+    super();
     var self = this;
     button.onclick = function(event) { self.add_child_option(event) };
   }
@@ -371,14 +356,9 @@ class WriteIn {
       id.value = option['id'];
     }
 
-    const preceding_text = document.createElement("textarea");
-    fieldset.appendChild(preceding_text);
-    preceding_text.setAttribute("cols", "50");
-    preceding_text.setAttribute("rows", "2");
-    preceding_text.setAttribute("name",
-                                "preceding_text_write_in_" + option_number);
-    preceding_text.setAttribute("placeholder",
-                                "preceding text ...(can be left blank)");
+    const preceding_text_input_field =
+        this.get_preceding_text(option_number, option);
+    fieldset.appendChild(preceding_text_input_field);
 
     const user_input_field = document.createElement("input");
     fieldset.appendChild(user_input_field);
@@ -390,7 +370,6 @@ class WriteIn {
 
     if (option) {
       console.log(option['data']['correct_answer']);
-      preceding_text.innerText = option['preceding_text'];
       user_input_field.value = option['data']['correct_answer'];
     }
     option_number++;
@@ -465,16 +444,8 @@ class OneFromMany extends Option {
       id.name = "option_id_" + option_number;
       id.value = select['id'];
     }
-    // const preceding_text_input_field = document.createElement("textarea");
-    // table_row.appendChild(preceding_text_input_field);
-    // preceding_text_input_field.setAttribute("cols", "50");
-    // preceding_text_input_field.setAttribute("rows", "2");
-    // preceding_text_input_field.setAttribute(
-    //     "name", "preceding_text_one_from_many_" + new_option_number);
-    // preceding_text_input_field.setAttribute(
-    //     "placeholder", "Here goes preceding text(can be left blank)");
     const preceding_text_input_field =
-        this.get_precceding_text(new_option_number, select);
+        this.get_preceding_text(new_option_number, select);
     table_row.appendChild(preceding_text_input_field);
 
     const example_selector = document.createElement("select");

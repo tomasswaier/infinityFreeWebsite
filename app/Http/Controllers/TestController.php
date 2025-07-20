@@ -152,6 +152,7 @@ class TestController extends Controller
                     continue;
                 }
                 if (str_contains($key,'preceding')) {
+                    //compare last 2 chars of the string . it can be either option_number_x or preceding_text_something_x this way it cna hold up to 99 options
                     if ($prevOption && substr($prevOption,strlen($prevOption)-2,strlen($prevOption))!=substr($key,strlen($key)-2,strlen($key))) {
                         $prevOption=$key;
                         $optionId=null;
