@@ -139,16 +139,23 @@ class TestController extends Controller
     private function insertOptionsFromArray($input,$questionId){
             $myClass=null;
             $optionId=null;
+            //would be better to save a number to compare it to but im in a hurry
+            $prevOption=null;
             foreach ($input as $key => $value) {
                 //will be building this with future possibility of multiple types of questions per one question
                 if (substr($key,0,10)=='option_id_') {
                     $optionId=$value;
+                    $prevOption=$key;
                     continue;
                 }
                 if ($key=="question_text") {
                     continue;
                 }
                 if (str_contains($key,'preceding')) {
+                    if ($prevOption && substr($prevOption,strlen($prevOption)-2,strlen($prevOption))!=substr($key,strlen($key)-2,strlen($key))) {
+                        $prevOption=$key;
+                        $optionId=null;
+                    }
                     $myClass=$this->initQuestionTypeClass($key,$questionId,$value,$input,$optionId);
                     if (!$myClass) {
                         Log::error("myClass doesn't exist.Exiting");
@@ -228,6 +235,9 @@ class QuestionType{
     }
     function createQuestion($option_type){
         $option = Option::find($this->optionId);
+        if (!$option) {
+            $option= new Option;
+        }
         if ($this->optionId) {
             $option->id=$this->optionId;
         }
@@ -256,6 +266,39 @@ class QuestionType{
 
 
 class BooleanChoice extends QuestionType{
+    public $specificOptioNumber;
+    public function __toString(){
+        return "boolean_choice";
+    }
+    private function getSpecificOptionNumber($key){
+        return intval(substr($key,16,strlen($key)));
+    }
+    private function getOptionNumber($key){
+        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs
+        if (substr($key,0,19)=='option_text_number_') {
+            return intval(substr($key,19,20));
+        }
+        return intval(substr($key,14,15));
+    }
+    public function readOption($key,$val){
+        if (str_contains($key,"option_number_")) {
+            if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
+
+                $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
+            }
+            if ($val!='true' && $val!='false') {
+                Log::error('Bad boolean choice input');
+                exit;
+            }
+            $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
+            $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
+
+        }
+        return;
+    }
+
+}
+class BooleanChoiceOneCorrect extends QuestionType{
     public $specificOptioNumber;
     public function __toString(){
         return "boolean_choice";

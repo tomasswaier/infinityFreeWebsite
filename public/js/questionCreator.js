@@ -20,38 +20,56 @@ function display_input_image() {
 }
 var option_number = 0;
 
-class OpenAnswer {
-  constructor(event, button) {}
-  add_child_option(event, option = null) {
-    if (option) {
-      const id = document.createElement('input');
-      parent.appendChild(id);
-      id.name = "option_id_" + option_number;
-      id.type = "hidden";
-      id.value = option['id'];
-    }
+class Option {
+  constructor(event, button) {};
+  get_precceding_text(option_id, option, hidden = false) {
     const preceding_text_input_field = document.createElement("textarea");
-    const new_option_number = option_number;
-    const parent = document.getElementById("options_table");
-    parent.appendChild(preceding_text_input_field);
     preceding_text_input_field.setAttribute("cols", "50");
-    preceding_text_input_field.setAttribute("hidden", "true");
     preceding_text_input_field.setAttribute("rows", "2");
     preceding_text_input_field.setAttribute(
-        "name", "preceding_text_open_answer_" + new_option_number);
+        "name", "preceding_text_" + this.toString() + "_" + option_id);
     preceding_text_input_field.setAttribute(
         "placeholder", "Here goes preceding text(can be left blank)");
+    if (option) {
+      preceding_text_input_field.value = option['preceding_text'];
+    }
+    if (hidden) {
+      preceding_text_input_field.hidden = true;
+    }
+
+    return preceding_text_input_field;
+  }
+  dummy_function(parent) {
+    const meow = document.createElement('span');
+    meow.innerText = "mewowowowowowoo";
+    parent.appendChild(meow);
+  }
+  add_child_option(event, option = null) {}
+}
+
+class OpenAnswer extends Option {
+  constructor(event, button) { super() }
+  toString() { return 'open_answer'; }
+  add_child_option(event, option = null) {
+    const wrapper = document.getElementById('question_type_user_input_wrapper');
+    wrapper.appendChild(this.get_precceding_text(option_number, option, true));
+    // since it's hidden and always will be it's fine to just put it wherever
   }
 }
 
-class MultipleChoice {
+class MultipleChoice extends Option {
   constructor(event, button) {
+    super();
     var self = this;
     this.column_number = 0;
     this.initialize_column_row();
     this.newOptionFieldButton = button;
     button.setAttribute("title", "add row");
     button.onclick = function(event) { self.add_child_option(event) };
+  }
+  toString() {
+    // used in get_preceding_text
+    return 'multiple_choice';
   }
   add_child_option(event, option = null) {
     this.column_number = 0;
@@ -66,14 +84,17 @@ class MultipleChoice {
       id.type = "hidden";
       id.value = option['id'];
     }
-    const preceding_text_input_field = document.createElement("textarea");
+    const preceding_text_input_field =
+        this.get_precceding_text(new_option_number, option);
     wrapper.appendChild(preceding_text_input_field);
-    preceding_text_input_field.setAttribute("cols", "50");
-    preceding_text_input_field.setAttribute("rows", "2");
-    preceding_text_input_field.setAttribute(
-        "name", "preceding_text_multiple_choice_" + new_option_number);
-    preceding_text_input_field.setAttribute(
-        "placeholder", "Here goes preceding text(can be left blank)");
+    // const preceding_text_input_field = document.createElement("textarea");
+    // wrapper.appendChild(preceding_text_input_field);
+    // preceding_text_input_field.setAttribute("cols", "50");
+    // preceding_text_input_field.setAttribute("rows", "2");
+    // preceding_text_input_field.setAttribute(
+    //     "name", "preceding_text_multiple_choice_" + new_option_number);
+    // preceding_text_input_field.setAttribute(
+    //     "placeholder", "Here goes preceding text(can be left blank)");
     const table = document.createElement("table");
     this.table = table;
     wrapper.appendChild(table);
@@ -91,7 +112,6 @@ class MultipleChoice {
                                       this.newOptionFieldButton);
     option_number += 1;
     if (option) {
-      preceding_text_input_field.value = option['preceding_text'];
       for (var column_name of option['data']['column_names']) {
         this.add_column(event, new_option_number, this.columns, column_name);
       }
@@ -135,7 +155,6 @@ class MultipleChoice {
     // adds one row with this.column_number number of radio buttons + input
     const column_number = parent.children[0].children[0].children.length - 1
     const row_number = parent.children.length - 1;
-    console.log(row_number);
     if (event) {
       event.preventDefault();
     }
@@ -159,6 +178,7 @@ class MultipleChoice {
       option_wrapper.classList.add("w-30", "flex", "justify-center");
       new_options_row.appendChild(option_wrapper)
       const radio_button_option = document.createElement("input");
+      radio_button_option.required = true;
       radio_button_option.setAttribute("type", "radio");
       radio_button_option.setAttribute("value", i);
       radio_button_option.setAttribute(
@@ -217,6 +237,7 @@ class BooleanChoiceClass {
     self.createNewButton = button;
     button.onclick = function(event) { self.add_child_option(event) };
   }
+  toString() { return 'boolean_choice'; }
   add_option_boolean_choice(event, parent, my_option_number, choice = null) {
     if (event) {
       event.preventDefault();
@@ -331,6 +352,7 @@ class WriteIn {
     var self = this;
     button.onclick = function(event) { self.add_child_option(event) };
   }
+  toString() { return 'write_in'; }
 
   add_child_option(event, option = null) {
     if (event) {
@@ -374,14 +396,16 @@ class WriteIn {
     option_number++;
   }
 }
-class OneFromMany {
+class OneFromMany extends Option {
   // thi si exactly why you use oop from the start. I should've made ONE CLASS
   // which then is being used as idk what it's called by the rest. Such a bad
   // design todo:redo classes
   constructor(event, button) {
+    super();
     var self = this;
     button.onclick = function(event) { self.add_child_option(event) };
   }
+  toString() { return 'one_from_many'; }
   add_select_option(event, parent_element, select_element, my_option_number,
                     option = null, is_correct = null) {
     if (event) {
@@ -441,14 +465,18 @@ class OneFromMany {
       id.name = "option_id_" + option_number;
       id.value = select['id'];
     }
-    const preceding_text_input_field = document.createElement("textarea");
+    // const preceding_text_input_field = document.createElement("textarea");
+    // table_row.appendChild(preceding_text_input_field);
+    // preceding_text_input_field.setAttribute("cols", "50");
+    // preceding_text_input_field.setAttribute("rows", "2");
+    // preceding_text_input_field.setAttribute(
+    //     "name", "preceding_text_one_from_many_" + new_option_number);
+    // preceding_text_input_field.setAttribute(
+    //     "placeholder", "Here goes preceding text(can be left blank)");
+    const preceding_text_input_field =
+        this.get_precceding_text(new_option_number, select);
     table_row.appendChild(preceding_text_input_field);
-    preceding_text_input_field.setAttribute("cols", "50");
-    preceding_text_input_field.setAttribute("rows", "2");
-    preceding_text_input_field.setAttribute(
-        "name", "preceding_text_one_from_many_" + new_option_number);
-    preceding_text_input_field.setAttribute(
-        "placeholder", "Here goes preceding text(can be left blank)");
+
     const example_selector = document.createElement("select");
     table_row.appendChild(example_selector);
     const hint_text = document.createElement("span");
@@ -476,7 +504,6 @@ class OneFromMany {
                                new_option_number, option,
                                select['data']['correct_option']);
       }
-      preceding_text_input_field.value = select['preceding_text'];
     } else {
       this.add_select_option(event, options_wrapper, example_selector,
                              new_option_number);
@@ -523,46 +550,20 @@ function process_option_type(event, user_option, question = null) {
   if (user_option == "boolean-choice") {
     display_option(event, BooleanChoiceClass, options, option_input_creator,
                    options_table, options_table);
-    // var boolean_choice_object =
-    //     new BooleanChoiceClass(event, option_input_creator, options_table);
-
-    // if (question) {
-
-    //  for (var option of question['options']) {
-    //    boolean_choice_object.add_child_option(option = option);
-    //  }
-    //} else {
-    //  boolean_choice_object.add_child_option();
-    //}
 
   } else if (user_option == "write-in") {
 
     display_option(event, WriteIn, options, option_input_creator, options_table,
                    options_table);
-    // var write_in_object =
-    //     new WriteIn(event, option_input_creator, options_table)
-    // write_in_object.add_child_option(event)
   } else if (user_option == "multiple-choice") {
-    // function that initiates
     display_option(event, MultipleChoice, options, option_input_creator,
                    options_table, options_table);
-    // var multiple_choice_object =
-    //     new MultipleChoice(event, option_input_creator, options_table)
-    // multiple_choice_object.add_child_option();
-    //  option_input_creator.onclick = add_child_option;
-    //  add_child_option(event);
   } else if (user_option == "one-from-many") {
-    // function that initiates
     display_option(event, OneFromMany, options, option_input_creator,
                    options_table, options_table);
-    // var one_from_many_object =
-    //     new OneFromMany(event, option_input_creator, options_table)
-    // one_from_many_object.add_child_option()
   } else if (user_option == 'open-answer') {
     display_option(event, OpenAnswer, options, option_input_creator,
                    options_table, options_table);
-    // var open_answer = new OpenAnswer(event, option_input_creator,
-    // options_table) open_answer.add_child_option()
   }
 }
 
@@ -615,8 +616,8 @@ function load_input_field(
   // webhosting issues
   // append options to selector
   const question_types = [
-    "boolean-choice", "write-in", "multiple-choice", "one-from-many",
-    "open-answer"
+    "boolean-choice", "boolean-choice-one-correct", "write-in",
+    "multiple-choice", "one-from-many", "open-answer"
   ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
@@ -632,17 +633,17 @@ function load_input_field(
   // append default option(boolean-choice) to form
   if (question) {
 
-    process_option_type(
-        event, question['options'][0]['option_type'].replaceAll('_', '-'),
-        question = question);
-  } else {
-    process_option_type(event, "boolean-choice");
-  }
-  form_element.appendChild(document.createElement("br"));
-  const explanation_input = document.createElement("textarea");
-  form_element.appendChild(explanation_input);
-  explanation_input.setAttribute("rows", "4");
-  if (question) {
+        process_option_type(
+            event, question['options'][0]['option_type'].replaceAll('_', '-'),
+            question = question);
+    } else {
+        process_option_type(event, "boolean-choice");
+    }
+    form_element.appendChild(document.createElement("br"));
+    const explanation_input = document.createElement("textarea");
+    form_element.appendChild(explanation_input);
+    explanation_input.setAttribute("rows", "4");
+    if (question) {
         explanation_input.innerText = question['explanation_text'];
     }
     explanation_input.setAttribute("cols", "50");
