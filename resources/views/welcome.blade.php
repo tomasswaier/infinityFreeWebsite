@@ -61,7 +61,7 @@
                 <span>it would be great if someone would redraw images used on my website. I've got them all from publicly available sources like github,google forms and such but I would prefer to have them redrawn.</span>
                 <br>
                 <br>
-                <span>Tests have been reworked and so now they also contain fields like <u title="serves as indicator for the question or as another general block where you can put question description to give it a cleaner look ">"preceding text"</u> and <u title="as name implies this is a field to explain the reasoning behind the correct answer">"explanation"</u>. These fields have to be manually filled in. Since I do no particularly care any more about the already done tests I won't be doing it myself but if one of you is interested in making this website tiny bit better I can give you admin account)</span>
+                <span>Tests have been reworked and so now they also contain fields like <u title="serves as indicator for the question or as another general block where you can put question description to give it a cleaner look ">"preceding text"</u> and <u title="as name implies this is a field to explain the reasoning behind the correct answer. It's displayed after submitting your test">"explanation"</u>. These fields have to be manually filled in. Since I do no particularly care any more about the already done tests I won't be doing it myself but if one of you is interested in making this website tiny bit better I can give you admin account)</span>
                 <br><br>
                 <span>will give anyone account who want's to make a test or contribute to existing test)</span>
                 <br><br>

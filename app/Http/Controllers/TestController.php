@@ -8,7 +8,7 @@ use Illuminate\View\View;
 use App\Models\Option;
 use App\Models\Question;
 use App\Models\Test;
-//use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
 use PhpParser\Node\Stmt\Foreach_;
@@ -27,7 +27,6 @@ class TestController extends Controller
     }
     public function editQuestion(Request $request,$questionId)
     {
-        $request->session()->put('editedOptions',Option::select('id')->where('questions_id','=',$questionId)->get());
         return view('admin/editTestQuestion',[
             'question'=>Question::find($questionId),
             'options'=>Option::where('questions_id','=',$questionId)->get(),
@@ -83,8 +82,8 @@ class TestController extends Controller
         return redirect('admin')->with('success', 'owo created!');
     }
     public function updateQuestion(Request $request){
-        $originalOptions=$request->session()->pull('editedOptions',[]);
         $questionId=$request['question_id'];
+        $originalOptions=Option::select('id')->where('questions_id','=',$questionId)->get();
         $question= Question::find($questionId);
         $question->question_text=$request['question_text'];
         $question->explanation_text=$request['question_explanation'];
@@ -92,7 +91,7 @@ class TestController extends Controller
         $images=(new ImageController)->show($questionId);
         // this is a prototype function that works only for one image and should be changed .
         if (isset($request['user_image']) || $images!=[]) {
-            $this->updateImages([$request['user_image']],$images);
+            $this->updateImages($request,$images);
 
         }
         $inputs=$request->except('_token','submit','question_id','question_explanation','user_image');
@@ -115,8 +114,20 @@ class TestController extends Controller
         });
         return redirect('admin')->with('success');
     }
-    private  function updateImages($userImages,$savedImages){
-        // ... imma do this later bcs itll need more than few minutes
+    private  function updateImages($request,$savedImages){
+        // I am just deleting all and replacign them with new ones. this is not the best approach but really doesn't matter
+        $questionId=$request['question_id'];
+        $prevImage=$request['prev_image'];
+        foreach($savedImages as $image){
+            if ($image['image_name']!=$prevImage) {
+                Log::info('deleting image:');
+                Log::info($image);
+                (new ImageController)->delete($image->image_name);
+            }
+        }
+        if ($request['user_image']) {
+            (new ImageController)->upload($request['user_image'],$questionId);
+        }
     }
     public function addQuestion(Request $request){
         try {

@@ -10,6 +10,9 @@ if (!document) {
 
 function display_input_image() {
   // displays  selected user image to user for confirmation/better ux
+  if (document.getElementById("prev_image")) {
+    document.getElementById("prev_image").value = '';
+  }
   var image = document.getElementById("user_image").files[0];
   var reader = new FileReader();
   reader.onload =
@@ -17,6 +20,13 @@ function display_input_image() {
           e) { document.getElementById("display_image").src = e.target.result; }
 
       reader.readAsDataURL(image);
+}
+
+function remove_input_image() {
+  // remove user image
+  document.getElementById("prev_image").value = '';
+  document.getElementById("user_image").value = '';
+  document.getElementById("display_image").src = '';
 }
 var option_number = 0;
 

@@ -4,7 +4,7 @@
     $questionNumber=0;
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  >
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,8 +33,8 @@
                 }
             </style>
     </head>
-    <body class="">
-        <header class="">
+    <body class="" onload="oldLinkChecker()">
+        <header class="" >
             <div class="">
                     <div class="bg-[#A33155] h-30 text-white text-8xl">
                             <span class="logo">Fiitsa joke</span>
@@ -290,3 +290,4 @@
     </body>
 </html>
 <script src="{{ asset('js/testEvaluator.js') }}"></script>
+<script src="{{ asset('js/oldLinkRedirect.js') }}"></script>

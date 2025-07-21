@@ -100,11 +100,11 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
         parent.classList.remove("!bg-red-500")
       }
 
-      parent.classList.add("bg-green-700");
+      parent.classList.add("!bg-green-700");
       // console.log("correct");
     } else {
       if (!parent.getAttribute("class") ||
-          !parent.getAttribute("class").includes("bg-green-700")) {
+          !parent.getAttribute("class").includes("!bg-green-700")) {
         parent.classList.add("!bg-red-500");
       }
     }
@@ -119,11 +119,11 @@ function evaluateSelect(input, id, grandParent) {
       grandParent.classList.remove("!bg-red-500")
     }
 
-    grandParent.classList.add("bg-green-700");
+    grandParent.classList.add("!bg-green-700");
     // console.log("correct");
   } else {
     if (!grandParent.getAttribute("class") ||
-        !grandParent.getAttribute("class").includes("bg-green-700")) {
+        !grandParent.getAttribute("class").includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
     }
     // console.log(grandParent.lastChild);
@@ -147,11 +147,11 @@ function evaluateWriteIn(input, id, grandParent) {
       input.classList.remove("!bg-red-500")
     }
 
-    input.classList.add("bg-green-700");
+    input.classList.add("!bg-green-700");
     // console.log("correct");
   } else {
     if (!input.getAttribute("class") ||
-        !input.getAttribute("class").includes("bg-green-700")) {
+        !input.getAttribute("class").includes("!bg-green-700")) {
       input.classList.add("!bg-red-500");
     }
     // console.log(grandParent.lastChild);
@@ -169,7 +169,7 @@ function evaluateRadioBox(input, id, grandParent) {
   if (!input.checked) {
     // console.log(input);
     if (grandParent.getAttribute("class") &&
-        !grandParent.getAttribute("class").includes("bg-green-700")) {
+        !grandParent.getAttribute("class").includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
     }
     if (correctOptions[id] == value) {
@@ -184,9 +184,9 @@ function evaluateRadioBox(input, id, grandParent) {
       grandParent.classList.remove("!bg-red-500")
     }
     input.classList.add('bg-green-200');
-    grandParent.classList.add("bg-green-700");
+    grandParent.classList.add("!bg-green-700");
   } else {
-    if (!parent_classes || !parent_classes.includes("bg-green-700")) {
+    if (!parent_classes || !parent_classes.includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
     }
   }
