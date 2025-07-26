@@ -9,12 +9,6 @@
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
 
         <!-- Password -->
         <div class="mt-4">
@@ -37,6 +31,13 @@
                             name="password_confirmation" required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+        <!-- Contact -->
+        <div class="mt-4">
+            <x-input-label for="description" :value="__('Description')" />
+            <br>
+            <textarea rows="3" cols="40"id="description" class="block mt-1 w-full"  name="description" required autocomplete="username" placeholder="in here write any form of contact(preferably discord) in case people might want you to change a mistake that you've made "></textarea>
+            {{--<x-input-error :messages="$errors->get('email')" class="mt-2" />--}}
         </div>
 
         <div class="flex items-center justify-end mt-4">

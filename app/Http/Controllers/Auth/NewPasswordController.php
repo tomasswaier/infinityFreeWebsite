@@ -13,6 +13,12 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+
+
+/*
+ *
+ * imma leave this be...  i dont wanna deal with email adresses nor changing password
+ */
 class NewPasswordController extends Controller
 {
     /**

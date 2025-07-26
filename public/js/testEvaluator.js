@@ -2,6 +2,9 @@ if (!document) {
   const {document} = require("postcss");
 }
 
+var countCorrect = 0;
+var countAll = 0;
+
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = correct_values[id];
   // console.log(correct_values);
@@ -40,6 +43,8 @@ function isCorrect(correctAnswer, userInputElement) {
 }
 
 function submitForm(event) {
+  countCorrect = 0;
+  countAll = 0;
   if (event) {
     event.preventDefault();
   }
@@ -62,6 +67,8 @@ function submitForm(event) {
     console.log(explanation);
     explanation.removeAttribute('hidden');
   });
+  document.getElementById('result_info').innerText =
+      countCorrect + '/' + countAll;
 }
 
 function evaluateOptions(inputs, correctValues, selectedFunction) {
@@ -94,20 +101,21 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       // todo:this
     } else {
     }
-    if (is_correct(name_id, value, type, input_value, correctValues)) {
-      if (parent.getAttribute("class") &&
-          parent.getAttribute("class").includes("!bg-red-500")) {
-        parent.classList.remove("!bg-red-500")
-      }
 
-      parent.classList.add("!bg-green-700");
-      // console.log("correct");
-    } else {
-      if (!parent.getAttribute("class") ||
-          !parent.getAttribute("class").includes("!bg-green-700")) {
-        parent.classList.add("!bg-red-500");
-      }
-    }
+    // if (is_correct(name_id, value, type, input_value, correctValues)) {
+    //   if (parent.getAttribute("class") &&
+    //       parent.getAttribute("class").includes("!bg-red-500")) {
+    //     parent.classList.remove("!bg-red-500")
+    //   }
+
+    //  parent.classList.add("!bg-green-700");
+    //  // console.log("correct");
+    //} else {
+    //  if (!parent.getAttribute("class") ||
+    //      !parent.getAttribute("class").includes("!bg-green-700")) {
+    //    parent.classList.add("!bg-red-500");
+    //  }
+    //}
   };
 }
 
@@ -120,6 +128,7 @@ function evaluateSelect(input, id, grandParent) {
     }
 
     grandParent.classList.add("!bg-green-700");
+    countCorrect++;
     // console.log("correct");
   } else {
     if (!grandParent.getAttribute("class") ||
@@ -136,6 +145,7 @@ function evaluateSelect(input, id, grandParent) {
       grandParent.appendChild(explanation);
     }
   }
+  countAll++;
 }
 
 function evaluateWriteIn(input, id, grandParent) {
@@ -162,6 +172,7 @@ function evaluateWriteIn(input, id, grandParent) {
       grandParent.appendChild(explanation);
     }
   }
+  countAll++;
 }
 
 function evaluateRadioBox(input, id, grandParent) {
@@ -178,6 +189,7 @@ function evaluateRadioBox(input, id, grandParent) {
     }
     return;
   }
+  countAll++;
   var parent_classes = grandParent.getAttribute("class");
   if (correctOptions[id] == value) {
     if (parent_classes && parent_classes.includes("!bg-red-500")) {
@@ -185,6 +197,7 @@ function evaluateRadioBox(input, id, grandParent) {
     }
     input.classList.add('bg-green-200');
     grandParent.classList.add("!bg-green-700");
+    countCorrect++;
   } else {
     if (!parent_classes || !parent_classes.includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");

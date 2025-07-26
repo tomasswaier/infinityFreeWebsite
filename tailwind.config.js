@@ -1,21 +1,33 @@
-import defaultTheme from 'tailwindcss/defaultTheme';
-import forms from '@tailwindcss/forms';
+const defaultTheme = require('tailwindcss/defaultTheme');
+const forms = require('@tailwindcss/forms');
 
-/** @type {import('tailwindcss').Config} */
-export default {
-    content: [
-        './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
-        './storage/framework/views/*.php',
-        './resources/views/**/*.blade.php',
-    ],
+module.exports = {
+  content :
+          [
+            './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+            './storage/framework/views/*.php',
+            './resources/views/**/*.blade.php',
+            './public/js/*.js',
+            './public/css/*.css',
+            './**/*.blade.php',
+            './**/*.html',
+            './**/*.js',
+            './**/*.vue',
 
-    theme: {
-        extend: {
-            fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-            },
-        },
+          ],
+  theme : {
+    extend : {
+      fontFamily : {
+        sans : [ 'Figtree', ...defaultTheme.fontFamily.sans ],
+      },
+      colors : {
+        'project-white' : '#EFEFEF',
+        'project-light-blue' : '#B1E6F3',
+        'project-blue' : '#72DDF7',
+        'project-dark-blue' : '#79B8F4',
+        'project-super-blue' : '#8093F1',
+      },
     },
-
-    plugins: [forms],
+  },
+  plugins : [ forms ],
 };

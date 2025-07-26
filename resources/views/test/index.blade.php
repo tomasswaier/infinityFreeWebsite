@@ -9,7 +9,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Fiits ucks</title>
+        <title>moew</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -37,7 +37,7 @@
         <header class="" >
             <div class="">
                     <div class="bg-[#A33155] h-30 text-white text-8xl">
-                            <span class="logo">Fiitsa joke</span>
+                            <a href="{{url('/')}}" class="logo">FillerText</a>
                     </div>
                     <div id="ais_text" class="bg-[#A33155] text-white text-2xl text-right">text on right</div>
                     <div class="bg-[#A33155] mt-1 text-white text-right">
@@ -272,6 +272,7 @@
                 <span>Display all correct options:<input type="checkbox" name="displayCorrectAnswers" value="1"> </span><br>
 		        <button id="my_button" name="submit" class="border-black border p-2 rounded-md" ><u>Display test</u></button>
             </form>
+            <span id='result_info'></span>
         @endif
         </main>
         {{--
