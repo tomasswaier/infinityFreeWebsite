@@ -17,9 +17,13 @@ use PhpParser\Node\Stmt\Foreach_;
 
 class TestController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
-        return view('test/index',['tests'=>Test::all()]);
+        $school_id= $request->session()->get('school_id',-1);
+        if ($school_id==-1) {
+            return redirect('/');
+        }
+        return view('test/index',['tests'=>Test::where('school_id','=',$school_id)->get()]);
     }
     public function showTestQuestionNames($testId)
     {
@@ -131,7 +135,7 @@ class TestController extends Controller
     }
     public function addQuestion(Request $request){
         try {
-            //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ?
+            //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ? would hidden input be better?
             $test_id= $request->session()->get('test_id',-1);
 
             $input=$request->except('_token','submit','question_explanation');

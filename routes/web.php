@@ -1,15 +1,13 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
+use illuminate\support\facades\route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\AdminController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('mainPage');
-
+Route::get('/', [SchoolController::class, 'showAll'])->name('mainPage');
 //example of old urls
 // http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
 //im thinking that if something like this comes I extract it with js and add link with
@@ -17,7 +15,14 @@ Route::get('/', function () {
 Route::get('subjects', [SubjectController::class,'showAllSubjects'])->name('subjects');
 
 Route::get('subjects/{id}',[SubjectController::class,'showSubject']);
-Route::get('test', [TestController::class,'show'])->name('testPage');
+Route::get('school/',function(){
+    return redirect('/');
+});
+Route::get('school/{id}',function($id){
+    session(['school_id' => $id]);
+    return view('school');
+
+});
 
 //Route::get('/dashboard', function () {
 //    return view('dashboard');
@@ -68,6 +73,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin', [AdminController::class,'show'])->name('adminPage');
         Route::middleware('is_admin')->group(function () {
+            Route::get('admin/schoolCreator', function(){
+                return view('admin/schoolCreator');}
+            );
+            Route::post('admin/schoolCreator',[SchoolController::class,'save'])->name('school.store');
 
 
         });

@@ -9,6 +9,18 @@
         <br>
         <span>Content on this website is regulated only for racial slurs and nsfw content. If there happens to be content which violates copyright or any kind of law please contact me(discord .maryann)</span>
     </section>
+    <br>
+    <section class="m-30">
+        <span>click the buttons</span>
+        <div class="flex gap-4">
+            @foreach($schools as $school)
+            <a href="{{url('school/'.$school->id)}}" class="">
+            <div class="inline-block p-2 text-6xl bg-project-blue rounded-md hover:bg-project-light-blue">
+                <span>{{$school->name}}</span>
+            </div></a>
+            @endforeach
+        </div>
+    </section>
         <br>
     <section class="max-w-5xl">
         <h3>help</h3>
@@ -16,7 +28,7 @@
         <br><br>
         <span>This is an open source student project and passwords are not safe in my hands!</span>
         <br><br>
-        <span>There are 2 account tiers 1)user 2)supervisor. Supervisors role is to take care of content in school environments. They may create update delete everything and anything which belongs to school supervised by them. Users may only suggest changes to content on a study guide but it's up to supervisor to accept or deny this change. Users account may be changed to supervisor of certain school upon request(to me) or by another supervisor.</span>
+        <span>There are 2 account tiers 1)user 2)supervisor(tiny admin). Supervisors role is to take care of content in school environments. They may create update delete everything and anything which belongs to school supervised by them. Users may only suggest changes to content on a study guide but it's up to supervisor to accept or deny this change. Users account may be changed to supervisor of certain school upon request(to me) or by another supervisor.</span>
         <br><br>
         <span>study guide page coming soon)</span>
         <br><br>

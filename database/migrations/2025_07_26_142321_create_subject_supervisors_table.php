@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('subject_supervisors', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
-            $table->foreign('tests_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('subject_id');
-            $table->foreign('tests_id')->references('id')->on('subjects')->onDelete('cascade');
+            $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
             $table->timestamps();
         });
     }
