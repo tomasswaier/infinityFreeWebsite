@@ -3,11 +3,16 @@
 <div class="p-2">
     <div class="m-2 p-2 inline-block border border-black rounded-md">
     <span>Creators</span> <br>
-    <a href="{{url('admin/testCreator')}}"><u>Test Creator</u></a>
+    <span>fix</span><a href="{{url('admin/testCreator')}}"><u>Test Creator</u></a>
     <br>
-    <a href="{{url('admin/subjectCreator')}}"><u>Subject Creator</u></a>
+    <span>fix</span><a href="{{url('admin/subjectCreator')}}"><u>Subject Creator</u></a>
     <br>
+    @if(Auth::user()->authorization=='admin')
     <a href="{{url('admin/schoolCreator')}}"><u>School Creator</u></a>
+    <br>
+    <a href="{{url('admin/users/manage')}}"><u>User Manager</u></a>
+    <br>
+    @endif
     </div>
     <br>
     <div class="inline-block w-1/2 float-left">

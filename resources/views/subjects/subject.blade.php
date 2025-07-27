@@ -1,11 +1,11 @@
 @extends('layouts.app')
 @section('mainContent')
 
-@auth
+@if(Auth::user() && Auth::user()->authorization=='admin')
 <div class="h-20 bg-project-blue text-white">
     <a href="{{url('admin/subjectCreator/'.$subject['id'])}}">click me</a>
 </div>
-@endauth
+@endif
 
 <div class="p-10">
     <div class="ml-20">

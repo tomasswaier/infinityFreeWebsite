@@ -259,7 +259,7 @@
             <br><br>
         @endif
         @if(isset($tests))
-	        <form id='main_form' action="{{route('displayTest')}}" method="post" enctype="multipart/form-data" >
+	        <form id='main_form' action="{{url('test/')}}" method="post" enctype="multipart/form-data" >
                 @csrf
                 <span>Select Test</span>
                 <select id="test_selector" class="rounded-md appearance-auto bg-none p-2" name="test_selector">

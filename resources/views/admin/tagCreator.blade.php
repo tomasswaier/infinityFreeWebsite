@@ -5,6 +5,7 @@
         <div class="grid grid-flow-row row-auto align-middle">
             <form action="{{route('tag.store')}}" method="post" enctype="multipart/form-data">
                 @csrf
+                <input type="hidden" name="school_id" value="{{$school_id}}">
                 <h2>Tag Creator Page</h2>
                 <span>Name:</span>
                 <input type="text" name="tagName" value="" class="rounded-lg  bg-project-white  p-2 shadow-inner">

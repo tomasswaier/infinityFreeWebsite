@@ -12,9 +12,10 @@ use PDO;
 class SubjectController extends Controller
 {
 
-    public function showAllSubjects(Request $request){
+    public function showAllSubjects($school_id,Request $request){
         return view('subjects/index',[
-            'subjects'=>Subjects::all()
+            'subjects'=>Subjects::query()->where('school_id','=',$school_id)->get(),
+            'school_id'=>$school_id,
         ]);
     }
 
@@ -33,7 +34,7 @@ class SubjectController extends Controller
     }
 
 
-    public function editSubject(Request $request,$subjectId=null){
+    public function editSubject(Request $request,$schoolId,$subjectId=null){
         $info=$request->all();
         $subject=null;
         $selectedTags=null;
@@ -45,11 +46,12 @@ class SubjectController extends Controller
                 array_push($selectedTags,$tag['tag_id']);
             }
         }
-        $tags=Tag::all();
+        $tags=Tag::query()->where('school_id','=',$schoolId)->get();
         return view('admin/subjectCreator',[
         'allTags'=>$tags,
         'selectedTags'=>$selectedTags,
         'subject'=>$subject,
+        'school_id'=>$schoolId
         ]);
     }
     //
@@ -61,6 +63,7 @@ class SubjectController extends Controller
             $subject=new Subjects;
         }
         $subject->name=$info['subjectName'];
+        $subject->school_id=$info['school_id'];
         $subject->description=$info['subjectDescription'];
         $subject->tldr=$info['subjectTldr'];
         $subject->rating=$info['subjectRating'];
@@ -80,18 +83,20 @@ class SubjectController extends Controller
 
             }
         }
-        return redirect('admin/subjectCreator');
+        return redirect('admin/subjectCreator/'.$info['school_id']);
     }
 
     public function saveTag(Request $request){
+        //should I check the users rights here ? if im not mistaken then the csrf token should take care of someone just calling this but i'm not sure
         try {
             $info=$request->all();
             $tag= new Tag;
             $tag->name=$info['tagName'];
+            $tag->school_id=$info['school_id'];
             $tag->save();
         } catch (\Throwable $th) {
             Log::error('Error while creating Tag:'.$th);
         }
-        return redirect('admin/subjectCreator');
+        return redirect('admin/subjectCreator/'.$info['school_id']);
     }
 }

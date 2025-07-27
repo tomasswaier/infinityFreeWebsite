@@ -34,11 +34,12 @@
 <div class="p-10 text-project-dark-blue text-lg w-full h-full flex justify-center align-middle">
     <div class="p-4 bg-white inline-block rounded-lg shadow-neutral-500 shadow-md">
         <div class="grid grid-flow-row row-auto align-middle">
-            <form action="{{route('subject.store')}}" method="post" enctype="multipart/form-data">
+            <form action="{{url('admin/subjectCreator')}}" method="post" enctype="multipart/form-data">
                 @csrf
-                @if(isset($subject))
+                <input type="hidden" name="school_id" value="{{$school_id}}">
+                @isset($subject)
                     <input type="hidden" name="subjectId" value="{{$subject['id']}}">
-                @endif
+                @endisset
                 <h2>Subject Creator Page</h2>
                 <span>test Id:</span><br><br>
                 <div class="p-4">
@@ -68,7 +69,7 @@
                     </div>
                     <span>Todo: finish this </span>
                     <br>
-                    <a href="{{ url('admin/tagCreator')}}">Create tag!</a>
+                    <a href="{{ url('admin/tagCreator/'.$school_id)}}">Create tag!</a>
                 </div>
                 <button type="submit" class=" rounded-xl  p-2 shadow-neutral-800 shadow-sm">submit</button>
             </form>

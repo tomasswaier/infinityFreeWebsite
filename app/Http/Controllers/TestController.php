@@ -17,13 +17,15 @@ use PhpParser\Node\Stmt\Foreach_;
 
 class TestController extends Controller
 {
-    public function show(Request $request)
+    public function show($school_id,Request $request)
     {
-        $school_id= $request->session()->get('school_id',-1);
-        if ($school_id==-1) {
+        if (!$school_id ||$school_id<1) {
             return redirect('/');
         }
-        return view('test/index',['tests'=>Test::where('school_id','=',$school_id)->get()]);
+        return view('test/index',[
+            'tests'=>Test::where('school_id','=',$school_id)->get(),
+            'school_id' =>$school_id,
+        ]);
     }
     public function showTestQuestionNames($testId)
     {

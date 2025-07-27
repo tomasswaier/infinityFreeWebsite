@@ -3,11 +3,11 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
                 <div class="shrink-0 flex items-center">
-                    @auth
+                    @if(Auth::user() && Auth::user()->authorization!='user')
                         <x-nav-link :href="route('adminPage')" :active="request()->routeIs('admin')">
                             {{ __('Admin Page') }}
                         </x-nav-link>
-                    @endauth
+                    @endif
                 </div>
 
                 <!-- Navigation Links -->
@@ -15,12 +15,14 @@
                     <x-nav-link :href="route('mainPage')" :active="request()->routeIs('mainPage')">
                         {{ __('Main Page') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('testPage')" :active="request()->routeIs('testPage')">
-                        {{ __('Test Page') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('subjects')" :active="request()->routeIs('subjects')">
-                        {{ __('Subjects Page') }}
-                    </x-nav-link>
+                    @isset($school_id)
+                        <x-nav-link :href="url('test/'.$school_id)" >
+                            {{ __('Test Page') }}
+                        </x-nav-link>
+                        <x-nav-link :href="url('subjects/'.$school_id)" >
+                            {{ __('Subjects Page') }}
+                        </x-nav-link>
+                    @endisset
                     @auth
 
                     @else
