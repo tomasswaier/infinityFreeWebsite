@@ -40,15 +40,20 @@ Route::middleware('auth')->group(function () {
         return redirect('/');
     });
     //Route::post('test', [TestController::class,'getTest'])->name('displayTest');
+    Route::get('/profile', [ProfileController::class, 'info'])->name('profile.info');
+    Route::get('/profile/{id}', [ProfileController::class, 'info']);
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
 
     Route::middleware('more_than_user')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-        Route::get('admin/testCreator', function(){
-            return view('admin/testCreator');
-        })->name('admin/testCreator');
+        Route::get('admin/testCreator/{id}', function($id){
+            return view('admin/testCreator',[
+                'school_id'=>$id,
+            ]);
+        });
         Route::post('admin/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
         Route::get('admin/questionDisplay/{test_id}',[TestController::class,'showTestQuestionNames']);
         Route::get('admin/questionDelete/{questionId}',[TestController::class,'deleteQuestion']);
@@ -85,9 +90,7 @@ Route::middleware('auth')->group(function () {
             );
             Route::post('admin/schoolCreator',[SchoolController::class,'save'])->name('school.store');
 
-            Route::get('admin/users/manage', function(){
-                return view('admin/users/manage');}
-            );
+            Route::get('admin/users/manage', [ProfileController::class,'showAll']);
 
 
 

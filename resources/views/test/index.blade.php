@@ -83,6 +83,13 @@
             </div>
         </header>
         <main class="md:p-10 sm:p-0">
+        @if(Auth::user() && Auth::user()->authorization=='admin')
+        <div class="absolute right-0 bg-project-dark-blue text-project-white">
+            <span>Admin Panel</span>
+            <br>
+            <span><a href="{{url('admin/testCreator/'.$school_id)}}">create test</a></span>
+        </div>
+        @endif
         @if(isset($data))
             <form id='testForm'>
             <h1 class="">Test Site</h1>

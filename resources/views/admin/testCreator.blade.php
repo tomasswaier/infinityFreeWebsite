@@ -9,6 +9,7 @@
     <br>
     <form action="{{route('testCreator.store')}}" method="post" enctype="multipart/form-data">
         @csrf
+        <input type="hidden" name="school_id" value="{{$school_id}}">
         <span>Test Name:</span><input type="text" name="test_name" value=""><span>(this can be anything but try to keep it understandabale like "PSI final 2024/2025" )</span>
         <br>
         <span>Test CREATOR Name:"{{ Auth::user()->name }}"</span><span>(This field is derived from your profile thingy)</span>

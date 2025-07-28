@@ -8,35 +8,53 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function info(Request $request,$id=null): View
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
+        $user=null;
+        if ($id!=null) {
+            $user=User::find($id);
+        }else{
+            $user=$request->user();
+        }
+        $canAlterAuthorization=false;
+        return view('profile.info', [
+            'user' => $user,
+            'alter'=>$canAlterAuthorization,
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
+    public function update(Request $request,$id)
+    {
+
+        $user= User::find($id);
+        return view('profile.update', [
+            'user' => $user,
+        ]);
+
+    }
+    /*
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $request->user()->fill($request->validated());
 
-        /*
         if ($request->user()->isDirty('name')) {
             $request->user()->email_verified_at = null;
-        }*/
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.info')->with('status', 'profile-updated');
     }
+     */
 
     /**
      * Delete the user's account.
@@ -57,5 +75,11 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+    public function showAll(Request $request){
+
+        return view('admin.users.manage',[
+            'users'=>User::all(),
+        ]);
     }
 }

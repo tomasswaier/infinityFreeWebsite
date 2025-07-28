@@ -11,7 +11,8 @@ use App\Models\Test;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
-use PhpParser\Node\Stmt\Foreach_;
+
+use function App\supervisesClass;
 
 //use app\Models\Question;
 
@@ -55,10 +56,12 @@ class TestController extends Controller
             $question['image']=(new ImageController)->show($question->id);
         }
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
-
+        $tempModel=Test::find($test_id);
+        $school_id=$tempModel->school_id;
         return view('test/index',[
             'tests'=>Test::all(),
             'data'=>$data,
+            'school_id'=>$school_id,
             'displayCorrectAnswers'=>$loadCorrectOptions
         ]
         );
@@ -73,19 +76,26 @@ class TestController extends Controller
     }
     //
     public function createTest(Request $request) {
-        try {
-            $id=Test::create([
-                'test_name'=>$request['test_name'],
-                'test_author'=>Auth::user()->name,
-                'number_of_submits'=>0,
-            ]);
-        } catch (\Throwable $e) {
-            Log::error('Test creation failed: '.$e->getMessage(), [
-                'trace' => $e->getTraceAsString()
-            ]);
+        $user=$request->user();
+        $school_id=$request['school_id'];
+        if (supervisesClass($user,$school_id)) {
+            try {
+                $id=Test::create([
+                    'test_name'=>$request['test_name'],
+                    'school_id'=>$request['school_id'],
+                    'test_author'=>Auth::user()->name,
+                    'number_of_submits'=>0,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Test creation failed: '.$e->getMessage(), [
+                    'trace' => $e->getTraceAsString()
+                ]);
 
+            }
+            return redirect('admin')->with('success', 'owo created!');
+        }else{
+            return redirect('admin');
         }
-        return redirect('admin')->with('success', 'owo created!');
     }
     public function updateQuestion(Request $request){
         $questionId=$request['question_id'];
