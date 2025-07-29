@@ -30,21 +30,24 @@
     </table>
 
     </div>
-    <div class="w-1/2 inline-block">
-        <table class="border">
-            <thead>
-            <tr>
-            <th class="w-60">Test name</th>
-            <th class="w-20">id</th>
-            <th class="w-40">edit button?</th>
-            <th class="w-40">add question</th>
-            <th class="w-40">delte text</th>
-            </tr>
+    <div class="w-1/2 inline-block rounded-md ">
+        <table class="border rounded-xl overflow-hidden">
+            <thead class="bg-project-super-blue px-4 h-16 text-xl text-white ">
+                <tr>
+                    <th name="styling" class="w-4"></th>
+                    <th class="w-60">Test name</th>
+                    <th class="w-40">edit</th>
+                    <th class="w-40">add question</th>
+                    <th class="w-40">delete</th>
+                    <th name="styling" class="w-4"></th>
+                </tr>
             </thead>
         @foreach($tests as $test)
             <tr class="border">
-             <td>{{$test->test_name}}</td> <td>{{$test->id}}</td> <td><a  href="{{url('admin/questionDisplay/'.$test->id)}}">|?|</a></td>  <td><a  href="{{url('admin/questionCreator/'.$test->id)}}">|+|</a></td><td><button type="submit" title="heh lmao never gonna implement this">X</button></td>
-             <td></td>
+                <td name="styling"></td>
+                <td align="center">{{$test->test_name}}</td><td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}"><img src="{{asset('storage/assets/edit_icon.png')}}" class="h-10 w-auto" alt="random edit icon"></a></td><td align="center"><a  href="{{url('admin/questionCreator/'.$test->id)}}" class="text-4xl font-bold">+</a></td><td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td>
+                <td name="styling"></td>
+                <td></td>
 
             </tr>
         @endforeach

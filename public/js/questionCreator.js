@@ -661,12 +661,13 @@ function load_input_field(
   // form_element.innerHTML = "";
   //  apend field for question text input
   const question_name_wrapper = document.createElement("div");
-  question_name_wrapper.setAttribute("class", "block");
   const question_name_input = document.createElement("textarea");
   question_name_input.required = true;
   question_name_input.setAttribute("rows", "4");
   question_name_input.setAttribute("cols", "50");
   question_name_input.setAttribute("name", "question_text");
+  question_name_input.classList.add('bg-project-white', 'p-2', 'rounded-md',
+                                    'mb-4')
   question_name_input.setAttribute("placeholder",
                                    "Question : who has dog with 4 eyes?");
   if (question) {
@@ -678,7 +679,7 @@ function load_input_field(
   if (!document.getElementById('user_image')) {
     const has_image = document.createElement("div");
     has_image.innerHTML =
-        '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" /><br><img id="display_image" src="" />';
+        '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" class="bg-project-super-blue" /><br><img id="display_image" src="" />';
     form_element.appendChild(has_image);
   }
   // apend options select element
