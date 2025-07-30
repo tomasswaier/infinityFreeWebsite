@@ -34,6 +34,8 @@ class Option {
   constructor(event, button) {};
   get_preceding_text(option_id, option, hidden = false) {
     const preceding_text_input_field = document.createElement("textarea");
+    preceding_text_input_field.setAttribute('class',
+                                            'p-1 rounded-md bg-project-white');
     preceding_text_input_field.setAttribute("cols", "50");
     preceding_text_input_field.setAttribute("rows", "2");
     preceding_text_input_field.setAttribute(
@@ -103,6 +105,7 @@ class MultipleChoice extends Option {
     const parent = document.getElementById("options_table");
     parent.appendChild(wrapper);
     this.table.appendChild(this.initialize_column_row(new_option_number));
+    this.table.appendChild(document.createElement('tbody'));
     const button_add_row = document.createElement("button");
     this.table.parentElement.appendChild(button_add_row);
     button_add_row.onclick = function(
@@ -132,7 +135,6 @@ class MultipleChoice extends Option {
     const column_names_row = document.createElement("tr");
     column_names_row.setAttribute("id", "column_names_row");
     self.columns = column_names_row;
-    column_names_row.classList.add("flex", "flex-nowrap", "block");
     table_head.appendChild(column_names_row);
     const button_add_columns = document.createElement("button");
     button_add_columns.setAttribute("type", "button");
@@ -173,11 +175,11 @@ class MultipleChoice extends Option {
       column_row.appendChild(empty_cell)
     }
     const new_options_row = document.createElement("tr");
-    new_options_row.classList.add("flex", "justify-center");
-    parent.appendChild(new_options_row);
+    // new_options_row.classList.add("flex", "justify-center");
+    parent.children[1].appendChild(new_options_row);
     for (let i = 0; i < column_number; i++) {
       const option_wrapper = document.createElement("td");
-      option_wrapper.classList.add("w-30", "flex", "justify-center");
+      option_wrapper.setAttribute('align', 'center');
       new_options_row.appendChild(option_wrapper)
       const radio_button_option = document.createElement("input");
       radio_button_option.required = true;
@@ -193,8 +195,8 @@ class MultipleChoice extends Option {
     }
     const input_wrapper = document.createElement("td")
     new_options_row.appendChild(input_wrapper);
-    input_wrapper.classList.add("w-30")
     const input_field = document.createElement("input");
+    input_field.setAttribute('class', 'p-1 rounded-md bg-project-white');
     input_wrapper.appendChild(input_field)
     input_field.setAttribute("id",
                              "row_text_" + option_number + "_" + row_number);
@@ -211,7 +213,7 @@ class MultipleChoice extends Option {
       event.preventDefault();
     }
     const column_number = column_row.children.length - 1;
-    const new_column = document.createElement("td");
+    const new_column = document.createElement("th");
 
     column_row.appendChild(new_column);
     new_column.setAttribute("name", "column_name_" + column_number);
@@ -276,6 +278,7 @@ class BooleanChoiceOneCorrect extends Option {
                                               my_option_number + "_" +
                                               specific_option_number);
     user_input_field.setAttribute("placeholder", "option text ...");
+    user_input_field.setAttribute('class', 'bg-project-white p-2 rounded-md')
     if (option_text) {
       user_input_field.innerText = option_text;
     }
@@ -386,6 +389,7 @@ class BooleanChoiceClass extends Option {
                                               my_option_number + "_" +
                                               specific_option_number);
     user_input_field.setAttribute("placeholder", "option text ...");
+    user_input_field.setAttribute('class', 'bg-project-white p-2 rounded-md')
     if (choice) {
       user_input_field.innerText = choice['option_text'];
     }
@@ -523,6 +527,7 @@ class OneFromMany extends Option {
                                             "_" + private_option_num);
     user_input_field.setAttribute("name", "option_number_" + my_option_number +
                                               "_" + private_option_num);
+    user_input_field.setAttribute('class', 'bg-project-white p-2 rounded-md')
     user_input_field.required = true;
     user_input_field.onchange = function() {
       let newText = user_input_field.value;
@@ -611,7 +616,8 @@ function process_option_type(event, user_option, question = null) {
   const question_type_user_input_wrapper =
       document.getElementById("question_type_user_input_wrapper");
   question_type_user_input_wrapper.innerHTML = "";
-  const options_table = document.createElement("table");
+  const options_table = document.createElement("div");
+  options_table.setAttribute('class', 'bg-project-light-blue p-2 rounded-md')
   question_type_user_input_wrapper.appendChild(options_table);
   options_table.setAttribute("id", "options_table");
   options_table.setAttribute("name", "options_table");
@@ -678,14 +684,17 @@ function load_input_field(
   // append field for optional user image
   if (!document.getElementById('user_image')) {
     const has_image = document.createElement("div");
+    has_image.classList.add('mb-4');
     has_image.innerHTML =
-        '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" class="bg-project-super-blue" /><br><img id="display_image" src="" />';
+        '<input id="user_image" name="user_image" type="file" onChange="display_input_image()" class=" text-sm text-grey-500 file:mr-5 file:py-2 file:px-6 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-project-white file:text-blue-700 hover:file:cursor-pointer hover:file:bg-project-light-blue " /><br><img id="display_image" src="" />';
     form_element.appendChild(has_image);
   }
   // apend options select element
   const question_type_selector_wrapper = document.createElement("div");
   form_element.append(question_type_selector_wrapper);
   const question_type_selector = document.createElement("select");
+  question_type_selector.setAttribute('class',
+                                      'mb-4 p-2 bg-project-white rounded-md');
   question_type_selector_wrapper.appendChild(question_type_selector);
   question_type_selector.setAttribute("id", "question_type_selector");
   question_type_selector.setAttribute("onChange",
