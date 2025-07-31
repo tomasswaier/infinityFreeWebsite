@@ -33,23 +33,34 @@ var option_number = 0;
 class Option {
   constructor(event, button) {};
   get_preceding_text(option_id, option, hidden = false) {
-    const preceding_text_input_field = document.createElement("textarea");
-    preceding_text_input_field.setAttribute('class',
-                                            'p-1 rounded-md bg-project-white');
-    preceding_text_input_field.setAttribute("cols", "50");
-    preceding_text_input_field.setAttribute("rows", "2");
-    preceding_text_input_field.setAttribute(
+    const wrapper = document.createElement('div');
+    const preceding_text_field = document.createElement("textarea");
+    wrapper.appendChild(preceding_text_field);
+    preceding_text_field.setAttribute('class',
+                                      'p-1 rounded-md bg-project-white');
+    preceding_text_field.setAttribute("cols", "50");
+    preceding_text_field.setAttribute("rows", "2");
+    preceding_text_field.setAttribute(
         "name", "preceding_text_" + this.toString() + "_" + option_id);
-    preceding_text_input_field.setAttribute(
+    preceding_text_field.setAttribute(
         "placeholder", "Here goes preceding text(can be left blank)");
     if (option) {
-      preceding_text_input_field.value = option['preceding_text'];
+      preceding_text_field.value = option['preceding_text'];
     }
     if (hidden) {
-      preceding_text_input_field.hidden = true;
+      preceding_text_field.hidden = true;
     }
+    const del_button = document.createElement('input');
+    wrapper.appendChild(del_button);
+    del_button.type = "button";
+    del_button.value = "X"
+    del_button.setAttribute(
+        'class',
+        'p-1 rounded-md bg-project-super-blue m-2 hover:bg-project-dark-blue w-8 ');
+    del_button.onclick =
+        function() { del_button.parentElement.parentElement.innerHTML = ""; }
 
-    return preceding_text_input_field;
+    return wrapper;
   }
   dummy_function(parent) {
     const meow = document.createElement('span');
@@ -96,9 +107,9 @@ class MultipleChoice extends Option {
       id.type = "hidden";
       id.value = option['id'];
     }
-    const preceding_text_input_field =
+    const preceding_text_field =
         this.get_preceding_text(new_option_number, option);
-    wrapper.appendChild(preceding_text_input_field);
+    wrapper.appendChild(preceding_text_field);
     const table = document.createElement("table");
     this.table = table;
     wrapper.appendChild(table);
@@ -158,7 +169,7 @@ class MultipleChoice extends Option {
   add_row(event, parent, option_number, row_data = null) {
     // adds one row with this.column_number number of radio buttons + input
     const column_number = parent.children[0].children[0].children.length - 1
-    const row_number = parent.children.length - 1;
+    const row_number = parent.children[1].children.length - 1;
     if (event) {
       event.preventDefault();
     }
@@ -180,6 +191,8 @@ class MultipleChoice extends Option {
     for (let i = 0; i < column_number; i++) {
       const option_wrapper = document.createElement("td");
       option_wrapper.setAttribute('align', 'center');
+      option_wrapper.setAttribute('valign', 'middle');
+
       new_options_row.appendChild(option_wrapper)
       const radio_button_option = document.createElement("input");
       radio_button_option.required = true;
@@ -251,13 +264,16 @@ class BooleanChoiceOneCorrect extends Option {
     }
     const table_row = document.createElement("tr");
     parent.appendChild(table_row);
-    const fieldset = document.createElement("fieldset");
-    table_row.appendChild(fieldset);
+    const table_data = document.createElement('td');
+    table_row.appendChild(table_data);
+    table_data.setAttribute('align', 'center');
+    table_data.setAttribute('valign', 'middle');
     const specific_option_number =
-        fieldset.parentElement.parentElement.children.length - 2;
+        table_data.parentElement.parentElement.children.length - 2;
     const is_correct = document.createElement("input");
-    fieldset.appendChild(is_correct);
+    table_data.appendChild(is_correct);
     is_correct.setAttribute("type", "radio");
+    is_correct.setAttribute('class', 'w-10');
     // Ill fix it some other time
     is_correct.setAttribute("value", specific_option_number);
     if (correct_index == specific_option_number) {
@@ -282,7 +298,7 @@ class BooleanChoiceOneCorrect extends Option {
     if (option_text) {
       user_input_field.innerText = option_text;
     }
-    fieldset.appendChild(user_input_field);
+    table_data.appendChild(user_input_field);
   }
 
   add_child_option(event, option = null) {
@@ -302,9 +318,9 @@ class BooleanChoiceOneCorrect extends Option {
     }
     const new_option_number = option_number;
 
-    const preceding_text_input_field =
+    const preceding_text_field =
         this.get_preceding_text(new_option_number, option);
-    wrapper.appendChild(preceding_text_input_field);
+    wrapper.appendChild(preceding_text_field);
     const input_table = document.createElement('table');
     wrapper.appendChild(input_table);
     const indicator = document.createElement("tr");
@@ -413,9 +429,9 @@ class BooleanChoiceClass extends Option {
     }
     const new_option_number = option_number;
 
-    const preceding_text_input_field =
+    const preceding_text_field =
         this.get_preceding_text(new_option_number, option);
-    wrapper.appendChild(preceding_text_input_field);
+    wrapper.appendChild(preceding_text_field);
     const input_table = document.createElement('table');
     wrapper.appendChild(input_table);
     const indicator = document.createElement("tr");
@@ -449,15 +465,34 @@ class WriteIn extends Option {
     super();
     var self = this;
     button.onclick = function(event) { self.add_child_option(event) };
+    this.init_class();
   }
+  init_class() {
+
+    const wrapper = document.getElementById("options_table");
+    const option_wrapper = document.createElement('div');
+    wrapper.appendChild(option_wrapper);
+    option_wrapper.id = 'write_in_options_table';
+
+    const after_text = document.createElement('textarea');
+    wrapper.appendChild(after_text);
+    after_text.setAttribute('class', 'p-1 rounded-md bg-project-white mt-8');
+    after_text.setAttribute("cols", "50");
+    after_text.setAttribute("rows", "2");
+    after_text.setAttribute("name", "after_text");
+    after_text.setAttribute("id", "after_text");
+    after_text.setAttribute("placeholder",
+                            "Here goes after text(can be left blank)");
+  }
+
   toString() { return 'write_in'; }
 
   add_child_option(event, option = null) {
     if (event) {
       event.preventDefault();
     }
-    const wrapper = document.getElementById("options_table");
-    const table_row = document.createElement("tr");
+    const wrapper = document.getElementById("write_in_options_table");
+    const table_row = document.createElement("div");
     wrapper.appendChild(table_row);
     const fieldset = document.createElement("fieldset");
     table_row.appendChild(fieldset);
@@ -469,21 +504,24 @@ class WriteIn extends Option {
       id.value = option['id'];
     }
 
-    const preceding_text_input_field =
-        this.get_preceding_text(option_number, option);
-    fieldset.appendChild(preceding_text_input_field);
-
+    const preceding_text_field = this.get_preceding_text(option_number, option);
+    fieldset.appendChild(preceding_text_field);
     const user_input_field = document.createElement("input");
     fieldset.appendChild(user_input_field);
     user_input_field.setAttribute("type", "text");
     user_input_field.setAttribute("id", "option_number_" + option_number);
     user_input_field.setAttribute("name", "option_number_" + option_number);
+    user_input_field.setAttribute("class", "mb-6");
     user_input_field.setAttribute("placeholder", "expected answer");
     user_input_field.required = true;
 
     if (option) {
       console.log(option['data']['correct_answer']);
       user_input_field.value = option['data']['correct_answer'];
+      if (option['data']['after_text']) {
+        document.getElementById('after_text').innerText =
+            option['data']['after_text'];
+      }
     }
     option_number++;
   }
@@ -558,9 +596,9 @@ class OneFromMany extends Option {
       id.name = "option_id_" + option_number;
       id.value = select['id'];
     }
-    const preceding_text_input_field =
+    const preceding_text_field =
         this.get_preceding_text(new_option_number, select);
-    table_row.appendChild(preceding_text_input_field);
+    table_row.appendChild(preceding_text_field);
 
     const example_selector = document.createElement("select");
     table_row.appendChild(example_selector);
@@ -626,7 +664,8 @@ function process_option_type(event, user_option, question = null) {
   const option_input_creator = document.createElement("button");
 
   option_input_creator.classList.add("border", "rounded-md", "w-10",
-                                     "border-black", "!bg-green-200");
+                                     "border-black", "!bg-project-super-blue",
+                                     'mt-4');
   // console.log(option_input_creator);
   option_input_creator.setAttribute("type", "button");
   option_input_creator.innerHTML = "+";
@@ -721,8 +760,7 @@ function load_input_field(
   if (question) {
     question_type_selector.value =
         question['options'][0]['option_type'].replaceAll('_', '-');
-  }
-
+    }
     // append default option(boolean-choice) to form
     if (question) {
         process_option_type(
@@ -742,6 +780,8 @@ function load_input_field(
     explanation_input.setAttribute("name", "question_explanation");
     explanation_input.setAttribute("placeholder",
         "Explenation:No one has dog with 4 eyes because dogs have 2 eyes");
+    explanation_input.classList.add('bg-project-white', 'p-2', 'rounded-md',
+        'mb-4')
     form_element.appendChild(document.createElement("br"));
 
     // append final button
@@ -749,6 +789,6 @@ function load_input_field(
     test_submit_button.setAttribute("type", "submit");
     test_submit_button.setAttribute("name", "submit");
     test_submit_button.innerHTML = "submit";
-    test_submit_button.classList.add("border", "border-black");
+    test_submit_button.classList.add("border", 'rounded-md', 'p-2', "bg-project-super-blue", 'border-none', 'm-4');
     form_element.appendChild(test_submit_button);
 }

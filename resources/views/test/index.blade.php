@@ -153,6 +153,9 @@
                                                 value="{{$option['data']['correct_answer']}}"
                                             @endif
                                             ></span>
+                                            @isset($option['data']['after_text'])
+                                                <span>{{$option['data']['after_text']}}</span>
+                                            @endisset
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['correct_answer'];
                                                 $optionIndex++;

@@ -112,8 +112,8 @@ class TestController extends Controller
         }
         $inputs=$request->except('_token','submit','question_id','question_explanation','user_image');
         $this->insertOptionsFromArray($inputs,$questionId);
-        Log::info($request);
-        Log::info($originalOptions);
+        //Log::info($request);
+        //Log::info($originalOptions);
 
         //iterating trough the array and finding all options which are no longer in the request array
         //chatgpt line... very likely a first one
@@ -128,7 +128,8 @@ class TestController extends Controller
         $optionsToRemove->each(function ($option) {
             Option::destroy($option->id);
         });
-        return redirect('admin')->with('success');
+        $test=Test::find($question['tests_id']);
+        return redirect('admin/questionDisplay/'.$test['school_id']);
     }
     private  function updateImages($request,$savedImages){
         // I am just deleting all and replacign them with new ones. this is not the best approach but really doesn't matter
@@ -136,8 +137,8 @@ class TestController extends Controller
         $prevImage=$request['prev_image'];
         foreach($savedImages as $image){
             if ($image['image_name']!=$prevImage) {
-                Log::info('deleting image:');
-                Log::info($image);
+                //Log::info('deleting image:');
+                //Log::info($image);
                 (new ImageController)->delete($image->image_name);
             }
         }
@@ -164,10 +165,10 @@ class TestController extends Controller
             if (isset($request['user_image'])) {
                     $response=(new ImageController)->upload($request['user_image'],$question->id);
                     if ($response==1) {
-                            Log::info('Image saved');
+                            //Log::info('Image saved');
                     }
                     else{
-                        Log::info('Image did not get saved');
+                        Log::error('Image did not get saved');
                     }
             }
 
@@ -194,7 +195,7 @@ class TestController extends Controller
                     $prevOption=$key;
                     continue;
                 }
-                if ($key=="question_text") {
+                if ($key=="question_text"||$key=="prev_image") {
                     continue;
                 }
                 if (str_contains($key,'preceding')) {
@@ -377,7 +378,7 @@ class BooleanChoiceOneCorrect extends QuestionType{
         //    $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
         //    $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
 
-        //}
+        //}correct_answer
         if (!isset($this->data['option_array'])) {
             $this->data['option_array']=collect();
         }
@@ -398,6 +399,8 @@ class WriteIn extends QuestionType{
     public function readOption($key,$val){
         if (str_contains($key,"option_number_")) {
             $this->data['correct_answer']=$val;
+        }else if (str_contains($key,"after_text")) {
+            $this->data['after_text']=$val;
         }else {
             Log::error('$key does not contain option_number_ .Error in input key:'.$key);
         }
