@@ -3,7 +3,7 @@
 
 @if(Auth::user() && Auth::user()->authorization=='admin')
 <div class="h-20 bg-project-blue text-white">
-    <a href="{{url('admin/subjectCreator/'.$subject['id'])}}">click me</a>
+    <a href="{{url('admin/subjectCreator/'.$subject['school_id'].'/'.$subject['id'])}}">click me</a>
 </div>
 @endif
 

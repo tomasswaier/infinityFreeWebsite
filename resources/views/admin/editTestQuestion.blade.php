@@ -4,7 +4,7 @@
 <div class="p-10">
     <h1>Question Creator. </h1>
     <br>
-    <div class="p-4 bg-project-dark-blue rounded-lg inline-block ">
+    <div class="p-4 bg-project-blue rounded-lg inline-block ">
         <form action="{{route('question.edit')}}"  method="post" enctype="multipart/form-data">
             @csrf
             <input name="question_id" type="hidden" value="{{$question['id']}}"/>
@@ -27,9 +27,14 @@
         </form ">
     </div>
 </div>
+@php
+$question->question_text = json_encode($question->question_text);
+@endphp
 <script>
-    let question_data=@json($question);
+    let question_data = @json($question);
+    question_data.question_text = JSON.parse(question_data.question_text);
     question_data['options']=@json($options);
+
 </script>
 <script src="{{ asset('js/questionCreator.js') }}" onload="load_input_field(question_data)"></script>
 @endsection

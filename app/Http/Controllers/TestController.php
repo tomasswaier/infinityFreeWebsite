@@ -67,12 +67,10 @@ class TestController extends Controller
         );
     }
     public function getTest(Request $request){
-        //Log::info($request->all());
         if ($request['displayCorrectAnswers']==1) {
             session(['displayCorrectAnswers' => true]);
         }
         return redirect('test/idonlikeppi/'.$request['test_selector'].'/'.$request['number_of_questions']);
-        //todo : learn routes
     }
     //
     public function createTest(Request $request) {
@@ -129,7 +127,7 @@ class TestController extends Controller
             Option::destroy($option->id);
         });
         $test=Test::find($question['tests_id']);
-        return redirect('admin/questionDisplay/'.$test['school_id']);
+        return redirect('admin/questionDisplay/'.$question['tests_id']);
     }
     private  function updateImages($request,$savedImages){
         // I am just deleting all and replacign them with new ones. this is not the best approach but really doesn't matter
@@ -224,12 +222,16 @@ class TestController extends Controller
                 }
             }
     }
+    private function getQuestionType($key){
+        $helperArr=explode('_',$key);
+        $questionType=substr($key,0,strlen($key)-strlen(last($helperArr))-1);
+        $questionType=substr($questionType,15,strlen($questionType)-15);
 
+        return $questionType;
+    }
 
     private function initQuestionTypeClass($key,$questionId,$precedingText,$inputs,$optionId){
-        //this could cause problems when entering more than 10 fields
-        $questionType=substr($key,0,strlen($key)-2);
-        $questionType=substr($questionType,15,strlen($questionType)-15);
+        $questionType=$this->getQuestionType($key);
         switch ($questionType) {
             case "boolean_choice":
                 $questionNumber=substr($key,30,strlen($key));

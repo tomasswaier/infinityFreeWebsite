@@ -56,7 +56,7 @@ class Option {
     del_button.value = "X"
     del_button.setAttribute(
         'class',
-        'p-1 rounded-md bg-project-super-blue m-2 hover:bg-project-dark-blue w-8 ');
+        'p-1 rounded-md bg-project-blue m-2 hover:bg-project-dark-blue w-8 ');
     del_button.onclick =
         function() { del_button.parentElement.parentElement.innerHTML = ""; }
 
@@ -296,7 +296,7 @@ class BooleanChoiceOneCorrect extends Option {
     user_input_field.setAttribute("placeholder", "option text ...");
     user_input_field.setAttribute('class', 'bg-project-white p-2 rounded-md')
     if (option_text) {
-      user_input_field.innerText = option_text;
+      user_input_field.value = option_text;
     }
     table_data.appendChild(user_input_field);
   }
@@ -407,7 +407,7 @@ class BooleanChoiceClass extends Option {
     user_input_field.setAttribute("placeholder", "option text ...");
     user_input_field.setAttribute('class', 'bg-project-white p-2 rounded-md')
     if (choice) {
-      user_input_field.innerText = choice['option_text'];
+      user_input_field.value = choice['option_text'];
     }
     fieldset.appendChild(user_input_field);
   }
@@ -716,7 +716,7 @@ function load_input_field(
   question_name_input.setAttribute("placeholder",
                                    "Question : who has dog with 4 eyes?");
   if (question) {
-    question_name_input.innerText = question['question_text'];
+    question_name_input.value = question['question_text'];
   }
   question_name_wrapper.appendChild(question_name_input);
   form_element.appendChild(question_name_wrapper);
@@ -774,7 +774,7 @@ function load_input_field(
     form_element.appendChild(explanation_input);
     explanation_input.setAttribute("rows", "4");
     if (question) {
-        explanation_input.innerText = question['explanation_text'];
+        explanation_input.value = question['explanation_text'];
     }
     explanation_input.setAttribute("cols", "50");
     explanation_input.setAttribute("name", "question_explanation");

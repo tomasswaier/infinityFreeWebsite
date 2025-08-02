@@ -5,11 +5,11 @@
     theme: {
       extend: {
         colors: {
-          'project-white': '#EFEFEF',
-          'project-light-blue': '#B1E6F3',
-          'project-blue': '#72DDF7',
-          'project-dark-blue': '#79B8F4',
-          'project-super-blue': '#8093F1',
+          'project-white': '#F9f9fd',
+          'project-light-blue': '#e7eefb;',
+          'project-blue': '#a5c0f0',
+          'project-dark-blue': '#004A99',
+          'project-super-blue': '#00254d',
         }
       }
     }
