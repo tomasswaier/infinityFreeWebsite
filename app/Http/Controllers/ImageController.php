@@ -18,12 +18,12 @@ class ImageController extends Controller
         $splitFile=explode('.',$image->getClientOriginalName());
         $fileType='.'.end($splitFile);
 
-        $imageName=$id.$fileType;
-        $insertedImage=QuestionImage::create([
-            'questions_id'=>$id,
-            'image_name'=>$imageName
-        ]);
+        $imageName=($id-1).$fileType;
         if ($image->storeAs('test_images', $imageName, 'public')) {
+            QuestionImage::create([
+                'questions_id'=>$id,
+                'image_name'=>$imageName
+            ]);
             return 1;
         }
         return 0;
