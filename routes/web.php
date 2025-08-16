@@ -71,8 +71,8 @@ Route::middleware('auth')->group(function () {
         Route::post('admin/questionCreator', [TestController::class,'addQuestion'])->name('question.store');
         Route::post('admin/questionEditor', [TestController::class,'updateQuestion'])->name('question.edit');
 
-        Route::get('admin/subjectCreator/{school_id}',[SubjectController::class,'editSubject']);//edit question is used for getting data for editing the question
-        Route::get('admin/subjectCreator/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);//edit question is used for getting data for editing the question
+        Route::get('admin/subjectCreator/{school_id}',[SubjectController::class,'editSubject']);
+        Route::get('admin/subjectCreator/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
         Route::post('admin/subjectCreator',[SubjectController::class,'saveSubject'])->name('subject.store');
 
 

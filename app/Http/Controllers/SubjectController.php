@@ -7,15 +7,19 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Subjects;
 use App\Models\SubjectTag;
 use App\Models\Tag;
-use PDO;
 
 class SubjectController extends Controller
 {
 
     public function showAllSubjects($school_id,Request $request){
+        $subjects=Subjects::query()->orderBy('rating','desc')->where('school_id','=',$school_id)->get();
+        foreach($subjects as &$subject){
+            $subject['tags']=Subjects::find($subject['id'])->tags()->get();
+        }
         return view('subjects/index',[
-            'subjects'=>Subjects::query()->where('school_id','=',$school_id)->get(),
+            'subjects'=>$subjects,
             'school_id'=>$school_id,
+            'tags'=>Tag::query()->where('school_id','=',$school_id)->get()
         ]);
     }
 
@@ -29,7 +33,8 @@ class SubjectController extends Controller
         }
 
         return view('subjects/subject',[
-            'subject'=>$subject
+            'subject'=>$subject,
+            'tags'=>Subjects::find($subject['id'])->tags()->get()
         ]);
     }
 
@@ -97,6 +102,6 @@ class SubjectController extends Controller
         } catch (\Throwable $th) {
             Log::error('Error while creating Tag:'.$th);
         }
-        return redirect('admin/subjectCreator/'.$info['school_id']);
+        return redirect()->back();
     }
 }
