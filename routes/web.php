@@ -6,7 +6,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\StudyGuideController;
 Route::get('/', [SchoolController::class, 'showAll'])->name('mainPage');
 //example of old urls
 // http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
@@ -49,19 +49,19 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('more_than_user')->group(function () {
 
-        Route::get('admin/testCreator/{id}', function($id){
-            return view('admin/testCreator',[
+        Route::get('admin/test/testCreator/{id}', function($id){
+            return view('admin/test/testCreator',[
                 'school_id'=>$id,
             ]);
         });
-        Route::post('admin/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
+        Route::post('admin/test/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
         Route::get('admin/questionDisplay/{test_id}',[TestController::class,'showTestQuestionNames']);
         Route::get('admin/questionDelete/{questionId}',[TestController::class,'deleteQuestion']);
 
         Route::get('admin/questionCreator/{test_id}', function($test_id)
         {
             session(['test_id' => $test_id]);
-            return view('admin/addTestQuestion',[
+            return view('admin/test/addQuestion',[
                 'test_id'=>$test_id,
             ]);
         });
@@ -92,6 +92,9 @@ Route::middleware('auth')->group(function () {
 
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
 
+            Route::get('admin/studyGuide/{school_id}',[StudyGuideController::class,'create']);
+            Route::get('admin/studyGuide/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
+            //Route::post('admin/studyGuide',[SubjectController::class,'saveSubject'])->name('subject.store');
 
 
         });

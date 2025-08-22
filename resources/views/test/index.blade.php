@@ -11,7 +11,7 @@
     <div class="absolute right-0 bg-project-dark-blue text-project-white">
         <span>Admin Panel</span>
         <br>
-        <span><a href="{{url('admin/testCreator/'.$school_id)}}">create test</a></span>
+        <span><a href="{{url('admin/test/testCreator/'.$school_id)}}">create test</a></span>
     </div>
     @endif
     @if(isset($data))

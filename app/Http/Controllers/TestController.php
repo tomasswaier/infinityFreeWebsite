@@ -30,13 +30,13 @@ class TestController extends Controller
     }
     public function showTestQuestionNames($testId)
     {
-        return view('admin/allTestQuestions',[
+        return view('admin/test/allQuestions',[
             'data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()
         ]);
     }
     public function editQuestion(Request $request,$questionId)
     {
-        return view('admin/editTestQuestion',[
+        return view('admin/test/editQuestion',[
             'question'=>Question::find($questionId),
             'options'=>Question::find($questionId)->options()->get(),
             'images'=>(new ImageController)->show($questionId)]);
