@@ -24,19 +24,21 @@ class TestController extends Controller
             return redirect('/');
         }
         return view('test/index',[
-            'tests'=>Test::where('school_id','=',$school_id)->get(),
+            'tests'=>Test::find($school_id)->get(),
             'school_id' =>$school_id,
         ]);
     }
     public function showTestQuestionNames($testId)
     {
-        return view('admin/allTestQuestions',['data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()]);
+        return view('admin/allTestQuestions',[
+            'data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()
+        ]);
     }
     public function editQuestion(Request $request,$questionId)
     {
         return view('admin/editTestQuestion',[
             'question'=>Question::find($questionId),
-            'options'=>Option::where('questions_id','=',$questionId)->get(),
+            'options'=>Question::find($questionId)->options()->get(),
             'images'=>(new ImageController)->show($questionId)]);
     }
     public function deleteQuestion($questionId,Request $request){
@@ -50,9 +52,9 @@ class TestController extends Controller
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
-        $data = Question::query()->where('tests_id','=',intval($test_id))->inRandomOrder()->limit($number_of_questions)->get();
+        $data = Test::find($test_id)->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
-            $question['options']=Option::query()->where('questions_id','=',$question->id)->get();
+            $question['options']=Question::find($question->id)->options()->get();
             $question['image']=(new ImageController)->show($question->id);
         }
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
