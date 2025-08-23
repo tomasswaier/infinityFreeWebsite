@@ -15,7 +15,7 @@ class AuthHelper
     }
 
 }
-function supervisesClass($user,$school_id){
+function supervisesSchool($user,$school_id){
     if (!$school_id||!$user||$user->authorization!='supervisor') {
         return false;
     }

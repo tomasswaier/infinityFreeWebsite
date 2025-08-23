@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
 
-use function App\supervisesClass;
+use function App\supervisesSchool;
 
 //use app\Models\Question;
 
@@ -78,7 +78,7 @@ class TestController extends Controller
     public function createTest(Request $request) {
         $user=$request->user();
         $school_id=$request['school_id'];
-        if (supervisesClass($user,$school_id)) {
+        if (supervisesSchool($user,$school_id)) {
             try {
                 $id=Test::create([
                     'test_name'=>$request['test_name'],

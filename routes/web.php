@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'info'])->name('profile.info');
     Route::get('/profile/{id}', [ProfileController::class, 'info']);
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile', [ProfileController::class, 'saveUpdate'])->name('profile.privilege.save');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
