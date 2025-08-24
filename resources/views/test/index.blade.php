@@ -7,15 +7,15 @@
         $questionNumber=0;
     @endphp
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-    @if(Auth::user() && Auth::user()->authorization=='admin')
-    <div class="absolute right-0 bg-project-dark-blue text-project-white">
+    @if(Auth::user() && supervisesSchool(Auth::user(),$school_id))
+    <div class="absolute right-0 bg-project-super-blue text-project-white p-3 rounded-md">
         <span>Admin Panel</span>
-        <br>
-        <span><a href="{{url('admin/test/testCreator/'.$school_id)}}">create test</a></span>
+        <br><br>
+        <span class=" bg-project-blue text-white rounded-sm p-2"><a href="{{url('admin/test/testCreator/'.$school_id)}}">create test</a></span>
     </div>
     @endif
     @if(isset($data))
-        <form id='testForm' class="xl:w-1/2 w-full">
+        <form id='testForm' class="xl:w-1/2 w-full"> {{--data is never sent hence no need for all form parameters even tho html demands them--}}
         @if($displayCorrectAnswers==true)
             <h1>CORRECT ANSWERS ARE</h1>
         @endif

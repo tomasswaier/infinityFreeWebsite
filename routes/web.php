@@ -16,14 +16,13 @@ Route::get('subjects', function(){
     return redirect('/');
 });
 Route::get('subjects/{id}', [SubjectController::class,'showAllSubjects']);
+Route::post('subjects/{id}', [SubjectController::class,'showAllSubjects']);
 Route::get('subjects/info/{id}',[SubjectController::class,'showSubject']);
 
 Route::get('school/',function(){
     return redirect('/');
 });
-Route::get('school/{id}',function($id){
-    return view('school',['school_id'=>$id]);
-});
+Route::get('school/{id}',[SchoolController::class,'info']);
 
 //Route::get('/dashboard', function () {
 //    return view('dashboard');
@@ -85,6 +84,8 @@ Route::middleware('auth')->group(function () {
         Route::post('admin/tagCreator',[SubjectController::class,'saveTag'])->name('tag.store');
 
         Route::get('admin', [AdminController::class,'show'])->name('adminPage');
+
+
         Route::middleware('is_admin')->group(function () {
             Route::get('admin/schoolCreator', function(){
                 return view('admin/schoolCreator');}
@@ -93,8 +94,14 @@ Route::middleware('auth')->group(function () {
 
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
 
-            Route::get('admin/studyGuide/{school_id}',[StudyGuideController::class,'create']);
-            Route::get('admin/studyGuide/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
+            Route::get('admin/studyGuide/create/{$id}', function($id){
+                return view('admin/studyGuide/create',[
+                    'school_id'=>$id,
+                ]);
+            } );
+
+            //Route::get('admin/studyGuide/{school_id}',[StudyGuideController::class,'create']);
+            //Route::get('admin/studyGuide/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
             //Route::post('admin/studyGuide',[SubjectController::class,'saveSubject'])->name('subject.store');
 
 

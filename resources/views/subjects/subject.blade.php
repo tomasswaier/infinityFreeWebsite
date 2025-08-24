@@ -20,12 +20,12 @@
     </div>
     <div class=" bg-red-100 w-30 h-30 "></div>
 </div>
-@if(Auth::user() && Auth::user()->authorization=='admin')
+@if(Auth::user() && supervisesSchool(Auth::user(),$school_id))
 <div class="right-0 bg-project-super-blue text-project-white p-3 rounded-md absolute">
     <h4>admin panel</h4>
     <a href=""></a>
     <div class="bg-project-blue text-white rounded-sm p-2 mb-2">
-        <a href="{{url('admin/subjectCreator/'.$subject['school_id'].'/'.$subject['id'])}}">click me</a>
+        <a href="{{url('admin/subjectCreator/'.$subject['school_id'].'/'.$subject['id'])}}">edit subject</a>
     </div>
 </div>
 @endif

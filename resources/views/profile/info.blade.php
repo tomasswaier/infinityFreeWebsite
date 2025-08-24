@@ -21,7 +21,6 @@
 </div>
 <div class="right-0 bg-project-super-blue text-project-white p-3 rounded-md absolute mr-4 mt-4">
     <h4>admin panel</h4>
-    <a href=""></a>
     <div class="bg-project-blue text-white rounded-sm p-2">
         <a href="{{url('profile/update/'.$user->id)}}">alter priviledges</a>
     </div>

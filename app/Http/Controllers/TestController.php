@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
 
-use function App\supervisesSchool;
+use function App\AuthHelper;
 
 //use app\Models\Question;
 
@@ -31,6 +31,7 @@ class TestController extends Controller
     public function showTestQuestionNames($testId)
     {
         return view('admin/test/allQuestions',[
+            //todo: change all the selct tags.. would be better to use relationship and by value
             'data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()
         ]);
     }
@@ -57,6 +58,7 @@ class TestController extends Controller
             $question['options']=Question::find($question->id)->options()->get();
             $question['image']=(new ImageController)->show($question->id);
         }
+        //todo:change this to an optional parameter in the url... idk why i put it into the session
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
         $tempModel=Test::find($test_id);
         $school_id=$tempModel->school_id;

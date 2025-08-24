@@ -23,4 +23,13 @@ class SchoolController extends Controller
         }
         return redirect('/');
     }
+    public function info(Request $request,$school_id){
+
+        return view('school',
+        [
+            'school_id'=>$school_id,
+            'study_guides'=>School::find($school_id)->studyGuides()->get(),
+        ]
+        );
+    }
 }

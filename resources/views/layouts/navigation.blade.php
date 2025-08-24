@@ -16,6 +16,10 @@
                         {{ __('Main Page') }}
                     </x-nav-link>
                     @isset($school_id)
+                        <x-nav-link :href="url('school/'.$school_id)" >
+                            {{ __('School Page') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="url('test/'.$school_id)" >
                             {{ __('Test Page') }}
                         </x-nav-link>

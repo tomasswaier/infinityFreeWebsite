@@ -11,8 +11,19 @@ use App\Models\Tag;
 class SubjectController extends Controller
 {
 
-    public function showAllSubjects($school_id,Request $request){
-        $subjects=Subjects::query()->orderBy('rating','desc')->where('school_id','=',$school_id)->get();
+    public function showAllSubjects(Request $request,$school_id){
+
+        $query=Subjects::query()->orderBy('rating','desc')->where('school_id','=',$school_id);
+        $parameters=$request->except('_token');
+        foreach($parameters as $parameter=>$id){
+            //if more than tag selectors will be added then this part will need adjusting based on $parameter
+            $query->whereHas('tags',function($q) use ($id){
+                $q->where('tag_id','=',$id);
+            });
+
+        }
+
+        $subjects=$query->get();
         foreach($subjects as &$subject){
             $subject['tags']=Subjects::find($subject['id'])->tags()->get();
         }
@@ -34,6 +45,7 @@ class SubjectController extends Controller
 
         return view('subjects/subject',[
             'subject'=>$subject,
+            'school_id'=>$subject->school_id,
             'tags'=>Subjects::find($subject['id'])->tags()->get()
         ]);
     }

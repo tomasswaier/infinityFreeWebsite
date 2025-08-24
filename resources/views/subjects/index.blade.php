@@ -4,12 +4,13 @@
     <section>
         <div class="inline-block float-left w-3/4">
             <h2>This is a page dedicated to sharing information about subjects. So you know what to expect</h2>
-            <form>
+            <form action="{{url('subjects/'.$school_id)}}" method="post" enctype="multipart/form-data">
+                @csrf
                 <div>
                     <h3 class="font-bold text-2xl">Tags</h3>
                     @foreach($tags as $tag)
                         <span>{{$tag['name']}}</span>
-                        <input type="checkbox" name="checkbox_{{$tag['id']}}" value="1">
+                        <input type="checkbox" name="checkbox_{{$tag['id']}}" value="{{$tag['id']}}">
                     @endforeach
                 </div>
                 <button type="submit" class="border-black border p-2 rounded-md mb-4 mt-2">Filter</button>
@@ -31,7 +32,8 @@
                 </tbody>
             </table>
         </div>
-        @if(Auth::user() && Auth::user()->authorization=='admin')
+
+        @if(Auth::user() && supervisesSchool(Auth::user(),$school_id))
         <div class="right-0 bg-project-super-blue text-project-white p-3 rounded-md absolute">
             <h4>admin panel</h4>
             <a href=""></a>

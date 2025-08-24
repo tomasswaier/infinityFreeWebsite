@@ -1,34 +1,3 @@
-{{--
-@extends('layouts.app')
-@section('mainContent')
-<div class="p-10 text-project-dark-blue text-lg w-full h-full flex justify-center align-middle">
-    <div class="p-4 bg-white inline-block rounded-lg border-2 border-project-dark-blue">
-        <div class="grid grid-flow-row row-auto align-middle">
-            <h2>Subject Creator Page</h2>
-            <span>test Id:</span><br><br>
-            <div class="p-4">
-                <span>Name:</span>
-                <input type="text" name="subjectName" value="" class="rounded-lg  bg-project-white shadow-inner p-2">
-                <span>Rating:</span>
-                <input type="number" name="subjectRating" value="" step="0.1" max='10' class="rounded-lg  bg-project-white shadow-inner p-2 w-20">
-            </div>
-            <div class="p-4">
-                <span>Description:</span><br>
-
-                <textarea name="subjectDescription" rows="3" cols="40" placeholder="in description try to mention everything from projects to lectures" class="rounded-lg  bg-project-white shadow-inner p-2"></textarea>
-            </div>
-            <div class="p-4">
-                <span>TLDR:</span>
-                <br>
-                <textarea name="subjectTldr" rows="3" cols="40" placeholder="Write in here the most relevant parts of description like complexity of projects and tests (1024 chars long)" class="rounded-lg  bg-project-white shadow-inner p-2"></textarea>
-            </div>
-            <button type="submit" class="border-project-dark-blue rounded-xl border-2 p-2">submit</button>
-        </div>
-    </div>
-</div>
-@endsection
---}}
-
 @extends('layouts.app')
 @section('mainContent')
 <div class="p-10 text-project-dark-blue text-lg w-full h-full flex justify-center align-middle">
@@ -67,9 +36,7 @@
                         @endforeach
 
                     </div>
-                    <span>Todo: finish this </span>
                     <br>
-                    <a href="{{ url('admin/tagCreator/'.$school_id)}}">Create tag!</a>
                 </div>
                 <button type="submit" class=" rounded-xl  p-2 shadow-neutral-800 shadow-sm">submit</button>
             </form>

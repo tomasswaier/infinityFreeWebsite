@@ -3,7 +3,7 @@
 <div class="p-2">
     <div class="m-2 p-2 inline-block border border-black rounded-md">
     <span>Creators</span> <br>
-    <span>fix</span><a href="{{url('admin/test/testCreator')}}"><u>Test Creator</u></a>
+    <!--<span>fix</span><a href="{{url('admin/test/testCreator')}}"><u>Test Creator</u></a>-->
     <br>
     <span>fix</span><a href="{{url('admin/subjectCreator')}}"><u>Subject Creator</u></a>
     <br>
