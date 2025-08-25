@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     /*
      * here will go routes for study guides
      */
+
+
+
     Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
     Route::get('test/{id}', [TestController::class,'show']);
     Route::post('test', [TestController::class,'getTest'])->name('displayTest');
@@ -48,6 +51,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
 
     Route::middleware('more_than_user')->group(function () {
+        Route::get('admin/studyGuide/create/{id}', function($id){
+            return view('admin/studyGuide/create',[
+                'school_id'=>$id,
+            ]);
+        } );
+        Route::post('admin/studyGuide/create/{id}', [StudyGuideController::class,'create'] );
+
 
         Route::get('admin/test/testCreator/{id}', function($id){
             return view('admin/test/testCreator',[
@@ -94,11 +104,6 @@ Route::middleware('auth')->group(function () {
 
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
 
-            Route::get('admin/studyGuide/create/{$id}', function($id){
-                return view('admin/studyGuide/create',[
-                    'school_id'=>$id,
-                ]);
-            } );
 
             //Route::get('admin/studyGuide/{school_id}',[StudyGuideController::class,'create']);
             //Route::get('admin/studyGuide/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
