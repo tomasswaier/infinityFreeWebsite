@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id()->primary();
             $table->json('data');
             $table->string('name');
-            $table->unsignedBigInteger('study_guide_section_order_id');
-            $table->foreign('study_guide_section_order_id')->references('id')->on('study_guide_section_order')->onDelete('cascade');
             $table->timestamps();
         });
     }

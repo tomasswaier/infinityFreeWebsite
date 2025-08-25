@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('study_guide_section_order', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedInteger('order');
-            $table->unsignedBigInteger('study_guide_id');
-            $table->foreign('study_guide_id')->references('id')->on('study_guides')->onDelete('cascade');
+        Schema::create('study_guide_images', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->timestamps();
+            $table->string('filename');
             $table->unsignedBigInteger('study_guide_section_data_id');
             $table->foreign('study_guide_section_data_id')->references('id')->on('study_guide_section_data')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('study_guide_section_order');
+        Schema::dropIfExists('study_guide_images');
     }
 };

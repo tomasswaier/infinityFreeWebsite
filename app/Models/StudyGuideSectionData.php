@@ -16,4 +16,7 @@ class StudyGuideSectionData extends Model
     protected $casts = [
         'data' => 'array'
     ];
+    public function images():HasMany{
+        return $this->hasMany(StudyGuideImage::class,'study_guide_section_data_id');
+    }
 }
