@@ -15,7 +15,8 @@
             </thead>
             <tbody>
                 @foreach($study_guides as $study_guide)
-                    <tr><td>{{$study_guide->name}}</td><td>todo:subject</td></tr>
+                    <tr><td>
+                    <a href="{{url('admin/studyGuide/'.$study_guide->id)}}">{{$study_guide->name}}</a></td><td>todo:subject</td></tr>
                 @endforeach
             </tbody>
         </table>

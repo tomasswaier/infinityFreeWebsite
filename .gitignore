@@ -21,6 +21,7 @@ node_modules/
 /storage/*.key
 /storage/.image_backup/
 /storage/pail
+/storage/app/public/studyGuideImages
 /vendor
 Homestead.json
 Homestead.yaml

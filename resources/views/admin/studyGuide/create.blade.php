@@ -3,7 +3,10 @@
 <div>
     <h2>Study Guide creator page</h2>
     <span>rules?</span>
+    <br>
     <span>Section is NOT a section until a title is added</span>
+    <br>
+    <span>Text is displayed in p element so to add something to a new line create a new section(intended design)</span>
 
     <div >
     <br><br>

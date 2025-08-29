@@ -19,4 +19,13 @@ class StudyGuide extends Model
     public function sectionOrder():HasMany{
         return $this->hasMany(StudyGuideSectionOrder::class,'study_guide_section_id');
     }
+    // In StudyGuide model
+    public function sectionData() {
+        return $this->belongsToMany(
+            StudyGuideSectionData::class,
+            'study_guide_section_order',
+            'study_guide_id',
+            'study_guide_section_data_id'
+        )->orderByPivot('order')->with('image'); // Include the order if needed
+    }
 }

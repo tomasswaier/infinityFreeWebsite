@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class StudyGuideSectionData extends Model
 {
@@ -16,7 +16,7 @@ class StudyGuideSectionData extends Model
     protected $casts = [
         'data' => 'array'
     ];
-    public function images():HasMany{
-        return $this->hasMany(StudyGuideImage::class,'study_guide_section_data_id');
+    public function image():HasOne{
+        return $this->hasOne(StudyGuideImage::class,'study_guide_section_data_id');
     }
 }

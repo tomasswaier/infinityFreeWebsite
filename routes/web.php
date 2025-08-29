@@ -32,8 +32,7 @@ Route::middleware('auth')->group(function () {
     /*
      * here will go routes for study guides
      */
-
-
+    Route::get('admin/studyGuide/{id}', [StudyGuideController::class,'show'] );
 
     Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
     Route::get('test/{id}', [TestController::class,'show']);

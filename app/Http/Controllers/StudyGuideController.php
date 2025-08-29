@@ -54,7 +54,6 @@ class StudyGuideController extends Controller
             else if (substr($key,0,9)=='img_file_') {
                 $sectionData=collect();
                 $sectionData['hasImage']=true;
-                $sectionData['title']=($val);
                 $id=substr($key,9,strlen($key));
                 if ($request['img_title_'.substr($key,9,strlen($key))]) {
                     $sectionData['title']=$request['img_title_'.substr($key,9,strlen($key))];
@@ -73,6 +72,20 @@ class StudyGuideController extends Controller
 
             }
         }
+    }
+    public function show(Request $request,$guideId){
+        $studyGuide=StudyGuide::with('sectionData.image')->find($guideId);
+        $studyGuide['section_data']=$studyGuide->sectionData;
+        foreach($studyGuide['section_data'] as &$section){
+            $section['image']=$section->image;
+        }
+
+        if (!$studyGuide) {
+            return redirect('/');
+        }
+        return view('studyGuide/info',[
+            'studyGuide'=>$studyGuide,
+        ]);
     }
 
 }
