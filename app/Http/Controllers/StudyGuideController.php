@@ -29,40 +29,70 @@ class StudyGuideController extends Controller
         return redirect('school/'.$schoolId);
     }
     public function edit(Request $request,$studyGuideId){
-        if (!StudyGuide::find($studyGuideId)){
-            Log::error('study guide Id not found');
+        $prevVersion=StudyGuide::find($studyGuideId);
+        if (!$prevVersion ||$request['studyGuideId']!=$studyGuideId){
+            Log::error('Someone is fucking around ...');
             return redirect('/');
         }
         Log::info($request->all());
-        /*
+
         $studyGuide=StudyGuide::create([
             'name'=>$request['title'],
             'author'=>$request->user()->name,
-            'version'=>1,
+            'version'=>$prevVersion->version+1,
             'viewCount'=>0,
-            'school_id'=>$schoolId
+            'school_id'=>$prevVersion->school_id
         ]);
         $this->uploadStudyGuideContents($request,$studyGuide);
-         */
-
         return redirect('school/'.StudyGuide::find($studyGuideId)->school_id);
     }
     private function uploadStudyGuideContents($request,$studyGuide){
+        //I'm sorry for how this function is about to look like
         $order=0;
+        $prevSection=-1;
         foreach($request->all() as $key=>$val){
-            if (strlen($key)<14) {//14 is length of longest checked substr
+            if (in_array($key,['_token','title','studyGuideId'])) {
                 continue;
             }
-            if (substr($key,0,13)=='section_text_') {
-                $sectionData=collect();
-                $sectionData['text']=($val);
-                if ($request['section_title_'.substr($key,13,strlen($key))]) {
-                    $sectionData['title']=$request['section_title_'.substr($key,13,strlen($key))];
+            if (substr($key,0,13)=='prev_section_') {
+                if (!StudyGuideSectionData::find($val)) {
+                  continue;
                 }
-                $studyGuideSectionData=StudyGuideSectionData::create([
-                    'data'=>$sectionData,
-                    'name'=>$request->user()->name,
+                $prevSection=$val;
+            }
+            if (substr($key,0,11)=='prev_image_')  {
+                if (!StudyGuideSectionData::find($prevSection) || $prevSection==-1) {
+                    continue;
+                }
+                StudyGuideSectionOrder::create([
+                    'order'=>$order,
+                    'study_guide_id'=>$studyGuide->id,
+                    'study_guide_section_data_id'=>$prevSection,
                 ]);
+                $prevSection=-1;
+                $order++;
+            }
+            if (substr($key,0,13)=='section_text_') {
+                $studyGuideSectionData=null;
+                if ($prevSection!=-1 ) {
+                    $prevSectionData=StudyGuideSectionData::find($prevSection);
+                    if (isset($request['section_title_'.substr($key,13,strlen($key))]) && $prevSectionData['data']['title']==$request['section_title_'.substr($key,13,strlen($key))] && $prevSectionData['data']['text']==$val) {
+                        $studyGuideSectionData=$prevSectionData;
+                    }
+                    $prevSection=-1;
+
+                }
+                if(!$studyGuideSectionData){
+                    $sectionData=collect();
+                    $sectionData['text']=($val);
+                    if ($request['section_title_'.substr($key,13,strlen($key))]) {
+                        $sectionData['title']=$request['section_title_'.substr($key,13,strlen($key))];
+                    }
+                    $studyGuideSectionData=StudyGuideSectionData::create([
+                        'data'=>$sectionData,
+                        'name'=>$request->user()->name,
+                    ]);
+                }
                 StudyGuideSectionOrder::create([
                     'order'=>$order,
                     'study_guide_id'=>$studyGuide->id,

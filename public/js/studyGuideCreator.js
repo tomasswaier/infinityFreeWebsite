@@ -9,6 +9,8 @@ function naiveId() {
       .replace('.', '');
 }
 
+function removeParent(element) { element.parentElement.remove() }
+
 function displayInputImage(inputId, imageId) {
   if (!inputId) {
     return;
@@ -57,6 +59,12 @@ function createImageField() {
   wrapper.appendChild(image);
   image.id = 'img_display_' + uid;
   image.src = '';
+  const removeSectionButton = document.createElement('button');
+  wrapper.appendChild(removeSectionButton);
+  removeSectionButton.onclick =
+      function() { removeParent(removeSectionButton) };
+  removeSectionButton.type = 'button';
+  removeSectionButton.innerText = 'delete section'
   return wrapper;
 }
 
@@ -78,6 +86,12 @@ function createTextField() {
   sectionText.classList.add('border', 'border-project-blue', 'rounded-md');
   sectionText.rows = 4;
   sectionText.cols = 100;
+  const removeSectionButton = document.createElement('button');
+  wrapper.appendChild(removeSectionButton);
+  removeSectionButton.onclick =
+      function() { removeParent(removeSectionButton) };
+  removeSectionButton.type = 'button';
+  removeSectionButton.innerText = 'delete section'
 
   return wrapper;
 }
@@ -109,4 +123,9 @@ function displaySectionCreators(parentElement) {
         }
         element.appendChild(createImageField());
     }
+}
+
+function initScrollable(id) {
+    const studyGuideContents = document.getElementById(id);
+    new Sortable(studyGuideContents, {});
 }

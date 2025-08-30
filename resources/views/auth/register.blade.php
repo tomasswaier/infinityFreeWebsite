@@ -1,7 +1,7 @@
 <x-guest-layout>
     <form method="POST" action="{{ route('register') }}">
         @csrf
-
+        <span>REGISTERING PROVIDES NOTHING FOR AVERAGE USER SO DO SO ONLY WHEN INTENDING TO POST CONTENT(and for that you will need to ask for authorization)</span><br>
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
