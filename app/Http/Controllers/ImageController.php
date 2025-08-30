@@ -31,7 +31,7 @@ class ImageController extends Controller
             }
         }elseif ($imagePath=='studyGuideImages') {
             $uuid=Str::uuid();
-            $imageName=$uuid.'.'.$fileType;
+            $imageName=$uuid.$fileType;
             if ($image->storeAs($imagePath, $imageName, 'public')) {
                 StudyGuideImage::create([
                     'id'=>$uuid,

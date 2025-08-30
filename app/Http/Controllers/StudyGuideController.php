@@ -14,7 +14,7 @@ class StudyGuideController extends Controller
 {
     public function create(Request $request,$schoolId){
         if (!(intval($schoolId)>0 && $request['title']) ){
-            Log::erro('something went wrong');
+            Log::error('something went wrong');
             return redirect('school/'.$schoolId);
         }
         $studyGuide=StudyGuide::create([
@@ -27,6 +27,25 @@ class StudyGuideController extends Controller
         $this->uploadStudyGuideContents($request,$studyGuide);
 
         return redirect('school/'.$schoolId);
+    }
+    public function edit(Request $request,$studyGuideId){
+        if (!StudyGuide::find($studyGuideId)){
+            Log::error('study guide Id not found');
+            return redirect('/');
+        }
+        Log::info($request->all());
+        /*
+        $studyGuide=StudyGuide::create([
+            'name'=>$request['title'],
+            'author'=>$request->user()->name,
+            'version'=>1,
+            'viewCount'=>0,
+            'school_id'=>$schoolId
+        ]);
+        $this->uploadStudyGuideContents($request,$studyGuide);
+         */
+
+        return redirect('school/'.StudyGuide::find($studyGuideId)->school_id);
     }
     private function uploadStudyGuideContents($request,$studyGuide){
         $order=0;
@@ -73,18 +92,35 @@ class StudyGuideController extends Controller
             }
         }
     }
-    public function show(Request $request,$guideId){
-        $studyGuide=StudyGuide::with('sectionData.image')->find($guideId);
+    private function getStudyGuide($studyGuideId){
+        $studyGuide=StudyGuide::with('sectionData.image')->find($studyGuideId);
+        if(!$studyGuide){
+            return null;
+        }
         $studyGuide['section_data']=$studyGuide->sectionData;
         foreach($studyGuide['section_data'] as &$section){
             $section['image']=$section->image;
         }
-
+        return $studyGuide;
+    }
+    public function show(Request $request,$guideId){
+        $studyGuide=$this->getStudyGuide($guideId);
         if (!$studyGuide) {
             return redirect('/');
         }
         return view('studyGuide/info',[
             'studyGuide'=>$studyGuide,
+            'school_id'=>$studyGuide->school_id
+        ]);
+    }
+    public function displayEditor(Request $request,$guideId){
+        $studyGuide=$this->getStudyGuide($guideId);
+        if (!$studyGuide ||!supervisesSchool($request->user() ,$studyGuide->school_id)) {
+            return redirect('/');
+        }
+        return view('admin/studyGuide/edit',[
+            'studyGuide'=>$studyGuide,
+            'school_id'=>$studyGuide->school_id
         ]);
     }
 

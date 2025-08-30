@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
             ]);
         } );
         Route::post('admin/studyGuide/create/{id}', [StudyGuideController::class,'create'] );
+        Route::get('admin/studyGuide/edit/{id}', [StudyGuideController::class,'displayEditor'] );
+        Route::post('admin/studyGuide/edit/{id}', [StudyGuideController::class,'edit'] );
 
 
         Route::get('admin/test/testCreator/{id}', function($id){
