@@ -12,20 +12,33 @@
   <br>
   @foreach($studyGuide['section_data'] as $_key => $section)
     <section>
-
-      @isset($section['image'])
-        <img src="{{asset('storage/studyGuideImages/'.$section['image']['filename'])}}" alt="myimage">
-        @isset($section['data']['title'])
-          <span class="text-gray-500">{{$section['data']['title']}}</span>
-        @endisset
-        <br>
-      @else
-        @isset($section['data']['title'])
-          <h3 class="text-2xl bold">{{$section['data']['title']}}</h3>
+      @isset($section['data']['sectionType'])
+        <span>meow</span>
+        @if($section['data']['sectionType']=="imageSection")
+          <img src="{{asset('storage/studyGuideImages/'.$section['image']['filename'])}}" alt="myimage">
+          @isset($section['data']['title'])
+            <span class="text-gray-500">{{$section['data']['title']}}</span>
+          @endisset
           <br>
-        @endisset
-          <pre>{{$section['data']['text']}}</pre>
-          <br>
+        @elseif($section['data']['sectionType']=="simpleTextSection")
+          @isset($section['data']['title'])
+            <h3 class="text-2xl bold">{{$section['data']['title']}}</h3>
+            <br>
+          @endisset
+            <pre>{{$section['data']['text']}}</pre>
+            <br>
+        @elseif($section['data']['sectionType']=="verticalSplitTextSection")
+          @isset($section['data']['title'])
+            <h3 class="text-2xl bold">{{$section['data']['title']}}</h3>
+            <br>
+          @endisset
+          <div class="grid grid-cols-2">
+            <pre class='w-1/2'>{{$section['data']['text_left']}}</pre>
+            <pre class='w-1/2'>{{$section['data']['text_right']}}</pre>
+          </div>
+        @else
+          <span>ERROR UNKNOWN SECTION TYPE</span>
+        @endif
       @endisset
     </section>
   @endforeach

@@ -29,6 +29,7 @@ class SchoolController extends Controller
         [
             'school_id'=>$school_id,
             'study_guides'=>School::find($school_id)->studyGuides()->get(),
+            'subjects'=>School::find($school_id)->subjects()->get(),
         ]
         );
     }

@@ -53,20 +53,21 @@ class TestController extends Controller
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
-        $data = Test::find($test_id)->questions()->inRandomOrder()->limit($number_of_questions)->get();
+        $test=Test::find($test_id);
+        $data = $test->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
             $question['options']=Question::find($question->id)->options()->get();
             $question['image']=(new ImageController)->show($question->id);
         }
         //todo:change this to an optional parameter in the url... idk why i put it into the session
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
-        $tempModel=Test::find($test_id);
-        $school_id=$tempModel->school_id;
+        $school_id=$test->school_id;
         return view('test/index',[
             'tests'=>Test::all(),
             'data'=>$data,
             'school_id'=>$school_id,
-            'displayCorrectAnswers'=>$loadCorrectOptions
+            'displayCorrectAnswers'=>$loadCorrectOptions,
+            'test_id'=>$test_id//sry for bad naming
         ]
         );
     }
@@ -261,6 +262,14 @@ class TestController extends Controller
         }
 
         return null;
+    }
+    public function incrementNumberOfSubmits($testId){
+        if (intval($testId)>0 ) {
+            $test=Test::find($testId);
+            $test->number_of_submits=$test->number_of_submits+1;
+            $test->save();
+        }
+
     }
 
 }

@@ -5,6 +5,20 @@ if (!document) {
 var countCorrect = 0;
 var countAll = 0;
 
+async function incrementNumberOfSubmits(testId) {
+  try {
+    console.log(window.location.href +
+                `/../../../../api/incrementNumberOfSubmits/${testId}`);
+    const response =
+        await fetch(window.location.href +
+                    `/../../../../api/incrementNumberOfSubmits/${testId}`);
+    if (!response.ok)
+      throw new Error('Network response was not ok');
+  } catch (error) {
+    console.error('Error incrementing test viewCount', error);
+  }
+}
+
 function is_correct(id, value, type, input_value, correct_values) {
   var correct_value = correct_values[id];
   // console.log(correct_values);
@@ -43,6 +57,8 @@ function isCorrect(correctAnswer, userInputElement) {
 }
 
 function submitForm(event) {
+  incrementNumberOfSubmits(test_id);
+
   countCorrect = 0;
   countAll = 0;
   if (event) {
@@ -97,8 +113,6 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       type = 'option';
       name_id = input.attributes['name'].value;
       evaluateSelect(input, name_id, parent);
-      // console.log(input);
-      // todo:this
     } else {
     }
 
@@ -150,7 +164,6 @@ function evaluateSelect(input, id, grandParent) {
 
 function evaluateWriteIn(input, id, grandParent) {
 
-  console.log(input);
   if (input.value == correctOptions[id]) {
     if (input.getAttribute("class") &&
         input.getAttribute("class").includes("!bg-red-500")) {

@@ -17,4 +17,7 @@ class School extends Model
     public function studyGuides():HasMany{
         return $this->hasMany(StudyGuide::class);
     }
+    public function subjects():HasMany{
+        return $this->hasMany(Subjects::class);
+    }
 }

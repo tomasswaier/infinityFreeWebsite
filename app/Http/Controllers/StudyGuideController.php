@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -28,6 +29,13 @@ class StudyGuideController extends Controller
 
         return redirect('school/'.$schoolId);
     }
+    public function blank(Request $request,$schoolId){
+            return view('admin/studyGuide/create',[
+                'school_id'=>$schoolId,
+                'subjects'=>School::find($schoolId)->subjects()->get(),
+            ]);
+    }
+
     public function edit(Request $request,$studyGuideId){
         $prevVersion=StudyGuide::find($studyGuideId);
         if (!$prevVersion ||$request['studyGuideId']!=$studyGuideId){
@@ -84,6 +92,7 @@ class StudyGuideController extends Controller
                 }
                 if(!$studyGuideSectionData){
                     $sectionData=collect();
+                    $sectionData['sectionType']='simpleTextSection';
                     $sectionData['text']=($val);
                     if ($request['section_title_'.substr($key,13,strlen($key))]) {
                         $sectionData['title']=$request['section_title_'.substr($key,13,strlen($key))];
@@ -100,8 +109,43 @@ class StudyGuideController extends Controller
                 ]);
                 $order++;
             }
+            else if (substr($key,0,18)=='section_left_text_') {
+                $studyGuideSectionData=null;
+                if ($prevSection!=-1 ) {
+                    $prevSectionData=StudyGuideSectionData::find($prevSection);
+                    if (isset($request['section_title_'.substr($key,13,strlen($key))]) && $prevSectionData['data']['title']==$request['section_title_'.substr($key,13,strlen($key))] && $prevSectionData['data']['text_left']==$val && isset($request['section_right_text_'.substr($key,18,strlen($key))]) && $prevSectionData['data']['text_right']== $request['section_right_text_'.substr($key,18,strlen($key))]) {
+                        $studyGuideSectionData=$prevSectionData;
+                    }
+                    $prevSection=-1;
+
+                }
+                if(!$studyGuideSectionData){
+                    $sectionData=collect();
+                    $sectionData['sectionType']='verticalSplitTextSection';
+                    $sectionData['text_left']=($val);
+                    if ($request['section_title_'.substr($key,13,strlen($key))]) {
+                        $sectionData['title']=$request['section_title_'.substr($key,13,strlen($key))];
+                    }
+                    if (isset($request['section_right_text_'.substr($key,18,strlen($key))])) {
+                        $sectionData['text_right']=$request['section_right_text_'.substr($key,18,strlen($key))];
+                    }
+
+                    $studyGuideSectionData=StudyGuideSectionData::create([
+                        'data'=>$sectionData,
+                        'name'=>$request->user()->name,
+                    ]);
+                }
+                StudyGuideSectionOrder::create([
+                    'order'=>$order,
+                    'study_guide_id'=>$studyGuide->id,
+                    'study_guide_section_data_id'=>$studyGuideSectionData->id,
+                ]);
+                $order++;
+
+            }
             else if (substr($key,0,9)=='img_file_') {
                 $sectionData=collect();
+                $sectionData['sectionType']='imageSection';
                 $sectionData['hasImage']=true;
                 $id=substr($key,9,strlen($key));
                 if ($request['img_title_'.substr($key,9,strlen($key))]) {

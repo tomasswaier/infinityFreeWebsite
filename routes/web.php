@@ -12,6 +12,10 @@ Route::get('/', [SchoolController::class, 'showAll'])->name('mainPage');
 // http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
 //im thinking that if something like this comes I extract it with js and add link with
 
+
+
+
+
 Route::get('subjects', function(){
     return redirect('/');
 });
@@ -50,11 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
 
     Route::middleware('more_than_user')->group(function () {
-        Route::get('admin/studyGuide/create/{id}', function($id){
-            return view('admin/studyGuide/create',[
-                'school_id'=>$id,
-            ]);
-        } );
+        Route::get('admin/studyGuide/create/{id}', [StudyGuideController::class,'blank'] );
         Route::post('admin/studyGuide/create/{id}', [StudyGuideController::class,'create'] );
         Route::get('admin/studyGuide/edit/{id}', [StudyGuideController::class,'displayEditor'] );
         Route::post('admin/studyGuide/edit/{id}', [StudyGuideController::class,'edit'] );
@@ -114,5 +114,7 @@ Route::middleware('auth')->group(function () {
         });
     });
 });
-
+Route::prefix('api')->group(function () {
+    Route::get('/incrementNumberOfSubmits/{id}',[TestController::class,'incrementNumberOfSubmits']);
+});
 require __DIR__.'/auth.php';

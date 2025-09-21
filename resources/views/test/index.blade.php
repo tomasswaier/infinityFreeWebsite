@@ -196,11 +196,11 @@
             <span>Select Test</span>
             <select id="test_selector" class="rounded-md appearance-auto bg-none p-2" name="test_selector">
                @foreach($tests as $test)
-                <option value="{{$test->id}}">{{$test->test_name}}</option>
+                <option value="{{$test->id}}" @if(isset($test_id) && $test->id==$test_id) selected @endif>{{$test->test_name}}</option>
                @endforeach
             </select>
             <br>
-            <span>number of questions:</span><input name='number_of_questions' type="number" class="border w-20  rounded-md "id="number_of_questions" value='30'><br>
+            <span>number of questions:</span><input name='number_of_questions' type="number" class="border w-20  rounded-md "id="number_of_questions" value='@if($questionNumber!=0){{$questionNumber}}@else{{30}}@endif'><br>
             <span>Display all correct options:<input type="checkbox" name="displayCorrectAnswers" value="1"> </span><br>
             <button id="my_button" name="submit" class="border-black border p-2 rounded-md" ><u>Display test</u></button>
         </form>
@@ -214,6 +214,7 @@
         correctOptions[{{$number}}]=@json($val);
     @endforeach
     console.log(correctOptions);
+    var test_id=@isset($test_id){{$test_id}}@endisset;
 </script>
 <script src="{{ asset('js/testEvaluator.js') }}"></script>
 <script src="{{ asset('js/oldLinkRedirect.js') }}"></script>

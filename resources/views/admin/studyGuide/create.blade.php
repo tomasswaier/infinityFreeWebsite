@@ -9,10 +9,17 @@
     <span>Text is displayed in p element so to add something to a new line create a new section(intended design)</span>
 
     <div >
+    <span>Choose which subject does this study guide explain(maybe add tags later for when you have 2 that go over webdev or sum ?)</span>
+    <select>
+        <option value="0"></option>
+        @foreach($subjects as $subject)
+        <option value="{{$subject->id}}">{{$subject->name}}</option>
+        @endforeach
+    </select>
     <br><br>
         <form id='mainForm' action="{{url('admin/studyGuide/create/'.$school_id)}}" method="post" enctype="multipart/form-data">
             @csrf
-            <div>
+            <div class="">
                 <input type="text" name="title" placeholder="Study Guide title" required>
                 <div id='studyGuideContents'>
 

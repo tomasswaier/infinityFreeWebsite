@@ -2,6 +2,7 @@
     <form method="POST" action="{{ route('register') }}">
         @csrf
         <span>REGISTERING PROVIDES NOTHING FOR AVERAGE USER SO DO SO ONLY WHEN INTENDING TO POST CONTENT(and for that you will need to ask for authorization)</span><br>
+        <span>I repeat once more. DO NOT create account unless you've talked to admin or whomever.</span><br>
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />
