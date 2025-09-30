@@ -28,7 +28,7 @@ Route::get('school/',function(){
 });
 Route::get('school/{id}',[SchoolController::class,'info']);
 Route::post('school/{id}',[SchoolController::class,'info']);
-Route::get('admin/studyGuide/{id}', [StudyGuideController::class,'show'] );
+Route::get('studyGuide/{id}', [StudyGuideController::class,'show'] );
 
 Route::get('/profile', [ProfileController::class, 'info'])->name('profile.info');
 Route::get('/profile/{id}', [ProfileController::class, 'info']);

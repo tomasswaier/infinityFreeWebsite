@@ -35,4 +35,15 @@
     </section>
   @endforeach
 </div>
+<div class="w-full">
+@isset($prevStudyGuide)
+    <a href="{{url('studyGuide/'.$prevStudyGuide->id)}}">old Version</a>
+@endisset
+<span class="p-10">version</span>
+@isset($nextStudyGuide)
+    <a href="{{url('studyGuide/'.$nextStudyGuide->id)}}">new Version</a>
+@endisset
+
+
+</div>
 @endsection

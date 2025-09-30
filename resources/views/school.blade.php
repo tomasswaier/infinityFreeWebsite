@@ -44,7 +44,7 @@
                 <tbody>
                     @foreach($study_guides as $study_guide)
                         <tr><td align="center">
-                        <a href="{{url('admin/studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td><td>{{$study_guide->version}}</td></tr>
+                        <a href="{{url('studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td><td>{{$study_guide->version}}</td></tr>
 
                     @endforeach
                 </tbody>

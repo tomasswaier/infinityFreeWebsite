@@ -24,11 +24,12 @@ class SchoolController extends Controller
         return redirect('/');
     }
     public function info(Request $request,$school_id){
-        Log::info($request);
+        Log::info($request->all());
         $selected_subject_id=0;
         $query= School::find($school_id)->studyGuides();
-        $order=isset($request->order)? $request->order:'viewCount';
-        Log::info($order);
+        if (!isset($request->order)) {
+            $request->order='lastVersion';
+        }
         if (isset($request->order) && $request->order!='noOrder') {
             if($request->order=="viewCount"){
                 $query->orderBy('viewCount','desc');
@@ -44,6 +45,7 @@ class SchoolController extends Controller
                 }
             );
         }
+        $order= $request->order;
         $studyGuides= $query->get()->unique('origin_study_guide_id');
         //I should be skinned alive
         return view('school',

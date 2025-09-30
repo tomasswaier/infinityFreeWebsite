@@ -83,7 +83,6 @@ class StudyGuideController extends Controller
         //I'm sorry for how this function is about to look like
         $order=0;
         $prevSection=-1;
-        Log::info($request);
         foreach($request->all() as $key=>$val){
             if (in_array($key,['_token','title','studyGuideId'])) {
                 continue;
@@ -209,7 +208,6 @@ class StudyGuideController extends Controller
         $studyGuide['section_data']=$studyGuide->sectionData;
         foreach($studyGuide['section_data'] as &$section){
             $section['image']=$section->image;
-            Log::info($section);
         }
         return $studyGuide;
     }
@@ -220,11 +218,19 @@ class StudyGuideController extends Controller
             return redirect('/');
         }
         $this->incrementViewCount($guideId);
-
-
+        $prevGuide=StudyGuide::where([
+            ['origin_study_guide_id','=',$studyGuide->origin_study_guide_id],
+            ['version','=',$studyGuide->version -1]
+        ])->first();
+        $nextGuide=StudyGuide::where([
+            ['origin_study_guide_id','=',$studyGuide->origin_study_guide_id],
+            ['version','=',$studyGuide->version +1]
+        ])->first();
         return view('studyGuide/info',[
             'studyGuide'=>$studyGuide,
-            'school_id'=>$studyGuide->school_id
+            'school_id'=>$studyGuide->school_id,
+            'prevStudyGuide'=>$prevGuide,
+            'nextStudyGuide'=>$nextGuide,
         ]);
     }
     private function incrementViewCount($studyGuideId){
