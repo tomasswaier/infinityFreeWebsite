@@ -38,6 +38,8 @@ class Option {
     wrapper.appendChild(preceding_text_field);
     preceding_text_field.setAttribute('class',
                                       'p-1 rounded-md bg-project-white');
+    preceding_text_field.setAttribute('onblur', 'preserveWhitespace(this)');
+
     preceding_text_field.setAttribute("cols", "50");
     preceding_text_field.setAttribute("rows", "2");
     preceding_text_field.setAttribute(
@@ -712,7 +714,7 @@ function load_input_field(
   question_name_input.setAttribute("cols", "50");
   question_name_input.setAttribute("name", "question_text");
   question_name_input.classList.add('bg-project-white', 'p-2', 'rounded-md',
-                                    'mb-4')
+                                    'mb-4', 'whitespace-pre')
   question_name_input.setAttribute("placeholder",
                                    "Question : who has dog with 4 eyes?");
   if (question) {

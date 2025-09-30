@@ -27,7 +27,11 @@ Route::get('school/',function(){
     return redirect('/');
 });
 Route::get('school/{id}',[SchoolController::class,'info']);
+Route::post('school/{id}',[SchoolController::class,'info']);
+Route::get('admin/studyGuide/{id}', [StudyGuideController::class,'show'] );
 
+Route::get('/profile', [ProfileController::class, 'info'])->name('profile.info');
+Route::get('/profile/{id}', [ProfileController::class, 'info']);
 //Route::get('/dashboard', function () {
 //    return view('dashboard');
 //})->middleware(['auth', 'verified'])->name('dashboard');
@@ -36,7 +40,6 @@ Route::middleware('auth')->group(function () {
     /*
      * here will go routes for study guides
      */
-    Route::get('admin/studyGuide/{id}', [StudyGuideController::class,'show'] );
 
     Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
     Route::get('test/{id}', [TestController::class,'show']);
@@ -45,8 +48,6 @@ Route::middleware('auth')->group(function () {
         return redirect('/');
     });
     //Route::post('test', [TestController::class,'getTest'])->name('displayTest');
-    Route::get('/profile', [ProfileController::class, 'info'])->name('profile.info');
-    Route::get('/profile/{id}', [ProfileController::class, 'info']);
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile', [ProfileController::class, 'saveUpdate'])->name('profile.privilege.save');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

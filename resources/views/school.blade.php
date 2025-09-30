@@ -11,7 +11,7 @@
     @endif
     <section name="placeholder section">
 
-        <h3>Welcome to you school page</h3>
+        <h3>Welcome to your school page</h3>
         <br>
         <br>
     </section>
@@ -19,23 +19,28 @@
         <h2>STUDY GUIDES!!</h2>
         <br>
         <form id='main_form' action="" method="post" enctype="multipart/form-data">
-            <span>Looking for specific subject?:</span><select>
+            @csrf
+            <span>Looking for specific subject?:</span>
+            <select name="subject" onchange="this.form.submit()">
                 <option value="0"></option>
                 @foreach($subjects as $subject)
-                <option value="{{$subject->id}}">{{$subject->name}}</option>
+                    <option value="{{$subject->id}}" @if($subject->id==$selected_subject_id)
+                                                    selected
+                                                    @endif>{{$subject->name}}</option>
                 @endforeach
             </select>
             <table>
                 <thead>
-                    <tr><th class="w-80">name</th><th>subjects</th></tr>
+                    <tr><th class="w-80">name</th></tr>
                 </thead>
                 <tbody>
                     @foreach($study_guides as $study_guide)
                         <tr><td align="center">
-                        <a href="{{url('admin/studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td><td>todo:subject</td></tr>
+                        <a href="{{url('admin/studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td></tr>
                     @endforeach
                 </tbody>
             </table>
+            {{--idk should i keep this in ? pagination seems like overkill--}}
             <input type="button" name="prev" value="PREV">
             <input type="button" name="next" value="NEXT">
         </form>

@@ -13,11 +13,15 @@ class StudyGuide extends Model
         'author',
         'version',
         'viewCount',
-        'school_id'
+        'school_id',
+        'parent_study_guide_id'
     ];
 
     public function sectionOrder():HasMany{
         return $this->hasMany(StudyGuideSectionOrder::class,'study_guide_section_id');
+    }
+    public function subjects(){
+        return $this->belongsToMany(Subjects::class, 'study_guide_subjects','study_guide_id','subject_id');
     }
     // In StudyGuide model
     public function sectionData() {

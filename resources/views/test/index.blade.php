@@ -37,7 +37,7 @@
                         <br>
                             @foreach($question->options as $option)
                                 @if(isset($option->preceding_text))
-                                    <span>{{$option->preceding_text}}</span>
+                                    <pre class="">{{$option->preceding_text}}</pre>
                                 @endif
                                 @if($option->option_type =='boolean_choice')
                                     <table  >
@@ -58,7 +58,7 @@
                                             >
                                             </td>
                                             <td>
-                                            <span>{{$boolean_option['option_text']}}</span>
+                                            <span >{{$boolean_option['option_text']}}</span>
                                             </td>
                                         </tr>
                                         @php
@@ -186,7 +186,7 @@
         @endforeach
         </table>
         <br><br><br>
-        <input type="submit" id='testSubmitButton' class="border border-black p-2 rounded-md">submit todo:add js for it to mark the stuff and api to track number of submits</button>
+        <input type="submit" id='testSubmitButton' class="border border-black p-2 rounded-md" value="Submit Test">
         </form>
         <br><br>
     @endif

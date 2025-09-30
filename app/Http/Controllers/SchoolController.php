@@ -24,12 +24,25 @@ class SchoolController extends Controller
         return redirect('/');
     }
     public function info(Request $request,$school_id){
+        $selected_subject_id=0;
+        $studyGuides=School::find($school_id)->studyGuides()->get();
+        if (isset($request->subject) && $request->subject!=0) {
+            $selected_subject_id=$request->subject;
+            $studyGuides=School::find($school_id)->studyGuides()->orderByDesc('viewCount')->whereHas('subjects',
+                function ($q) use ($selected_subject_id) {
+                    $q->where('subjects.id','=', $selected_subject_id);
+                })->get();
+        }else{
+            //why is this variable in camelCase?!?!?!? -MaryAnn
+            $studyGuides=School::find($school_id)->studyGuides()->orderByDesc('viewCount')->get();
+        }
 
         return view('school',
         [
             'school_id'=>$school_id,
-            'study_guides'=>School::find($school_id)->studyGuides()->get(),
+            'study_guides'=>$studyGuides,
             'subjects'=>School::find($school_id)->subjects()->get(),
+            'selected_subject_id'=>$selected_subject_id,
         ]
         );
     }

@@ -38,11 +38,15 @@ function createImageField() {
   wrapper.id = 'wrapper_' + uid;
   wrapper.classList.add('p-1', 'rounded-sm', 'm-4');
   const title = document.createElement('input');
+  wrapper.appendChild(title);
   title.placeholder = 'Image Title'
   title.name = 'img_title_' + uid;
   title.id = 'img_title_' + uid;
-  console.log(title.name);
-  wrapper.appendChild(title);
+  const hiddenInput = document.createElement('input');
+  wrapper.appendChild(hiddenInput);
+  hiddenInput.type = 'hidden';
+  hiddenInput.name = 'section_image_' + uid;
+  hiddenInput.value = uid;
   title.type = 'text';
   const imageInput = document.createElement('input');
   imageInput.name = 'img_file_' + uid;

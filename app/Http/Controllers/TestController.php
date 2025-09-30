@@ -31,7 +31,6 @@ class TestController extends Controller
     public function showTestQuestionNames($testId)
     {
         return view('admin/test/allQuestions',[
-            //todo: change all the selct tags.. would be better to use relationship and by value
             'data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get()
         ]);
     }
@@ -363,8 +362,8 @@ class BooleanChoice extends QuestionType{
         }
         return;
     }
-
 }
+
 class BooleanChoiceOneCorrect extends QuestionType{
     public $specificOptioNumber;
     public function __toString(){
