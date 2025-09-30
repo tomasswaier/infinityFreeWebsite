@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 
+use Illuminate\Support\Str;
 use App\Models\StudyGuide;
 use App\Models\StudyGuideSubjects;
 use App\Models\StudyGuideSectionData;
@@ -28,7 +29,7 @@ class StudyGuideController extends Controller
                 'viewCount'=>0,
                 'school_id'=>$schoolId,
                 'parent_study_guide_id'=>null,
-                'origin_study_guide_id'=>null
+                'origin_study_guide_id'=>Str::uuid()
             ]);
         }catch(Throwable $e){
             Log::error($e);

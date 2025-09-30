@@ -15,8 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_study_guide_id')->nullable();
             $table->foreign('parent_study_guide_id')->references('id')->on('study_guides')->onDelete('set null');
 
-            $table->unsignedBigInteger('origin_study_guide_id')->nullable();
-            $table->foreign('origin_study_guide_id')->references('id')->on('study_guides')->onDelete('set null');
+            $table->uuid('origin_study_guide_id');
         });
     }
 
@@ -28,7 +27,6 @@ return new class extends Migration
         Schema::table('study_guides', function (Blueprint $table) {
             $table->dropForeign(['parent_study_guide_id']);
             $table->dropColumn('parent_study_guide_id');
-            $table->dropForeign(['origin_study_guide_id']);
             $table->dropColumn('origin_study_guide_id');
         });
     }

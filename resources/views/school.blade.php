@@ -20,6 +20,7 @@
         <br>
         <form id='main_form' action="" method="post" enctype="multipart/form-data">
             @csrf
+            <span>Filters:</span>
             <span>Looking for specific subject?:</span>
             <select name="subject" onchange="this.form.submit()">
                 <option value="0"></option>
@@ -29,14 +30,22 @@
                                                     @endif>{{$subject->name}}</option>
                 @endforeach
             </select>
+            <br>
+            <span>order by:</span>
+            <select name="order" onchange="this.form.submit()">
+                <option value="lastVersion">last version</option>
+                <option value="viewCount" @if($order=="viewCount")selected @endif>view count</option>
+                <option value="noOrder" @if($order=="noOrder")selected @endif">no order</option>
+            </select>
             <table>
                 <thead>
-                    <tr><th class="w-80">name</th></tr>
+                    <tr><th class="w-80">name</th><th>version</th></tr>
                 </thead>
                 <tbody>
                     @foreach($study_guides as $study_guide)
                         <tr><td align="center">
-                        <a href="{{url('admin/studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td></tr>
+                        <a href="{{url('admin/studyGuide/'.$study_guide->id)}}" class="underline text-project-super-blue">{{$study_guide->name}}</a></td><td>{{$study_guide->version}}</td></tr>
+
                     @endforeach
                 </tbody>
             </table>

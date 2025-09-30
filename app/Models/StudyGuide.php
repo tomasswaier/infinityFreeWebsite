@@ -14,7 +14,8 @@ class StudyGuide extends Model
         'version',
         'viewCount',
         'school_id',
-        'parent_study_guide_id'
+        'parent_study_guide_id',
+        'origin_study_guide_id'
     ];
 
     public function sectionOrder():HasMany{
