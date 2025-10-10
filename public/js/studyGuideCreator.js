@@ -33,6 +33,8 @@ function removeInputImage(id) {
 }
 
 function createImageField() {
+  // todo : add
+  // compression->https://stackoverflow.com/questions/14672746/how-to-compress-an-image-via-javascript-in-the-browser
   const uid = naiveId();
   const wrapper = document.createElement('div');
   wrapper.id = 'wrapper_' + uid;

@@ -52,6 +52,8 @@ class TestController extends Controller
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
+        if($test_id==1 && !Auth::user()){
+            return redirect("/");        }
         $test=Test::find($test_id);
         $data = $test->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){

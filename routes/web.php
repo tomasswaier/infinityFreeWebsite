@@ -36,17 +36,17 @@ Route::get('/profile/{id}', [ProfileController::class, 'info']);
 //    return view('dashboard');
 //})->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
+Route::get('test/{id}', [TestController::class,'show']);
+Route::post('test', [TestController::class,'getTest'])->name('displayTest');
+Route::get('test', function(){
+    return redirect('/');
+});
 Route::middleware('auth')->group(function () {
     /*
      * here will go routes for study guides
      */
 
-    Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestController::class,'loadTest']);
-    Route::get('test/{id}', [TestController::class,'show']);
-    Route::post('test', [TestController::class,'getTest'])->name('displayTest');
-    Route::get('test', function(){
-        return redirect('/');
-    });
     //Route::post('test', [TestController::class,'getTest'])->name('displayTest');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile', [ProfileController::class, 'saveUpdate'])->name('profile.privilege.save');

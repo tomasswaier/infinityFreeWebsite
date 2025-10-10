@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @section('mainContent')
-<div class="p-10 text-project-dark-blue">
+<div class="border-t pt-10 border-black sm:p-10 sm:border-none  text-project-dark-blue">
     @php
         $correctOptions=array();
         $optionIndex=0;
@@ -20,7 +20,7 @@
             <h1>CORRECT ANSWERS ARE</h1>
         @endif
 
-        <table class="bg-project-light-blue">
+        <table class="bg-project-light-blue sm:rounded-md">
             <tr >
             <th class='max-w-12 text-xs'><span>question num</span></th><th class="p-2 flex justify-start">question text</th></tr>
         @foreach($data as $question)

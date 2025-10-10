@@ -11,22 +11,23 @@
   <h2 class="text-4xl font-bold">{{$studyGuide->name}}</h2>
   <br>
   @foreach($studyGuide['section_data'] as $_key => $section)
-    <section>
+    <section class="w-full">
       @isset($section['data']['sectionType'])
         @isset($section['data']['title'])
-          <span class="text-2xl font-bold">{{$section['data']['title']}}</span>
+          <span class="text-2xl font-bold">{{!! nl2br(e($section['data']['title']))}}</span>
           <br>
         @endisset
+
         @if($section['data']['sectionType']=="imageSection")
-          <img src="{{asset('storage/studyGuideImages/'.$section['image']['filename'])}}" alt="myimage">
+          <img class=" h-auto w-full lg:w-1/2 lg:h-auto" src="{{asset('storage/studyGuideImages/'.$section['image']['filename'])}}" alt="myimage">
           <br>
         @elseif($section['data']['sectionType']=="simpleTextSection")
-            <pre class="whitespace-pre-line">{{$section['data']['text']}}</pre>
+            <pre class="whitespace-pre-line">{{!! nl2br(e($section['data']['text']))}}</pre>
             <br>
         @elseif($section['data']['sectionType']=="verticalSplitTextSection")
-          <div class="grid grid-cols-2">
-            <pre class='w-1/2 whitespace-pre-line'>{{$section['data']['text_left']}}</pre>
-            <pre class='w-1/2 whitespace-pre-line'>{{$section['data']['text_right']}}</pre>
+          <div class="grid  grid-cols-1 md:grid-cols-2">
+            <pre class='p-4 whitespace-pre-line'>{{$section['data']['text_left']}}</pre>
+            <pre class='p-4 whitespace-pre-line'>{{$section['data']['text_right']}}</pre>
           </div>
         @else
           <span>ERROR UNKNOWN SECTION TYPE</span>
