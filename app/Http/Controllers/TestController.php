@@ -42,7 +42,6 @@ class TestController extends Controller
             'images'=>(new ImageController)->show($questionId)]);
     }
     public function deleteQuestion($questionId,Request $request){
-        //Log::info(json_decode($testId,true)[0]['tests_id']);
         (new ImageController)->deleteAllQuestionImages($questionId);
         $testId=Question::select('tests_id')->where('id','=',$questionId)->get();
         Question::select('tests_id')->where('id','=',$questionId)->delete();
@@ -116,8 +115,6 @@ class TestController extends Controller
         }
         $inputs=$request->except('_token','submit','question_id','question_explanation','user_image');
         $this->insertOptionsFromArray($inputs,$questionId);
-        //Log::info($request);
-        //Log::info($originalOptions);
 
         //iterating trough the array and finding all options which are no longer in the request array
         //chatgpt line... very likely a first one
@@ -141,8 +138,6 @@ class TestController extends Controller
         $prevImage=$request['prev_image'];
         foreach($savedImages as $image){
             if ($image['image_name']!=$prevImage) {
-                //Log::info('deleting image:');
-                //Log::info($image);
                 (new ImageController)->delete($image->image_name);
             }
         }
@@ -169,7 +164,6 @@ class TestController extends Controller
             if (isset($request['user_image'])) {
                     $response=(new ImageController)->upload($request['user_image'],$question->id);
                     if ($response==1) {
-                            //Log::info('Image saved');
                     }
                     else{
                         Log::error('Image did not get saved');
@@ -213,7 +207,6 @@ class TestController extends Controller
                         Log::error("myClass doesn't exist.Exiting");
                         exit;
                     }else {
-                        //Log::info($myClass);
                     }
                 }elseif (str_contains($key,'explenation')) {
                     continue;
@@ -257,6 +250,9 @@ class TestController extends Controller
             case "open_answer":
                 $questionNumber=substr($key,27,strlen($key));
                 return new OpenAnswer($questionNumber,$questionId,$precedingText,$inputs,$optionId);
+            case "fill_in_table":
+                $questionNumber=substr($key,29,strlen($key));
+                return new FillInTable($questionNumber,$questionId,$precedingText,$inputs,$optionId);
             default:
                 Log::error("unknown question type:".$questionType);
                 break;
@@ -314,17 +310,6 @@ class QuestionType{
         $option->option_type=$option_type;
         $option->data=$this->data;
         $option->save();
-
-        /*
-        Option::create([
-            'id'=>$this->optionId,
-            'questions_id'=>$this->questionId,
-            'preceding_text'=>$this->precedingText,
-            'option_type'=>$option_type,
-            'data'=>$this->data
-        ]);
-         */
-        //return $option['id'];
     }
     function readOption($key,$val){
 
@@ -375,26 +360,13 @@ class BooleanChoiceOneCorrect extends QuestionType{
         return intval(substr($key,16,strlen($key)));
     }
     private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs
+        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs -> todo:fix
         if (substr($key,0,19)=='option_text_number_') {
             return intval(substr($key,19,20));
         }
         return intval(substr($key,14,15));
     }
     public function readOption($key,$val){
-        //if (str_contains($key,"option_number_")) {
-        //    if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
-
-        //        $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
-        //    }
-        //    if ($val!='true' && $val!='false') {
-        //        Log::error('Bad boolean choice input');
-        //        exit;
-        //    }
-        //    $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
-        //    $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
-
-        //}correct_answer
         if (!isset($this->data['option_array'])) {
             $this->data['option_array']=collect();
         }
@@ -440,6 +412,31 @@ class MultipleChoice extends QuestionType{
             $this->data['row_array']->push(['row_name'=>$rowName,'correct_answer'=>$val]);
         }else if (str_contains($key,"row_text_")) {
             return;
+        }else {
+            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
+        }
+        return;
+    }
+}
+class FillInTable extends QuestionType{
+    public function __toString(){
+        return "fill_in_table";
+    }
+    public function readOption($key,$val){
+        if (!isset($this->data['row_array'])) {
+            $this->data['row_array']=collect();
+        }
+        if(str_contains($key,"is_answer_") || str_contains($key,"option_id_")){
+            return;
+        }else if (str_contains($key,"correct_option_")) {
+            $rowNumber=explode("_",$key)[3];
+            if(!isset($this->data['row_array'][intval($rowNumber)])){
+                $this->data['row_array'][intval($rowNumber)]=collect();
+            }
+            $this->data['row_array'][$rowNumber]->push([
+                "cellText"=>$val,
+                "isAnswer"=>isset($this->input["is_answer_".substr($key,15,strlen($key))])
+            ]);
         }else {
             Log::error('$key does not contain option_number_ .Error in input key:'.$key);
         }

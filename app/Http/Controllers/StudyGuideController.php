@@ -226,6 +226,7 @@ class StudyGuideController extends Controller
             ['origin_study_guide_id','=',$studyGuide->origin_study_guide_id],
             ['version','=',$studyGuide->version +1]
         ])->first();
+        Log::info($studyGuide);
         return view('studyGuide/info',[
             'studyGuide'=>$studyGuide,
             'school_id'=>$studyGuide->school_id,

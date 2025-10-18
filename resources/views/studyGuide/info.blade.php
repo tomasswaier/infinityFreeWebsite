@@ -14,7 +14,7 @@
     <section class="w-full">
       @isset($section['data']['sectionType'])
         @isset($section['data']['title'])
-          <span class="text-2xl font-bold">{{!! nl2br(e($section['data']['title']))}}</span>
+          <pre class="text-2xl font-bold">{{$section['data']['title']}}</pre>
           <br>
         @endisset
 
@@ -22,12 +22,12 @@
           <img class=" h-auto w-full lg:w-1/2 lg:h-auto" src="{{asset('storage/studyGuideImages/'.$section['image']['filename'])}}" alt="myimage">
           <br>
         @elseif($section['data']['sectionType']=="simpleTextSection")
-            <pre class="whitespace-pre-line">{{!! nl2br(e($section['data']['text']))}}</pre>
+            <pre class="whitespace-pre-wrap break-words overflow-x-auto">{{$section['data']['text']}}</pre>
             <br>
         @elseif($section['data']['sectionType']=="verticalSplitTextSection")
           <div class="grid  grid-cols-1 md:grid-cols-2">
-            <pre class='p-4 whitespace-pre-line'>{{$section['data']['text_left']}}</pre>
-            <pre class='p-4 whitespace-pre-line'>{{$section['data']['text_right']}}</pre>
+            <pre class='p-4 whitespace-pre-wrap break-words overflow-x-auto'>{{$section['data']['text_left']}}</pre>
+            <pre class='p-4 whitespace-pre-wrap break-words overflow-x-auto'>{{$section['data']['text_right']}}</pre>
           </div>
         @else
           <span>ERROR UNKNOWN SECTION TYPE</span>

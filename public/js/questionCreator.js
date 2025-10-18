@@ -81,6 +81,164 @@ class OpenAnswer extends Option {
     // since it's hidden and always will be it's fine to just put it wherever
   }
 }
+class FillInTable extends Option {
+  constructor(event, button) {
+    super();
+    var self = this;
+    this.column_number = 0;
+    this.newOptionFieldButton = button;
+    button.setAttribute("title", "add row");
+    button.onclick = function(event) { self.add_child_option(event) };
+  }
+  toString() {
+    // used in get_preceding_text
+    return 'fill_in_table';
+  }
+  add_child_option(event, option = null) {
+    this.column_number = 0;
+    var self = this;
+    const new_option_number = option_number;
+    const wrapper = document.createElement("tr");
+    if (option) {
+      const id = document.createElement('input');
+      id.name = "option_id_" + option_number;
+      wrapper.appendChild(id);
+      id.type = "hidden";
+      id.value = option['id'];
+    }
+    const preceding_text_field =
+        this.get_preceding_text(new_option_number, option);
+    wrapper.appendChild(preceding_text_field);
+    const table = document.createElement("table");
+    this.table = table;
+    wrapper.appendChild(table);
+    const parent = document.getElementById("options_table");
+    parent.appendChild(wrapper);
+    this.initialize_column_row(
+        new_option_number, table,
+        (option !=
+         null)); // I am sorry that 2 similar functions are so different...
+    const button_add_row = document.createElement("button");
+    this.table.parentElement.appendChild(button_add_row);
+    button_add_row.onclick = function(
+        event) { self.add_row(event, table, new_option_number, null, true) };
+    button_add_row.innerText = "+";
+    button_add_row.setAttribute('title', 'Add row');
+
+    parent.parentElement.insertBefore(document.createElement("br"),
+                                      this.newOptionFieldButton);
+    option_number += 1;
+    if (option) {
+      for (var row_data of option['data']['row_array']) {
+        this.add_row(event, table, new_option_number, row_data, true);
+      }
+    } else {
+      this.table.children[0].children[0].appendChild(this.create_input_field(
+          table.parentElement.parentElement.children.length - 1, 0, 0));
+      this.table.children[0].children[0].appendChild(this.create_input_field(
+          table.parentElement.parentElement.children.length - 1, 0, 1));
+    }
+  }
+  initialize_column_row(new_option_number, table, hasOptionData = false) {
+    var self = this;
+    const table_head = document.createElement("tbody");
+    table.appendChild(table_head);
+    if (hasOptionData) {
+      return;
+    }
+    const column_names_row = document.createElement("tr");
+    self.columns = column_names_row;
+    table_head.appendChild(column_names_row);
+    const button_add_columns = document.createElement("button");
+    button_add_columns.setAttribute("type", "button");
+    button_add_columns.setAttribute("title", "Add column");
+    button_add_columns.setAttribute("name", "button_add_columns");
+    self.button_add_columns = button_add_columns;
+    button_add_columns.classList.add(
+        "border",
+        "rounded-md",
+        "w-10",
+        "border-black",
+    );
+    button_add_columns.innerHTML = "+";
+    button_add_columns.onclick = function(event) {
+      // creates children in the row we just created
+      table.children[0].children[0].appendChild(self.create_input_field(
+          0, 0, table.children[0].children[0].children.length - 1));
+    };
+    column_names_row.appendChild(button_add_columns)
+  }
+
+  add_row(event, parent, option_number, row_data = null, del_button = null) {
+    // adds one row with this.column_number number of radio buttons + input
+    if (event) {
+      event.preventDefault();
+    }
+    console.log(parent);
+    // bad
+    var column_number =
+        0; // I am indeed very sorry. It's a humongous mess of spaghetti code
+    // but I have a test to study for ...
+    if (typeof parent.children[0].children[0] !== 'undefined' &&
+        typeof parent.children[0].children[0].children[0] !==
+            'undefined') { // I am sorry but
+      // I'm in a hurry
+      var button = parent.children[0].children[0].children[0];
+      if (button && button.name == "button_add_columns" && del_button) {
+        // if this is first time we are adding rows this removes the button for
+        // adding columns + adds blank cell
+        //;j
+        button.remove();
+      }
+      column_number = parent.children[0].children[0].children.length;
+    }
+    const row_number = parent.children[0].children.length;
+    const new_options_row = document.createElement("tr");
+    // new_options_row.classList.add("flex", "justify-center");
+    parent.children[0].appendChild(new_options_row);
+    if (row_data) {
+      var i = 0;
+      for (var cell of row_data) {
+        new_options_row.appendChild(
+            this.create_input_field(option_number, row_number, i, cell))
+        i++;
+      }
+    } else {
+      for (let i = 0; i < column_number; i++) {
+        new_options_row.appendChild(
+            this.create_input_field(option_number, row_number, i, row_data))
+      }
+    }
+  }
+  create_input_field(option_number, row_number, row_id, cell = null) {
+    const option_wrapper = document.createElement("td");
+    option_wrapper.setAttribute('align', 'center');
+    option_wrapper.setAttribute('valign', 'middle');
+
+    const input_field_option = document.createElement("input");
+    input_field_option.required = true;
+    input_field_option.setAttribute("type", "text");
+    input_field_option.setAttribute("name", "correct_option_" + option_number +
+                                                "_" + row_number + "_" +
+                                                row_id);
+
+    option_wrapper.appendChild(input_field_option);
+    const is_answer_checkbox = document.createElement("input");
+    is_answer_checkbox.setAttribute("type", "checkbox");
+    is_answer_checkbox.setAttribute("value", "1");
+    is_answer_checkbox.setAttribute("name", "is_answer_" + option_number + "_" +
+                                                row_number + "_" + row_id);
+
+    option_wrapper.appendChild(is_answer_checkbox);
+    if (cell) {
+      input_field_option.value = cell['cellText'];
+      if (cell['isAnswer']) {
+        is_answer_checkbox.checked = true;
+      }
+    }
+    return option_wrapper;
+  }
+}
 
 class MultipleChoice extends Option {
   constructor(event, button) {
@@ -694,6 +852,9 @@ function process_option_type(event, user_option, question = null) {
   } else if (user_option == 'boolean-choice-one-correct') {
     display_option(event, BooleanChoiceOneCorrect, options,
                    option_input_creator, options_table, options_table);
+  } else if (user_option == 'fill-in-table') {
+    display_option(event, FillInTable, options, option_input_creator,
+                   options_table, options_table);
   }
 }
 
@@ -751,17 +912,17 @@ function load_input_field(
   // append options to selector
   const question_types = [
     "boolean-choice", "boolean-choice-one-correct", "write-in",
-    "multiple-choice", "one-from-many", "open-answer"
+    "multiple-choice", "one-from-many", "open-answer", "fill-in-table"
   ];
   for (const question_type of question_types) {
     const question_type_option = document.createElement("option");
     question_type_option.setAttribute("value", question_type);
     question_type_option.innerHTML = question_type;
     question_type_selector.appendChild(question_type_option);
-  }
-  if (question) {
-    question_type_selector.value =
-        question['options'][0]['option_type'].replaceAll('_', '-');
+    }
+    if (question) {
+        question_type_selector.value =
+            question['options'][0]['option_type'].replaceAll('_', '-');
     }
     // append default option(boolean-choice) to form
     if (question) {

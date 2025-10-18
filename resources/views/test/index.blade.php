@@ -43,8 +43,11 @@
                                     <table  >
                                     <thead><tr><th>true</th><th>false</th><th class="px-2">option text</th></tr></thead>
                                     <tbody >
-
-                                    @foreach($option->data as $boolean_option)
+                                    @php
+                                        $shuffledArr=$option->data;
+                                        shuffle($shuffledArr);
+                                    @endphp
+                                    @foreach($shuffledArr as $boolean_option)
 
                                         <tr class="color-separator"><td ><input class="" type="radio" name="{{$optionIndex}}"  value="1"
                                         @if( $displayCorrectAnswers==true && $boolean_option['is_correct']==true)
@@ -85,14 +88,13 @@
                                 @elseif($option->option_type =='one_from_many')
                                     <br>
                                     <div>
-
                                     <select class="appearance-auto bg-none">
                                         @for($i=0;$i<count($option->data['option_array']);$i++)
-                                        <option value="{{$i}}" name="{{$optionIndex}}"
-                                        @if( $displayCorrectAnswers==true && $option['data']['correct_option']==$i )
-                                        selected
-                                        @endif
-                                        >{{$option->data['option_array'][$i]}}</option>
+                                            <option value="{{$i}}" name="{{$optionIndex}}"
+                                            @if( $displayCorrectAnswers==true && $option['data']['correct_option']==$i )
+                                                selected
+                                            @endif
+                                            >{{$option->data['option_array'][$i]}}</option>
                                         @endfor
                                         @php
                                             $correctOptions[$optionIndex]=$option['data']['correct_option'];
@@ -125,7 +127,7 @@
                                         @foreach($option->data['row_array'] as $rowData)
                                             <tr class="color-separator">
                                             @for($j=0;$j<$i;$j++)
-                                                <td><input type="radio" name="{{$optionIndex}}" value="{{$j}}"
+                                                <td><input type="radio"  name="{{$optionIndex}}" value="{{$j}}"
                                                     @if( $displayCorrectAnswers==true && $rowData['correct_answer']==$j )
                                                         checked
                                                     @endif
@@ -167,6 +169,31 @@
                                             $optionIndex++;
                                     @endphp
                                     </table>
+                                @elseif($option->option_type =='fill_in_table')
+                                    <br>
+                                    <table>
+                                        <tbody class="border-2 border-black">
+                                            @foreach($option->data["row_array"] as $row)
+                                              <tr>
+                                              @foreach($row as $cell)
+                                                <td align="middle" class="border border-black">
+                                                @if($cell['isAnswer'])
+                                                  <input type="text" class="border-none ring-2 ring-project-dark-blue focues:border-none" name="{{$optionIndex}}">
+                                                @else
+                                                    <span>{{$cell["cellText"]}}</span>
+                                                @endif
+                                                </td>
+                                                @php
+                                                        $correctOptions[$optionIndex]=$cell['cellText'];
+                                                        $optionIndex++;
+                                                @endphp
+                                              @endforeach
+                                              </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+
+
                                 @else
                                     <span>Something went very very very very wrong please contact .maryann</span>
                                 @endif
