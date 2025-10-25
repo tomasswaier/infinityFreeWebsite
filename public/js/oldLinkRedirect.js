@@ -14,9 +14,9 @@ function oldLinkChecker() {
   const isNumeric = (string) => string == Number.parseInt(string)
 
   if (pathHash[3] && isNumeric(pathHash[2]) && isNumeric(pathHash[3])) {
-    // load_questions();
-    // console.log('moew');
-    window.location.href = 'https://maryann.free.nf/test/' + pathHash[1] + '/' +
-                           pathHash[2] + '/' + pathHash[3];
+    if (parseInt(pathHash[2]) > 1) {
+      window.location.href = 'https://maryann.free.nf/test/' + pathHash[1] +
+                             '/' + pathHash[2] + '/' + pathHash[3];
+    }
   }
 }

@@ -22,6 +22,9 @@ Route::get('subjects', function(){
 Route::get('subjects/{id}', [SubjectController::class,'showAllSubjects']);
 Route::post('subjects/{id}', [SubjectController::class,'showAllSubjects']);
 Route::get('subjects/info/{id}',[SubjectController::class,'showSubject']);
+Route::get('test/redirect',function(){
+    return view('test/redirect');
+});
 
 Route::get('school/',function(){
     return redirect('/');
@@ -40,7 +43,7 @@ Route::get('test/{yourFeelings}/{test_id}/{number_of_questions}', [TestControlle
 Route::get('test/{id}', [TestController::class,'show']);
 Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 Route::get('test', function(){
-    return redirect('/');
+    return redirect('test/redirect');
 });
 Route::middleware('auth')->group(function () {
     /*

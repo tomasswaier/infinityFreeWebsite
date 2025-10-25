@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use App\Models\Option;
+use App\Models\School;
 use App\Models\Question;
 use App\Models\Test;
 use Illuminate\Support\Facades\Redirect;
@@ -21,10 +22,10 @@ class TestController extends Controller
     public function show($school_id,Request $request)
     {
         if (!$school_id ||$school_id<1) {
-            return redirect('/');
+            return redirect('test/redirect');
         }
         return view('test/index',[
-            'tests'=>Test::find($school_id)->get(),
+            'tests'=>School::find($school_id)->tests()->get(),
             'school_id' =>$school_id,
         ]);
     }
@@ -52,7 +53,8 @@ class TestController extends Controller
             return view('test/index',['tests'=>Test::all()]);
         }
         if($test_id==1 && !Auth::user()){
-            return redirect("/");        }
+            return redirect('test/redirect');
+        }
         $test=Test::find($test_id);
         $data = $test->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
@@ -63,7 +65,7 @@ class TestController extends Controller
         $loadCorrectOptions=$request->session()->pull('displayCorrectAnswers',false);
         $school_id=$test->school_id;
         return view('test/index',[
-            'tests'=>Test::all(),
+            'tests'=>School::find($school_id)->tests()->get(),
             'data'=>$data,
             'school_id'=>$school_id,
             'displayCorrectAnswers'=>$loadCorrectOptions,
