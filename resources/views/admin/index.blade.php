@@ -38,6 +38,7 @@
                 <tr>
                     <th name="styling" class="w-4"></th>
                     <th class="w-60">Test name</th>
+                    <th class="w-60">Submit count</th>
                     <th class="w-40">edit</th>
                     <th class="w-40">add question</th>
                     <th class="w-40">delete</th>
@@ -47,7 +48,7 @@
         @foreach($tests as $test)
             <tr class="border">
                 <td name="styling"></td>
-                <td align="center">{{$test->test_name}}</td><td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}"><img src="{{asset('storage/assets/edit_icon.png')}}" class="h-10 w-auto" alt="random edit icon"></a></td><td align="center"><a  href="{{url('admin/questionCreator/'.$test->id)}}" class="text-4xl font-bold">+</a></td><td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td>
+                <td align="center">{{$test->test_name}}</td><td align="center">{{$test->number_of_submits}}</td><td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}"><img src="{{asset('storage/assets/edit_icon.png')}}" class="h-10 w-auto" alt="random edit icon"></a></td><td align="center"><a  href="{{url('admin/questionCreator/'.$test->id)}}" class="text-4xl font-bold">+</a></td><td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td>
                 <td name="styling"></td>
                 <td></td>
 

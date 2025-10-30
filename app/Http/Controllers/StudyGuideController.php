@@ -34,7 +34,21 @@ class StudyGuideController extends Controller
         }catch(Throwable $e){
             Log::error($e);
         }
+        $this->uploadStudyGuideContents($request,$studyGuide);
+        $this->setStudyGuideSubject($request,$studyGuide,$schoolId);
+        return redirect('school/'.$schoolId);
+    }
+    public function blank(Request $request,$schoolId){
+        return view('admin/studyGuide/create',[
+            'school_id'=>$schoolId,
+            'subjects'=>School::find($schoolId)->subjects()->get(),
+        ]);
+    }
+
+
+    private function setStudyGuideSubject($request,StudyGuide $studyGuide, int $schoolId){
         if (isset($request->studyGuideSubjects) && $request->studyGuideSubjects!=0) {
+            StudyGuideSubjects::where("study_guide_id","=",$studyGuide->id)->delete();
             //should later be remade into function which can handle multiple subjects
             $requestedSubject=Subjects::find($request->studyGuideSubjects);
             if (!isset($requestedSubject) || !$requestedSubject->school_id==$schoolId) {
@@ -49,15 +63,7 @@ class StudyGuideController extends Controller
         }else{
             Log::error($request);
         }
-        $this->uploadStudyGuideContents($request,$studyGuide);
 
-        return redirect('school/'.$schoolId);
-    }
-    public function blank(Request $request,$schoolId){
-            return view('admin/studyGuide/create',[
-                'school_id'=>$schoolId,
-                'subjects'=>School::find($schoolId)->subjects()->get(),
-            ]);
     }
 
     public function edit(Request $request,$studyGuideId){
@@ -77,12 +83,14 @@ class StudyGuideController extends Controller
             'origin_study_guide_id'=>$prevVersion->origin_study_guide_id
         ]);
         $this->uploadStudyGuideContents($request,$studyGuide);
+        $this->setStudyGuideSubject($request,$studyGuide,$prevVersion->school_id);
         return redirect('school/'.StudyGuide::find($studyGuideId)->school_id);
     }
     private function uploadStudyGuideContents($request,$studyGuide){
         //I'm sorry for how this function is about to look like
         $order=0;
         $prevSection=-1;
+        Log::info($request);
         foreach($request->all() as $key=>$val){
             if (in_array($key,['_token','title','studyGuideId'])) {
                 continue;
@@ -246,7 +254,7 @@ class StudyGuideController extends Controller
         }
         $subjects=StudyGuide::find($studyGuide->id)->subjects()->get();
         $selected_subject_id=0;
-        if(isset($subjects) && empty($subjects)){
+        if(isset($subjects) && !empty($subjects)){
             $selected_subject_id=StudyGuide::find($studyGuide->id)->subjects()->get()[0]['id'];
         }
         return view('admin/studyGuide/edit',[
