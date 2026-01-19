@@ -18,19 +18,11 @@
     </div>
     <br>
     <div class="inline-block w-1/2 float-left">
-    <span>Study guides</span>
-    <table>
-       <thead>
-        <tr><th class="p-2">id</th><th>name</th></tr>
-        </thead>
-        <tbody>
-            <tr><td>1</td><td>filer data</td></tr>
-            <tr><td>3</td><td>som study guide</td></tr>
-            <tr><td>4</td><td>usb wii nintendo</td></tr>
-            <tr><td>5</td><td>whhi I hate ppi</td></tr>
-        </tbody>
-    </table>
-
+        <span>Hi!</span>
+        <span>Here is tutorial -> <a href="{{url('admin/testGuide/')}}">link.com</a></span>
+        <br>
+        <span>To get more familiar with question creation open this tutorial</span>
+        <p class="pt-16">This project was created to facilitate multiple schools so that's why it's structured as it is and not only for feet</p>
     </div>
     <div class="w-1/2 inline-block rounded-md ">
         <table class="border rounded-xl overflow-hidden">
@@ -48,7 +40,7 @@
         @foreach($tests as $test)
             <tr class="border">
                 <td name="styling"></td>
-                <td align="center">{{$test->test_name}}</td><td align="center">{{$test->number_of_submits}}</td><td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}"><img src="{{asset('storage/assets/edit_icon.png')}}" class="h-10 w-auto" alt="random edit icon"></a></td><td align="center"><a  href="{{url('admin/questionCreator/'.$test->id)}}" class="text-4xl font-bold">+</a></td><td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td>
+                <td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}">{{$test->test_name}}</a></td><td align="center">{{$test->number_of_submits}}</td><td align="center"><a  href="{{url('admin/questionDisplay/'.$test->id)}}"><img src="{{asset('storage/assets/edit_icon.png')}}" class="h-10 w-auto" alt="random edit icon"></a></td><td align="center"><a  href="{{url('admin/questionCreator/'.$test->id)}}" class="text-4xl font-bold">+</a></td><td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td>
                 <td name="styling"></td>
                 <td></td>
 

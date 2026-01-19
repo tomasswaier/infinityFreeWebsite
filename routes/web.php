@@ -58,6 +58,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
 
     Route::middleware('more_than_user')->group(function () {
+
+        Route::get('admin/testGuide',function(){
+            return view('admin/testGuide');
+        });
         Route::get('admin/studyGuide/create/{id}', [StudyGuideController::class,'blank'] );
         Route::post('admin/studyGuide/create/{id}', [StudyGuideController::class,'create'] );
         Route::get('admin/studyGuide/edit/{id}', [StudyGuideController::class,'displayEditor'] );

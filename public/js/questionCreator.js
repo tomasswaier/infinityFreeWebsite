@@ -823,8 +823,7 @@ function process_option_type(event, user_option, question = null) {
   // don't care that much
   const option_input_creator = document.createElement("button");
 
-  option_input_creator.classList.add("border", "rounded-md", "w-10",
-                                     "border-black", "!bg-project-super-blue",
+  option_input_creator.classList.add("rounded-md", "w-10", "!bg-project-white",
                                      'mt-4');
   // console.log(option_input_creator);
   option_input_creator.setAttribute("type", "button");
@@ -919,39 +918,41 @@ function load_input_field(
     question_type_option.setAttribute("value", question_type);
     question_type_option.innerHTML = question_type;
     question_type_selector.appendChild(question_type_option);
-    }
-    if (question) {
-        question_type_selector.value =
-            question['options'][0]['option_type'].replaceAll('_', '-');
-    }
-    // append default option(boolean-choice) to form
-    if (question) {
-        process_option_type(
-            event, question['options'][0]['option_type'].replaceAll('_', '-'),
-            question = question);
-    } else {
-        process_option_type(event, "boolean-choice");
-    }
-    form_element.appendChild(document.createElement("br"));
-    const explanation_input = document.createElement("textarea");
-    form_element.appendChild(explanation_input);
-    explanation_input.setAttribute("rows", "4");
-    if (question) {
-        explanation_input.value = question['explanation_text'];
-    }
-    explanation_input.setAttribute("cols", "50");
-    explanation_input.setAttribute("name", "question_explanation");
-    explanation_input.setAttribute("placeholder",
-        "Explenation:No one has dog with 4 eyes because dogs have 2 eyes");
-    explanation_input.classList.add('bg-project-white', 'p-2', 'rounded-md',
-        'mb-4')
-    form_element.appendChild(document.createElement("br"));
+  }
+  if (question) {
+    question_type_selector.value =
+        question['options'][0]['option_type'].replaceAll('_', '-');
+  }
+  // append default option(boolean-choice) to form
+  if (question) {
+    process_option_type(
+        event, question['options'][0]['option_type'].replaceAll('_', '-'),
+        question = question);
+  } else {
+    process_option_type(event, "boolean-choice");
+  }
+  form_element.appendChild(document.createElement("br"));
+  const explanation_input = document.createElement("textarea");
+  form_element.appendChild(explanation_input);
+  explanation_input.setAttribute("rows", "4");
+  if (question) {
+    explanation_input.value = question['explanation_text'];
+  }
+  explanation_input.setAttribute("cols", "50");
+  explanation_input.setAttribute("name", "question_explanation");
+  explanation_input.setAttribute(
+      "placeholder",
+      "Explanation:No one has dog with 4 eyes because dogs have 2 eyes");
+  explanation_input.classList.add('bg-project-white', 'p-2', 'rounded-md',
+                                  'mb-4')
+  form_element.appendChild(document.createElement("br"));
 
-    // append final button
-    const test_submit_button = document.createElement("button");
-    test_submit_button.setAttribute("type", "submit");
-    test_submit_button.setAttribute("name", "submit");
-    test_submit_button.innerHTML = "submit";
-    test_submit_button.classList.add("border", 'rounded-md', 'p-2', "bg-project-super-blue", 'border-none', 'm-4');
-    form_element.appendChild(test_submit_button);
+  // append final button
+  const test_submit_button = document.createElement("button");
+  test_submit_button.setAttribute("type", "submit");
+  test_submit_button.setAttribute("name", "submit");
+  test_submit_button.innerHTML = "submit";
+  test_submit_button.classList.add("border", 'rounded-md', 'p-2',
+                                   "bg-project-white", 'border-none', 'm-4');
+  form_element.appendChild(test_submit_button);
 }

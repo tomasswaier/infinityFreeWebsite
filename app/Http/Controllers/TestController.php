@@ -210,7 +210,7 @@ class TestController extends Controller
                         exit;
                     }else {
                     }
-                }elseif (str_contains($key,'explenation')) {
+                }elseif (str_contains($key,'explanation')) {
                     continue;
                 }
                 else{
