@@ -1,14 +1,14 @@
 if (!document) {
   const {document} = require("postcss");
 }
-
-var countCorrect = 0;
-var countAll = 0;
+function hideResults() {
+  const parent = document.getElementById("numberOfPointsPopupText")
+                     .parentElement.parentElement;
+  parent.classList.add("hidden");
+}
 
 async function incrementNumberOfSubmits(testId) {
   try {
-    console.log(window.location.href +
-                `/../../../../api/incrementNumberOfSubmits/${testId}`);
     const response =
         await fetch(window.location.href +
                     `/../../../../api/incrementNumberOfSubmits/${testId}`);
@@ -17,31 +17,6 @@ async function incrementNumberOfSubmits(testId) {
   } catch (error) {
     console.error('Error incrementing test viewCount', error);
   }
-}
-
-function is_correct(id, value, type, input_value, correct_values) {
-  var correct_value = correct_values[id];
-  // console.log(correct_values);
-  if (type == "radio" || type == "option") {
-    // console.log(input_value + correct_value);
-    if (correct_value == value) {
-      return true;
-    } else {
-      return false;
-    }
-  } else if (type == 'text') {
-    // if the answer can be multiple options then devide them by column
-    correct_value = correct_value.split(";");
-    for (const correct_option of correct_value) {
-      // console.log(correct_option, input_value);
-      if (correct_option.toLowerCase() === input_value.toLowerCase()) {
-        return true;
-      }
-    }
-    return false;
-  }
-  console.log("undefined type option , cannot evaluate " + type);
-  return undefined;
 }
 
 function function_input(input) {
@@ -59,8 +34,6 @@ function isCorrect(correctAnswer, userInputElement) {
 function submitForm(event) {
   incrementNumberOfSubmits(test_id);
 
-  countCorrect = 0;
-  countAll = 0;
   if (event) {
     event.preventDefault();
   }
@@ -79,16 +52,64 @@ function submitForm(event) {
   evaluateOptions(inputs, correctOptions, function_select);
 
   var expalnations = document.getElementsByName('explanation');
-  expalnations.forEach(explanation => {
-    console.log(explanation);
-    explanation.removeAttribute('hidden');
-  });
-  document.getElementById('result_info').innerText =
-      countCorrect + '/' + countAll;
+  expalnations.forEach(
+      explanation => { explanation.removeAttribute('hidden'); });
+  // document.getElementById('result_info').innerText =
+  //    countCorrect + '/' + countAll;
+}
+function displaynumberOfPoints() {
+  let correctCount = 0;
+  for (const questionId of questionIdArray) {
+    if (questionOptionAssignment[Number(questionId)] &&
+        (questionOptionAssignment[Number(questionId)].length == 0)) {
+      correctCount++;
+    } else {
+      // console.log("Unable to find questionId:" + questionId +
+      //             " in the following object");
+      // console.log(questionOptionAssignment);
+      // console.log("this may be because a question was left empty")
+    }
+  }
+
+  const popupText = document.getElementById("numberOfPointsPopupText");
+  popupText.parentElement.parentElement.classList.remove('hidden');
+  popupText.innerText = correctCount + " / " + questionCount;
+}
+function flagCorrectlyAnsweredQuestion(inputNumber, optionQuestionDict) {
+  if (!questionOptionAssignment || !questionIdArray) {
+    console.error("Error:Variable questionOptionAssignment is unavailable.")
+    return;
+  }
+  const questionId = Number(optionQuestionDict[inputNumber]);
+  if (!questionId || questionId < 1) {
+    console.error(
+        'Error:QuestionId to be removed from array can not be found.');
+    return
+  }
+
+  if (questionOptionAssignment[questionId] &&
+      (questionOptionAssignment[questionId].indexOf(inputNumber) > -1)) {
+    questionOptionAssignment[questionId].splice(
+        questionOptionAssignment[questionId].indexOf(inputNumber), 1);
+  } else {
+    console.log("didn't find questionId:" + questionId);
+  }
+}
+
+function questionOptionAssignmentToDict() {
+  let myDict = {};
+  for (const questionId in questionOptionAssignment) {
+    for (var inputNumber of questionOptionAssignment[questionId]) {
+      myDict[inputNumber] = questionId;
+    }
+  }
+  return myDict;
 }
 
 function evaluateOptions(inputs, correctValues, selectedFunction) {
   // Iterate through the inputs and log their values and IDs/names
+  var optionQuestionDict = questionOptionAssignmentToDict();
+
   for (var input of inputs) {
     input = selectedFunction(input);
 
@@ -102,54 +123,46 @@ function evaluateOptions(inputs, correctValues, selectedFunction) {
       continue;
     }
     var input_value;
+    let evaluationResult = false;
     if (type == "radio") {
-      evaluateRadioBox(input, name_id, parent);
-      continue;
+      evaluationResult = evaluateRadioBox(input, name_id, parent);
+
     } else if (type == "text") {
       parent = input;
-      evaluateWriteIn(input, name_id, input.parentElement);
-      continue;
+      evaluationResult = evaluateWriteIn(input, name_id, input.parentElement);
     } else if (input.localName == "option") {
       type = 'option';
       name_id = input.attributes['name'].value;
-      evaluateSelect(input, name_id, parent);
+      evaluationResult = evaluateSelect(input, name_id, parent);
     } else {
+      console.error('Error:could not identify type of input field');
+      continue;
     }
 
-    // if (is_correct(name_id, value, type, input_value, correctValues)) {
-    //   if (parent.getAttribute("class") &&
-    //       parent.getAttribute("class").includes("!bg-red-500")) {
-    //     parent.classList.remove("!bg-red-500")
-    //   }
-
-    //  parent.classList.add("!bg-green-700");
-    //  // console.log("correct");
-    //} else {
-    //  if (!parent.getAttribute("class") ||
-    //      !parent.getAttribute("class").includes("!bg-green-700")) {
-    //    parent.classList.add("!bg-red-500");
-    //  }
-    //}
+    if (evaluationResult) {
+      flagCorrectlyAnsweredQuestion(Number(name_id), optionQuestionDict);
+    }
   };
+  displaynumberOfPoints();
 }
 
 function evaluateSelect(input, id, grandParent) {
-
+  let isCorrect = false;
   if (input.value == correctOptions[id]) {
+    // option is correct
     if (grandParent.getAttribute("class") &&
         grandParent.getAttribute("class").includes("!bg-red-500")) {
       grandParent.classList.remove("!bg-red-500")
     }
 
     grandParent.classList.add("!bg-green-700");
-    countCorrect++;
-    // console.log("correct");
+    isCorrect = true;
   } else {
+    // option is incorrect
     if (!grandParent.getAttribute("class") ||
         !grandParent.getAttribute("class").includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
-    }
-    // console.log(grandParent.lastChild);
+    } // console.log(grandParent.lastChild);
     if (!(grandParent.lastChild.localName == 'span')) {
       const explanation = document.createElement('span');
       // console.log(input.parentElement.children[correctOptions[id]].innerText);
@@ -159,25 +172,26 @@ function evaluateSelect(input, id, grandParent) {
       grandParent.appendChild(explanation);
     }
   }
-  countAll++;
+  return isCorrect;
 }
 
 function evaluateWriteIn(input, id, grandParent) {
-
+  let isCorrect = false;
   if (input.value == correctOptions[id]) {
+    // is correct
     if (input.getAttribute("class") &&
         input.getAttribute("class").includes("!bg-red-500")) {
       input.classList.remove("!bg-red-500")
     }
 
     input.classList.add("!bg-green-700");
-    // console.log("correct");
+    isCorrect = true;
   } else {
+    // incorrect
     if (!input.getAttribute("class") ||
         !input.getAttribute("class").includes("!bg-green-700")) {
       input.classList.add("!bg-red-500");
     }
-    // console.log(grandParent.lastChild);
     if (!(grandParent.lastChild.localName == 'span')) {
       const explanation = document.createElement('span');
       explanation.classList.add('bg-red-200');
@@ -185,13 +199,12 @@ function evaluateWriteIn(input, id, grandParent) {
       grandParent.appendChild(explanation);
     }
   }
-  countAll++;
+  return isCorrect;
 }
 
 function evaluateRadioBox(input, id, grandParent) {
   const value = parseInt(input.value);
   if (!input.checked) {
-    // console.log(input);
     if (grandParent.getAttribute("class") &&
         !grandParent.getAttribute("class").includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
@@ -202,7 +215,6 @@ function evaluateRadioBox(input, id, grandParent) {
     }
     return;
   }
-  countAll++;
   var parent_classes = grandParent.getAttribute("class");
   if (correctOptions[id] == value) {
     if (parent_classes && parent_classes.includes("!bg-red-500")) {
@@ -210,12 +222,16 @@ function evaluateRadioBox(input, id, grandParent) {
     }
     input.classList.add('bg-green-200');
     grandParent.classList.add("!bg-green-700");
-    countCorrect++;
+    return true;
   } else {
     if (!parent_classes || !parent_classes.includes("!bg-green-700")) {
       grandParent.classList.add("!bg-red-500");
+    } else {
+      return true
     }
   }
+  return false;
 }
 
-document.getElementById('testSubmitButton').addEventListener("click", submitForm);
+document.getElementById('testSubmitButton')
+    .addEventListener("click", submitForm);

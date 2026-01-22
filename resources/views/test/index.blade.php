@@ -1,10 +1,30 @@
 @extends('layouts.app')
 @section('mainContent')
 <div class="border-t pt-10 border-black sm:p-10 sm:border-none  text-project-dark-blue">
+    <span name="numberOfPointsPopup" class="p-2 text-6xl fixed top-1/2 left-1/2 bg-project-light-blue hidden">
+        <div class="bg-project-white w-full h-full grid grid-flow-row">
+
+          <button class="align-left right-2 top-0 static font-bold text-4xl" onclick="hideResults()">x</button>
+          <span id="numberOfPointsPopupText" class="right-1/2 top-1/2 ">X/Y</span>
+        </div>
+    </span >
     @php
-        $correctOptions=array();
-        $optionIndex=0;
-        $questionNumber=0;
+
+      $questionOptionAssignment=array();
+      $correctOptions=array();
+      $optionIndex=0;
+      $questionNumber=0;
+      function handleQuestionOptionAssignment(&$questionOptionAssignment, $questionId, $optionNumber)
+      {
+          if (isset($questionOptionAssignment[$questionId])) {
+              $questionOptionAssignment[$questionId][] = $optionNumber;
+          } else {
+              $questionOptionAssignment[$questionId] = [$optionNumber];
+          }
+      }
+
+
+
     @endphp
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     @if(Auth::user() && supervisesSchool(Auth::user(),$school_id))
@@ -20,9 +40,9 @@
             <h1>CORRECT ANSWERS ARE</h1>
         @endif
 
-        <table class="bg-project-light-blue sm:rounded-md">
+        <table class="bg-project-light-blue sm:rounded-md overflow-x-auto">
             <tr >
-            <th class='max-w-12 text-xs'><span>question num</span></th><th class="p-2 flex justify-start">question text</th></tr>
+            <th class='max-w-12 text-xs'><span>q. num</span></th><th class="p-2 flex justify-start">question text</th></tr>
         @foreach($data as $question)
 
                 <tr><td class="grid grid-flow-row justify-center" align="center"><span>{{++$questionNumber}}.</span></td>
@@ -66,6 +86,7 @@
                                         </tr>
                                         @php
                                             $correctOptions[$optionIndex]=$boolean_option['is_correct']==true?1:0;
+                                            handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
                                             $optionIndex++;
                                         @endphp
                                     @endforeach
@@ -83,6 +104,7 @@
                                         @endisset
                                         @php
                                             $correctOptions[$optionIndex]=$option['data']['correct_answer'];
+                                            handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
                                             $optionIndex++;
                                         @endphp
                                 @elseif($option->option_type =='one_from_many')
@@ -98,6 +120,7 @@
                                         @endfor
                                         @php
                                             $correctOptions[$optionIndex]=$option['data']['correct_option'];
+                                            handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
                                             $optionIndex++;
                                         @endphp
                                     </select>
@@ -135,6 +158,7 @@
                                             @endfor
                                             @php
                                                 $correctOptions[$optionIndex]=$option['data']['row_array'][$rowArrayIndex]['correct_answer'];
+                                            handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
                                                 $optionIndex++;
                                                 $rowArrayIndex++;
                                             @endphp
@@ -166,6 +190,7 @@
                                     @endfor
                                     @php
                                             $correctOptions[$optionIndex]=$option->data['correct_index'];
+                                            handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
                                             $optionIndex++;
                                     @endphp
                                     </table>
@@ -178,15 +203,17 @@
                                               @foreach($row as $cell)
                                                 <td align="middle" class="border border-black">
                                                 @if($cell['isAnswer'])
-                                                  <input type="text" class="border-none ring-2 ring-project-dark-blue focues:border-none" name="{{$optionIndex}}">
+                                                  <input type="text" class="border-none ring-2 ring-project-dark-blue focues:border-none" name="{{$optionIndex}}" @if( $displayCorrectAnswers==true ) value="{{$cell['cellText']}}" @endif>
+
+                                                  @php
+                                                    $correctOptions[$optionIndex]=$cell['cellText'];
+                                                    handleQuestionOptionAssignment($questionOptionAssignment,$question->id,$optionIndex);
+                                                    $optionIndex++;
+                                                  @endphp
                                                 @else
                                                     <span>{{$cell["cellText"]}}</span>
                                                 @endif
                                                 </td>
-                                                @php
-                                                        $correctOptions[$optionIndex]=$cell['cellText'];
-                                                        $optionIndex++;
-                                                @endphp
                                               @endforeach
                                               </tr>
                                             @endforeach
@@ -235,13 +262,17 @@
     @endif
 </div>
 <script>
-//it's intended for the user to have full access to correct asnwers ,. hell i'd give everyone access to db if ash wasnt here. I am doing rthis with js because it's easier than submitting everyhting with laravel trying to recreate the test ,build completely new blade file  for this shi ... I dont need to info of what the user had correct or didnt so why send it over :3
-    var correctOptions={};
-    @foreach($correctOptions as $number=>$val)
-        correctOptions[{{$number}}]=@json($val);
-    @endforeach
-    console.log(correctOptions);
-    var test_id=@isset($test_id){{$test_id}}@endisset;
+//it's intended for the user to have full access to correct asnwers ,. hell i'd give everyone access to db if ash wasnt here. I am doing this with js because it's easier than submitting everyhting with laravel trying to recreate the test ,build completely new blade file  for this shi ... I dont need to info of what the user had correct or didnt so why send it over :3
+    let correctOptions=@json($correctOptions);
+    let test_id=@isset($test_id){{$test_id}}@endisset;
+    let questionOptionAssignment =@json($questionOptionAssignment);
+    let questionCount={{$questionNumber}};
+    let questionIdArray=[];//array which holds only unique question id's... used to evaluate test
+    @isset($data)
+        @foreach($data as $question)
+          questionIdArray.push({{$question->id}});
+        @endforeach
+    @endisset
 </script>
 <script src="{{ asset('js/testEvaluator.js') }}"></script>
 <script src="{{ asset('js/oldLinkRedirect.js') }}"></script>
