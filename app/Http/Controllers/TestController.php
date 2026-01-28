@@ -52,9 +52,9 @@ class TestController extends Controller
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
-        if($test_id==1 && !Auth::user()){
+        /*if($test_id==1 && !Auth::user()){
             return redirect('test/redirect');
-        }
+        }*/
         $test=Test::find($test_id);
         $data = $test->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
@@ -149,8 +149,9 @@ class TestController extends Controller
     }
     public function addQuestion(Request $request){
         try {
-            //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ? would hidden input be better?
+            //Not sure why I put it in session instead of a hidden input... If anyone wants they can chanage it
             $test_id= $request->session()->get('test_id',-1);
+
 
             $input=$request->except('_token','submit','question_explanation');
             if ($test_id==-1) {
@@ -183,12 +184,70 @@ class TestController extends Controller
         }
 
     }
+    private function shiftAfterText($input){
+        if (isset($input['after_text'])) {
+          //assume it's on the front of the array because go sorts them automatically.
+          $afterText=array_shift($input);
+          $input["after_text"]=$afterText;
+
+        }
+        return $input;
+    }
+
+    public function mcpAddQuestion(Request $request){
+        try {
+            if (!isset($request['test_id']) || !isset($request['question_text'])|| !isset($request['options']) ) {
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'Important parameter missing: test_id '.!isset($request['test_id']).'  missing: question_text'+!isset($request['question_text']).'  missing: options'+!isset($request['options'])
+                ]);
+            }
+            $testId=$request['test_id'];
+            if(!Test::find($testId)){
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'test_id has an invalid value'
+                ]);
+            }
+            $question= Question::create([
+                'tests_id'=>$testId,
+                'question_text'=>$request['question_text'],
+                'explanation_text'=>$request['question_explanation']
+            ]);
+            //Just testing atm. Images not supported atm..
+            /*if (isset($request['user_image'])) {
+                $response=(new ImageController)->upload($request['user_image'],$question->id);
+                if ($response==1) {
+                }
+                else{
+                    Log::error('Image did not get saved');
+                }
+            }*/
+            Log::info($request['options']);
+            $input=$this->shiftAfterText($request['options']);
+            $questionId=$question['id'];
+            $this->insertOptionsFromArray($input,$questionId);
+
+            return response()->json([
+                'success'=>true,
+                'message'=>'Question has been added to the test'
+            ]);
+
+            //return redirect('admin/questionCreator/'.$test_id);
+        } catch (\Exception $e) {
+            Log::error('Something bad failed: '.$e->getMessage());
+            return response()->json(['success' => false, message=>'Something. Check logs'], 500);
+        }
+
+    }
     private function insertOptionsFromArray($input,$questionId){
+            Log::info($input);
             $myClass=null;
             $optionId=null;
             //would be better to save a number to compare it to but im in a hurry
             $prevOption=null;
             foreach ($input as $key => $value) {
+                Log::info($key);
                 //will be building this with future possibility of multiple types of questions per one question
                 if (substr($key,0,10)=='option_id_') {
                     $optionId=$value;
@@ -208,14 +267,13 @@ class TestController extends Controller
                     if (!$myClass) {
                         Log::error("myClass doesn't exist.Exiting");
                         exit;
-                    }else {
                     }
-                }elseif (str_contains($key,'explanation')) {
+                }elseif (str_contains($key,'explanation')||str_contains($key,'option_number')) {
                     continue;
                 }
                 else{
                     if (!$myClass) {
-                        Log::error('myClass not initiated. Most probable cause is that ');
+                        Log::error('myClass not initiated. Most probable cause is that values came in an unexpected order');
                         break;
                     }
                     $myClass->readOption($key,$value);
@@ -275,7 +333,7 @@ class TestController extends Controller
 
 //move this somewhere ?
 class QuestionType{
-    //sorry for bad naming
+    //sorry for bad namizng
     public $questionNumber;
     public $precedingText;
     public $questionId; // questionId is needed for inserting optionId
@@ -386,10 +444,16 @@ class WriteIn extends QuestionType{
     public function __toString(){
         return "write_in";
     }
+    function __destruct()
+    {
+        $this->data['correct_answer']=$this->input['option_number_'.$this->questionNumber];
+
+        $this->optionId=$this->createQuestion($this->__toString());
+    }
     public function readOption($key,$val){
-        if (str_contains($key,"option_number_")) {
-            $this->data['correct_answer']=$val;
-        }else if (str_contains($key,"after_text")) {
+        /*if (str_contains($key,"option_number_")) {
+            $this->data['correct_answer']=$val;}else*/
+        if (str_contains($key,"after_text")) {
             $this->data['after_text']=$val;
         }else {
             Log::error('$key does not contain option_number_ .Error in input key:'.$key);

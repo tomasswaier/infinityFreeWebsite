@@ -124,5 +124,6 @@ Route::middleware('auth')->group(function () {
 });
 Route::prefix('api')->group(function () {
     Route::get('/incrementNumberOfSubmits/{id}',[TestController::class,'incrementNumberOfSubmits']);
+
 });
 require __DIR__.'/auth.php';

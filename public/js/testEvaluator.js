@@ -176,30 +176,32 @@ function evaluateSelect(input, id, grandParent) {
 }
 
 function evaluateWriteIn(input, id, grandParent) {
-  let isCorrect = false;
-  if (input.value == correctOptions[id]) {
-    // is correct
-    if (input.getAttribute("class") &&
-        input.getAttribute("class").includes("!bg-red-500")) {
-      input.classList.remove("!bg-red-500")
-    }
 
-    input.classList.add("!bg-green-700");
-    isCorrect = true;
-  } else {
-    // incorrect
-    if (!input.getAttribute("class") ||
-        !input.getAttribute("class").includes("!bg-green-700")) {
-      input.classList.add("!bg-red-500");
-    }
-    if (!(grandParent.lastChild.localName == 'span')) {
-      const explanation = document.createElement('span');
-      explanation.classList.add('bg-red-200');
-      explanation.innerText = correctOptions[id];
-      grandParent.appendChild(explanation);
+  var correctOptionSplit = correctOptions[id].split(';');
+
+  for (const option of correctOptionSplit) {
+    if (input.value == option) {
+      // is correct
+      if (input.getAttribute("class") &&
+          input.getAttribute("class").includes("!bg-red-500")) {
+        input.classList.remove("!bg-red-500")
+      }
+
+      input.classList.add("!bg-green-700");
+      return true;
     }
   }
-  return isCorrect;
+  if (!input.getAttribute("class") ||
+      !input.getAttribute("class").includes("!bg-green-700")) {
+    input.classList.add("!bg-red-500");
+  }
+  if (!(grandParent.lastChild.localName == 'span')) {
+    const explanation = document.createElement('span');
+    explanation.classList.add('bg-red-200');
+    explanation.innerText = correctOptions[id];
+    grandParent.appendChild(explanation);
+  }
+  return false;
 }
 
 function evaluateRadioBox(input, id, grandParent) {
