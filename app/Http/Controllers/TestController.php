@@ -12,7 +12,13 @@ use App\Models\Test;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
-
+use App\Helpers\QuestionCreators\BooleanChoice;
+use App\Helpers\QuestionCreators\BooleanChoiceOneCorrect;
+use App\Helpers\QuestionCreators\FillInTable;
+use App\Helpers\QuestionCreators\MultipleChoice;
+use App\Helpers\QuestionCreators\OneFromMany;
+use App\Helpers\QuestionCreators\OpenAnswer;
+use App\Helpers\QuestionCreators\WriteIn;
 use function App\AuthHelper;
 
 //use app\Models\Question;
@@ -223,7 +229,6 @@ class TestController extends Controller
                     Log::error('Image did not get saved');
                 }
             }*/
-            Log::info($request['options']);
             $input=$this->shiftAfterText($request['options']);
             $questionId=$question['id'];
             $this->insertOptionsFromArray($input,$questionId);
@@ -241,13 +246,11 @@ class TestController extends Controller
 
     }
     private function insertOptionsFromArray($input,$questionId){
-            Log::info($input);
             $myClass=null;
             $optionId=null;
             //would be better to save a number to compare it to but im in a hurry
             $prevOption=null;
             foreach ($input as $key => $value) {
-                Log::info($key);
                 //will be building this with future possibility of multiple types of questions per one question
                 if (substr($key,0,10)=='option_id_') {
                     $optionId=$value;
@@ -259,7 +262,7 @@ class TestController extends Controller
                 }
                 if (str_contains($key,'preceding')) {
                     //compare last 2 chars of the string . it can be either option_number_x or preceding_text_something_x this way it cna hold up to 99 options
-                    if ($prevOption && substr($prevOption,strlen($prevOption)-2,strlen($prevOption))!=substr($key,strlen($key)-2,strlen($key))) {
+                    if ($prevOption && explode('_',$prevOptionp)[count(explode('_',$prevOptionp))]!=explode('_',$key)[count(explode('_',$key))]) {
                         $prevOption=$key;
                         $optionId=null;
                     }
@@ -268,7 +271,7 @@ class TestController extends Controller
                         Log::error("myClass doesn't exist.Exiting");
                         exit;
                     }
-                }elseif (str_contains($key,'explanation')||str_contains($key,'option_number')) {
+                }elseif (str_contains($key,'explanation')) {
                     continue;
                 }
                 else{
@@ -331,209 +334,6 @@ class TestController extends Controller
 
 }
 
-//move this somewhere ?
-class QuestionType{
-    //sorry for bad namizng
-    public $questionNumber;
-    public $precedingText;
-    public $questionId; // questionId is needed for inserting optionId
-    public $optionId;//id of CREATED option or of UPDATED option
-    public $optionNumber; // number read from the option_number_  key
-    public $input; // input with all data from request
-    public $data;
-
-    function __construct($questionNumber,$questionId,$precedingText,$input,$optionId=null){
-        $this->questionNumber=$questionNumber;
-        $this->precedingText=$precedingText;
-        $this->questionId=$questionId;
-        $this->optionId=$optionId;
-        $this->input=$input;
-        $this->data=collect();
-    }
-    function __toString(){
-        return "question-type";
-    }
-    function __destruct()
-    {
-        $this->optionId=$this->createQuestion($this->__toString());
-    }
-    function createQuestion($option_type){
-        $option = Option::find($this->optionId);
-        if (!$option) {
-            $option= new Option;
-        }
-        if ($this->optionId) {
-            $option->id=$this->optionId;
-        }
-        $option->questions_id=$this->questionId;
-        $option->preceding_text=$this->precedingText;
-        $option->option_type=$option_type;
-        $option->data=$this->data;
-        $option->save();
-    }
-    function readOption($key,$val){
 
 
-    }
-}
 
-
-class BooleanChoice extends QuestionType{
-    public $specificOptioNumber;
-    public function __toString(){
-        return "boolean_choice";
-    }
-    private function getSpecificOptionNumber($key){
-        return intval(substr($key,16,strlen($key)));
-    }
-    private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs
-        if (substr($key,0,19)=='option_text_number_') {
-            return intval(substr($key,19,20));
-        }
-        return intval(substr($key,14,15));
-    }
-    public function readOption($key,$val){
-        if (str_contains($key,"option_number_")) {
-            if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
-
-                $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
-            }
-            if ($val!='true' && $val!='false') {
-                Log::error('Bad boolean choice input');
-                exit;
-            }
-            $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
-            $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
-
-        }
-        return;
-    }
-}
-
-class BooleanChoiceOneCorrect extends QuestionType{
-    public $specificOptioNumber;
-    public function __toString(){
-        return "boolean_choice_one_correct";
-    }
-    private function getSpecificOptionNumber($key){
-        return intval(substr($key,16,strlen($key)));
-    }
-    private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs -> todo:fix
-        if (substr($key,0,19)=='option_text_number_') {
-            return intval(substr($key,19,20));
-        }
-        return intval(substr($key,14,15));
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['option_array'])) {
-            $this->data['option_array']=collect();
-        }
-        if (str_contains($key,"option_text_number_")) {
-            $this->data['option_array']->push($val);
-        }else if(str_contains($key,"correct_option_")) {
-            $this->data['correct_index']=$val;
-        }
-
-        return;
-    }
-
-}
-class WriteIn extends QuestionType{
-    public function __toString(){
-        return "write_in";
-    }
-    function __destruct()
-    {
-        $this->data['correct_answer']=$this->input['option_number_'.$this->questionNumber];
-
-        $this->optionId=$this->createQuestion($this->__toString());
-    }
-    public function readOption($key,$val){
-        /*if (str_contains($key,"option_number_")) {
-            $this->data['correct_answer']=$val;}else*/
-        if (str_contains($key,"after_text")) {
-            $this->data['after_text']=$val;
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class MultipleChoice extends QuestionType{
-    public function __toString(){
-        return "multiple_choice";
-    }
-    public function readOption($key,$val){
-
-        if (!isset($this->data['column_names'])) {
-            $this->data['column_names']=collect();
-            $this->data['row_array']=collect();
-        }
-        if (str_contains($key,"column_number_")) {
-            $this->data['column_names']->push($val);
-        }else if (str_contains($key,"correct_option_")) {
-            $rowName=$this->input['row_text_'.substr($key,15,strlen($key))];
-            $this->data['row_array']->push(['row_name'=>$rowName,'correct_answer'=>$val]);
-        }else if (str_contains($key,"row_text_")) {
-            return;
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class FillInTable extends QuestionType{
-    public function __toString(){
-        return "fill_in_table";
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['row_array'])) {
-            $this->data['row_array']=collect();
-        }
-        if(str_contains($key,"is_answer_") || str_contains($key,"option_id_")){
-            return;
-        }else if (str_contains($key,"correct_option_")) {
-            $rowNumber=explode("_",$key)[3];
-            if(!isset($this->data['row_array'][intval($rowNumber)])){
-                $this->data['row_array'][intval($rowNumber)]=collect();
-            }
-            $this->data['row_array'][$rowNumber]->push([
-                "cellText"=>$val,
-                "isAnswer"=>isset($this->input["is_answer_".substr($key,15,strlen($key))])
-            ]);
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class OneFromMany extends QuestionType{
-    public function __toString(){
-        return "one_from_many";
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['option_array'])) {
-            $this->data['option_array']=collect();
-        }
-        if (str_contains($key,"option_number_")) {
-            $this->data['option_array']->push($val);
-        }else if (str_contains($key,"correct_option_index_")) {
-
-            //we assume that the user will not fuck with the html..(and that the json data will be in order but i do that quite a bit here bcs i dont see reason why na) like yes you could do it very easily but omg woow gj you did something on a student for fun project ur so kewl
-            $this->data['correct_option']=intval($val);
-        }else{
-            Log::error('$key does not contain option_number_ .Error in input key ');
-        }
-        return;
-    }
-}
-class OpenAnswer extends QuestionType{
-    public function __toString(){
-        return "open_answer";
-    }
-    public function readOption($key,$val){
-        return;
-    }
-}
