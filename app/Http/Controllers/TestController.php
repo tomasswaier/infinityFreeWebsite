@@ -200,12 +200,13 @@ class TestController extends Controller
         return $input;
     }
 
-    public function mcpAddQuestion(Request $request){
+    public function mcpAddQuestion(array $request){
         try {
             if (!isset($request['test_id']) || !isset($request['question_text'])|| !isset($request['options']) ) {
+                Log::error('Important parameter missing: test_id '.!isset($request['test_id']).'  missing: question_text '.!isset($request['question_text']).'  missing: options '.!isset($request['options']));
                 return response()->json([
                     'success'=>false,
-                    'message'=>'Important parameter missing: test_id '.!isset($request['test_id']).'  missing: question_text'+!isset($request['question_text']).'  missing: options'+!isset($request['options'])
+                    'message'=>'Important parameter missing: test_id '.var_export(!isset($request['test_id']),true).'  missing: question_text '.var_export(!isset($request['question_text']),true).'  missing: options '.var_export(!isset($request['options']),true)
                 ]);
             }
             $testId=$request['test_id'];
@@ -241,11 +242,12 @@ class TestController extends Controller
             //return redirect('admin/questionCreator/'.$test_id);
         } catch (\Exception $e) {
             Log::error('Something bad failed: '.$e->getMessage());
-            return response()->json(['success' => false, message=>'Something. Check logs'], 500);
+            return response()->json(['success' => false, 'message'=>'Something. Check logs'], 500);
         }
 
     }
     private function insertOptionsFromArray($input,$questionId){
+        Log::info($input);
             $myClass=null;
             $optionId=null;
             //would be better to save a number to compare it to but im in a hurry
@@ -275,11 +277,14 @@ class TestController extends Controller
                     continue;
                 }
                 else{
-                    if (!$myClass) {
+                    //Temporary fix while I'm developing mcp
+                    if (!$myClass ) {
                         Log::error('myClass not initiated. Most probable cause is that values came in an unexpected order');
-                        break;
+                        continue;
+                        //break;
+                    }else{
+                        $myClass->readOption($key,$value);
                     }
-                    $myClass->readOption($key,$value);
 
                 }
             }

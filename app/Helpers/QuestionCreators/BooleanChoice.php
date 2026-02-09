@@ -29,7 +29,7 @@ class BooleanChoice extends QuestionType{
                 $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
             }
             $splitKey=explode('_',$key);
-            $isCorrect=$this->input['option_number_'.$splitKey[3]."_".$splitKey[4]];
+            $isCorrect=strtolower($this->input['option_number_'.$splitKey[3]."_".$splitKey[4]]);
             if ($isCorrect!='true' && $isCorrect!='false') {
                 Log::error('Bad boolean choice input');
                 exit;
