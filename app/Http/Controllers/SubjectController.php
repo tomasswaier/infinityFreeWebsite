@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Subjects;
 use App\Models\SubjectTag;
+use App\Models\SubjectRating;
 use App\Models\Tag;
 
 class SubjectController extends Controller
@@ -42,11 +44,23 @@ class SubjectController extends Controller
         if ($subject==null) {
             return redirect('subjects');
         }
+        $userRating=null;
+        if (Auth::user()) {
+            $user_id=Auth::user()->id;
+            if ($user_id) {
+                $userRating=SubjectRating::select('rating')->where([['subject_id','=',$id],['user_id','=',$user_id]])-> find($subject['id']);
+                if (isset($userRating['rating'])) {
+                    $userRating=$userRating['rating'];
+                    Log::info($userRating['rating']);
+                }
+            }
+        }
 
         return view('subjects/subject',[
             'subject'=>$subject,
             'school_id'=>$subject->school_id,
-            'tags'=>Subjects::find($subject['id'])->tags()->get()
+            'tags'=>Subjects::find($subject['id'])->tags()->get(),
+            'subject_user_rating'=>$userRating
         ]);
     }
 
@@ -115,5 +129,44 @@ class SubjectController extends Controller
             Log::error('Error while creating Tag:'.$th);
         }
         return redirect()->back();
+    }
+    public function deleteOldestSubjectRating($subjectRatingId){
+        $countOfRows= count(SubjectRating::where('subject_id','=',$subjectRatingId)->get());
+        if ($countOfRows>19) {
+            SubjectRating::where('subject_id','=',$subjectRatingId)->oldest()->first()->delete();
+        }
+        return 1;
+    }
+    public function updateSubjectRating($subjectRatingId){
+
+        $subject = Subjects::find($subjectRatingId);
+        if (!$subject) {
+            Log::error("error:unable to find Subject by specified id");
+            return 0;
+        }
+        $meow=SubjectRating::where('subject_id','=',$subjectRatingId)->avg('rating');
+        $subject->rating=round($meow);
+        $subject->save();
+    }
+
+    public function saveRating(Request $request,$id){
+        try {
+            $this->deleteOldestSubjectRating($id);
+            $info=$request->all();
+            $rating= new SubjectRating;
+            SubjectRating::updateOrCreate(
+                [
+                    'user_id' => Auth::user()->id,
+                    'subject_id' => $id,
+                ],
+                [
+                    'rating' => $request['userRating'],
+                ]
+            );
+            $this->updateSubjectRating($id);
+        } catch (\Throwable $th) {
+            Log::error('Error while saving SubjectRating:'.$th);
+        }
+        return redirect('subjects/info/'.$id);
     }
 }

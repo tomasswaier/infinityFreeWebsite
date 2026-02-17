@@ -46,9 +46,7 @@ Route::get('test', function(){
     return redirect('test/redirect');
 });
 Route::middleware('auth')->group(function () {
-    /*
-     * here will go routes for study guides
-     */
+    Route::post('subjects/rating/{id}',[SubjectController::class,'saveRating']);
 
     //Route::post('test', [TestController::class,'getTest'])->name('displayTest');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
