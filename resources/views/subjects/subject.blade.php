@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('mainContent')
 
-<div class="p-10 inline-block float-left w-3/4">
+<div class="p-10 inline-block float-left lx:w-3/4">
     <div class="ml-20">
         <h1 class="text-2xl">{{$subject['name']}}</h1>
         <span>Average rating:{{$subject['rating']}}/10. (Rateing is average of past 20 votes)</span>
@@ -16,13 +16,15 @@
             <input type="number" name="userRating" class="w-20"
                 @isset($subject_user_rating)
                     value="{{$subject_user_rating}}"
+                @else
+                    value="1"
                 @endisset
             >
             <span>/10</span>
         </form>
         @endauth
     </div>
-    <div class="w-1/2 float-start">
+    <div class="md:w-1/2 float-start">
         <div class="p-2">
             <span>Tags:</span>
             @foreach($tags as $tag)

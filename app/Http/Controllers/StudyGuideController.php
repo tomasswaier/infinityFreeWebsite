@@ -254,7 +254,7 @@ class StudyGuideController extends Controller
         }
         $subjects=StudyGuide::find($studyGuide->id)->subjects()->get();
         $selected_subject_id=0;
-        if(isset($subjects) && !empty($subjects)){
+        if(isset($subjects) && !empty($subjects) && count($subjects)>0){
             $selected_subject_id=StudyGuide::find($studyGuide->id)->subjects()->get()[0]['id'];
         }
         return view('admin/studyGuide/edit',[

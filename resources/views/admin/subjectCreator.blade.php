@@ -13,25 +13,25 @@
                 <span>test Id:</span><br><br>
                 <div class="p-4">
                     <span>Name:</span>
-                    <input type="text" name="subjectName" value="{{isset($subject)? $subject['name']:''}}" class="rounded-lg  bg-project-white  p-2 shadow-inner"  >
+                    <input title="Name of the subject" type="text" name="subjectName" value="{{isset($subject)? $subject['name']:''}}" class="rounded-lg  bg-project-white  p-2 shadow-inner"  required>
                     <span>Rating:</span>
-                    <input type="number" name="subjectRating" value="{{isset($subject)? $subject['rating']:''}}" step="0.1" max='10' class="rounded-lg  bg-project-white shadow-inner p-2 w-20">
+                    <input title="This rating is only a paceholder until user specifically votes for this subjects rating in the subject menu" type="number" name="subjectRating" value="{{isset($subject)? $subject['rating']:''}}" step="0.1" max='10' class="rounded-lg  bg-project-white shadow-inner p-2 w-20" required>
                 </div>
                 <div class="p-4">
                     <span>Description:</span><br>
 
-                    <textarea name="subjectDescription" rows="3" cols="40" placeholder="in description try to mention everything from projects to lectures" class="rounded-lg  bg-project-white shadow-inner p-2">{{isset($subject)? $subject['description']:''}}</textarea>
+                    <textarea name="subjectDescription" rows="3" cols="40" placeholder="in description try to mention everything from projects to lectures" class="rounded-lg  bg-project-white shadow-inner p-2" required>{{isset($subject)? $subject['description']:''}}</textarea>
                 </div>
                 <div class="p-4">
                     <span>TLDR:</span>
                     <br>
-                    <textarea name="subjectTldr" rows="3" cols="40" placeholder="Write in here the most relevant parts of description like complexity of projects and tests (1024 chars long)" class="rounded-lg  bg-project-white shadow-inner p-2">{{isset($subject)?$subject['tldr']:''}}</textarea>
+                    <textarea name="subjectTldr" rows="3" cols="40" placeholder="Write in here the most relevant parts of description like complexity of projects and tests (1024 chars long)" class="rounded-lg  bg-project-white shadow-inner p-2" required>{{isset($subject)?$subject['tldr']:''}}</textarea>
                 </div>
                 <div>
                     <span>Choose Tags</span>
                     <div>
                         @foreach($allTags as $tag)
-                            <span>{{$tag['name']}}:</span><input type="checkbox" name="tag_id_{{$tag['id']}}"  {{isset($selectedTags)&&in_array($tag['id'],$selectedTags)? 'checked="true"' : ''}}value="true">
+                            <span>{{$tag['name']}}:</span><input type="checkbox" name="tag_id_{{$tag['id']}}"  {{isset($selectedTags)&&in_array($tag['id'],$selectedTags)? 'checked="true"' : ''}}value="true" >
                             <br>
                         @endforeach
 
