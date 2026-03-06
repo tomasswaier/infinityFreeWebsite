@@ -1,8 +1,6 @@
-// I am not changing kinda dumb logic begind option_number_x_y to
-// option_number_x[] because it's already working and I don't see reason why . I
-// konw it's an option just don't see much use in it
-//
-// I will rewrite this after finishing editing on questions
+// The code is so ugly like at some point i used thing.name="" and then I forgot
+// that it's possible and google told me setAttribute and now I have half the
+// things written in ugly ass form and idk
 //
 if (!document) {
   const {document} = require("postcss");
@@ -214,22 +212,29 @@ class FillInTable extends Option {
     const option_wrapper = document.createElement("td");
     option_wrapper.setAttribute('align', 'center');
     option_wrapper.setAttribute('valign', 'middle');
+    option_wrapper.setAttribute('class', 'pb-3');
+    const color_wrapper = document.createElement("span");
+    option_wrapper.appendChild(color_wrapper);
+    color_wrapper.classList.add("bg-project-blue", "p-2");
 
     const input_field_option = document.createElement("input");
     input_field_option.required = true;
     input_field_option.setAttribute("type", "text");
+    input_field_option.setAttribute("title", "displayed field in the table");
     input_field_option.setAttribute("name", "correct_option_" + option_number +
                                                 "_" + row_number + "_" +
                                                 row_id);
 
-    option_wrapper.appendChild(input_field_option);
+    color_wrapper.appendChild(input_field_option);
     const is_answer_checkbox = document.createElement("input");
     is_answer_checkbox.setAttribute("type", "checkbox");
     is_answer_checkbox.setAttribute("value", "1");
+    is_answer_checkbox.setAttribute(
+        "title", "Checked=input field, Unchecked=text displayed in plain text");
     is_answer_checkbox.setAttribute("name", "is_answer_" + option_number + "_" +
                                                 row_number + "_" + row_id);
 
-    option_wrapper.appendChild(is_answer_checkbox);
+    color_wrapper.appendChild(is_answer_checkbox);
     if (cell) {
       input_field_option.value = cell['cellText'];
       if (cell['isAnswer']) {
@@ -247,7 +252,8 @@ class MultipleChoice extends Option {
     this.column_number = 0;
     this.initialize_column_row();
     this.newOptionFieldButton = button;
-    button.setAttribute("title", "add row");
+    button.setAttribute(
+        "title", "add row,After clicking this you can no longer add columns");
     button.onclick = function(event) { self.add_child_option(event) };
   }
   toString() {
@@ -399,6 +405,7 @@ class MultipleChoice extends Option {
     column_input_area.setAttribute("id", "column_number_" + new_option_number +
                                              "_" + column_number);
     column_input_area.value = column_name;
+    column_input_area.title = "column name";
     column_input_area.setAttribute(
         "name", "column_number_" + new_option_number + "_" + column_number);
 
@@ -434,6 +441,7 @@ class BooleanChoiceOneCorrect extends Option {
     table_data.appendChild(is_correct);
     is_correct.setAttribute("type", "radio");
     is_correct.setAttribute('class', 'w-10');
+    is_correct.setAttribute('title', 'checked=correct');
     // Ill fix it some other time
     is_correct.setAttribute("value", specific_option_number);
     if (correct_index == specific_option_number) {
@@ -450,6 +458,7 @@ class BooleanChoiceOneCorrect extends Option {
     user_input_field.required = true;
     user_input_field.setAttribute("cols", "50");
     user_input_field.setAttribute("rows", "2");
+    user_input_field.setAttribute("title", "Text displayed next to checkbox");
     user_input_field.setAttribute("name", "option_text_number_" +
                                               my_option_number + "_" +
                                               specific_option_number);
@@ -532,6 +541,7 @@ class BooleanChoiceClass extends Option {
     const answer_true = document.createElement("input");
     fieldset.appendChild(answer_true);
     answer_true.setAttribute("type", "radio");
+    answer_true.setAttribute("title", "checked=true");
     // Ill fix it some other time
     answer_true.setAttribute("value", "true");
     if (choice && choice['is_correct'] == true) {
@@ -547,6 +557,7 @@ class BooleanChoiceClass extends Option {
     fieldset.appendChild(answer_false);
     answer_false.setAttribute("type", "radio");
     answer_false.setAttribute("value", "false");
+    answer_false.setAttribute("title", "checked=false");
     answer_false.setAttribute("id", "option_number_" + my_option_number + "_" +
                                         specific_option_number);
     answer_false.setAttribute("name", "option_number_" + my_option_number +
@@ -561,6 +572,8 @@ class BooleanChoiceClass extends Option {
     user_input_field.required = true;
     user_input_field.setAttribute("cols", "50");
     user_input_field.setAttribute("rows", "2");
+    user_input_field.setAttribute("title",
+                                  "Text dispalyed next to radio buttons");
     user_input_field.setAttribute("name", "option_text_number_" +
                                               my_option_number + "_" +
                                               specific_option_number);
