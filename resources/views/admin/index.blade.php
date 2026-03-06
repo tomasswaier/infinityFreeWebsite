@@ -3,27 +3,14 @@
 <div class="p-2">
     <div class="m-2 p-2 inline-block border border-black rounded-md">
     <span>Creators</span> <br>
-    <!--<span>fix</span><a href="{{url('admin/test/testCreator')}}"><u>Test Creator</u></a>-->
-    <br>
-    <span>fix</span><a href="{{url('admin/subjectCreator')}}"><u>Subject Creator</u></a>
-    <br>
-    @if(Auth::user()->authorization=='admin')
-    <a href="{{url('admin/schoolCreator')}}"><u>School Creator</u></a>
-    <br>
-    <a href="{{url('admin/users/manage')}}"><u>User Manager</u></a>
-    <br>
-    <a href="{{url('admin/studyGuide/create')}}"><u>studyGuide creator</u></a>
-    <br>
-    @endif
+        @if(Auth::user()->authorization=='admin')
+            <a href="{{url('admin/schoolCreator')}}"><u>School Creator</u></a>
+            <br>
+            <a href="{{url('admin/users/manage')}}"><u>User Manager</u></a>
+            <br>
+        @endif
     </div>
     <br>
-    <div class="inline-block w-1/2 float-left">
-        <span>Hi!</span>
-        <span>Here is tutorial -> <a href="{{url('admin/testGuide/')}}">link.com</a></span>
-        <br>
-        <span>To get more familiar with question creation open this tutorial</span>
-        <p class="pt-16">This project was created to facilitate multiple schools so that's why it's structured as it is and not only for feet</p>
-    </div>
     <div class="w-1/2 inline-block rounded-md ">
         <table class="border rounded-xl overflow-hidden">
             <thead class="bg-project-super-blue px-4 h-16 text-xl text-white ">
@@ -48,10 +35,17 @@
         @endforeach
         </table>
     </div>
+    <div class="">
+        <span>Hi!</span>
+        <span>Here is tutorial -> <a href="{{url('admin/testGuide/')}}">link.com</a></span>
+        <br>
+        <span>To get more familiar with question creation open this tutorial</span>
+        <p class="pt-16">This project was created to facilitate multiple schools so that's why it's structured as it is and not only for feet</p>
+    </div>
 
     <section name="yap_section">
         <h2>Section for me uwu</h2>
-        <span>creating tags really doesnt work as well as it should so it would be great to redo it(I have not tested it yet but i think it'll kill everything you wrote into ur subject)</span>
+        <pre>creating tags really doesnt work as well as it should so it would be great to redo it(I have not tested it yet but i think it'll kill everything you wrote into ur subject)</pre>
     </section>
 </div>
 @endsection
