@@ -12,7 +12,13 @@ use App\Models\Test;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
-
+use App\Helpers\QuestionCreators\BooleanChoice;
+use App\Helpers\QuestionCreators\BooleanChoiceOneCorrect;
+use App\Helpers\QuestionCreators\FillInTable;
+use App\Helpers\QuestionCreators\MultipleChoice;
+use App\Helpers\QuestionCreators\OneFromMany;
+use App\Helpers\QuestionCreators\OpenAnswer;
+use App\Helpers\QuestionCreators\WriteIn;
 use function App\AuthHelper;
 
 //use app\Models\Question;
@@ -52,9 +58,9 @@ class TestController extends Controller
         if (!is_numeric($test_id)||!is_numeric($number_of_questions)) {
             return view('test/index',['tests'=>Test::all()]);
         }
-        if($test_id==1 && !Auth::user()){
+        /*if($test_id==1 && !Auth::user()){
             return redirect('test/redirect');
-        }
+        }*/
         $test=Test::find($test_id);
         $data = $test->questions()->inRandomOrder()->limit($number_of_questions)->get();
         foreach($data as $question){
@@ -149,8 +155,9 @@ class TestController extends Controller
     }
     public function addQuestion(Request $request){
         try {
-            //Marek is this how I should do it ? in routes set the test id to sessions and then here retreive ti ? would hidden input be better?
+            //Not sure why I put it in session instead of a hidden input... If anyone wants they can chanage it
             $test_id= $request->session()->get('test_id',-1);
+
 
             $input=$request->except('_token','submit','question_explanation');
             if ($test_id==-1) {
@@ -183,7 +190,64 @@ class TestController extends Controller
         }
 
     }
+    private function shiftAfterText($input){
+        if (isset($input['after_text'])) {
+          //assume it's on the front of the array because go sorts them automatically.
+          $afterText=array_shift($input);
+          $input["after_text"]=$afterText;
+
+        }
+        return $input;
+    }
+
+    public function mcpAddQuestion(array $request){
+        try {
+            if (!isset($request['test_id']) || !isset($request['question_text'])|| !isset($request['options']) ) {
+                Log::error('Important parameter missing: test_id '.!isset($request['test_id']).'  missing: question_text '.!isset($request['question_text']).'  missing: options '.!isset($request['options']));
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'Important parameter missing: test_id '.var_export(!isset($request['test_id']),true).'  missing: question_text '.var_export(!isset($request['question_text']),true).'  missing: options '.var_export(!isset($request['options']),true)
+                ]);
+            }
+            $testId=$request['test_id'];
+            if(!Test::find($testId)){
+                return response()->json([
+                    'success'=>false,
+                    'message'=>'test_id has an invalid value'
+                ]);
+            }
+            $question= Question::create([
+                'tests_id'=>$testId,
+                'question_text'=>$request['question_text'],
+                'explanation_text'=>$request['question_explanation']
+            ]);
+            //Just testing atm. Images not supported atm..
+            /*if (isset($request['user_image'])) {
+                $response=(new ImageController)->upload($request['user_image'],$question->id);
+                if ($response==1) {
+                }
+                else{
+                    Log::error('Image did not get saved');
+                }
+            }*/
+            $input=$this->shiftAfterText($request['options']);
+            $questionId=$question['id'];
+            $this->insertOptionsFromArray($input,$questionId);
+
+            return response()->json([
+                'success'=>true,
+                'message'=>'Question has been added to the test'
+            ]);
+
+            //return redirect('admin/questionCreator/'.$test_id);
+        } catch (\Exception $e) {
+            Log::error('Something bad failed: '.$e->getMessage());
+            return response()->json(['success' => false, 'message'=>'Something. Check logs'], 500);
+        }
+
+    }
     private function insertOptionsFromArray($input,$questionId){
+        Log::info($input);
             $myClass=null;
             $optionId=null;
             //would be better to save a number to compare it to but im in a hurry
@@ -200,7 +264,7 @@ class TestController extends Controller
                 }
                 if (str_contains($key,'preceding')) {
                     //compare last 2 chars of the string . it can be either option_number_x or preceding_text_something_x this way it cna hold up to 99 options
-                    if ($prevOption && substr($prevOption,strlen($prevOption)-2,strlen($prevOption))!=substr($key,strlen($key)-2,strlen($key))) {
+                    if ($prevOption && explode('_',$prevOptionp)[count(explode('_',$prevOptionp))]!=explode('_',$key)[count(explode('_',$key))]) {
                         $prevOption=$key;
                         $optionId=null;
                     }
@@ -208,17 +272,19 @@ class TestController extends Controller
                     if (!$myClass) {
                         Log::error("myClass doesn't exist.Exiting");
                         exit;
-                    }else {
                     }
                 }elseif (str_contains($key,'explanation')) {
                     continue;
                 }
                 else{
-                    if (!$myClass) {
-                        Log::error('myClass not initiated. Most probable cause is that ');
-                        break;
+                    //Temporary fix while I'm developing mcp
+                    if (!$myClass ) {
+                        Log::error('myClass not initiated. Most probable cause is that values came in an unexpected order');
+                        continue;
+                        //break;
+                    }else{
+                        $myClass->readOption($key,$value);
                     }
-                    $myClass->readOption($key,$value);
 
                 }
             }
@@ -273,203 +339,6 @@ class TestController extends Controller
 
 }
 
-//move this somewhere ?
-class QuestionType{
-    //sorry for bad naming
-    public $questionNumber;
-    public $precedingText;
-    public $questionId; // questionId is needed for inserting optionId
-    public $optionId;//id of CREATED option or of UPDATED option
-    public $optionNumber; // number read from the option_number_  key
-    public $input; // input with all data from request
-    public $data;
-
-    function __construct($questionNumber,$questionId,$precedingText,$input,$optionId=null){
-        $this->questionNumber=$questionNumber;
-        $this->precedingText=$precedingText;
-        $this->questionId=$questionId;
-        $this->optionId=$optionId;
-        $this->input=$input;
-        $this->data=collect();
-    }
-    function __toString(){
-        return "question-type";
-    }
-    function __destruct()
-    {
-        $this->optionId=$this->createQuestion($this->__toString());
-    }
-    function createQuestion($option_type){
-        $option = Option::find($this->optionId);
-        if (!$option) {
-            $option= new Option;
-        }
-        if ($this->optionId) {
-            $option->id=$this->optionId;
-        }
-        $option->questions_id=$this->questionId;
-        $option->preceding_text=$this->precedingText;
-        $option->option_type=$option_type;
-        $option->data=$this->data;
-        $option->save();
-    }
-    function readOption($key,$val){
 
 
-    }
-}
 
-
-class BooleanChoice extends QuestionType{
-    public $specificOptioNumber;
-    public function __toString(){
-        return "boolean_choice";
-    }
-    private function getSpecificOptionNumber($key){
-        return intval(substr($key,16,strlen($key)));
-    }
-    private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs
-        if (substr($key,0,19)=='option_text_number_') {
-            return intval(substr($key,19,20));
-        }
-        return intval(substr($key,14,15));
-    }
-    public function readOption($key,$val){
-        if (str_contains($key,"option_number_")) {
-            if (!isset($this->optionNumber) || $this->getOptionNumber($key)!=$this->optionNumber) {
-
-                $this->optionNumber=$this->getOptionNumber($key);// By incrementing by 1 there could be errors
-            }
-            if ($val!='true' && $val!='false') {
-                Log::error('Bad boolean choice input');
-                exit;
-            }
-            $this->specificOptioNumber=$this->getSpecificOptionNumber($key);
-            $this->data->push(['is_correct'=>($val=='true'? True :False),'option_text'=>$this->input['option_text_number_'.substr($key,14,strlen($key))]]);
-
-        }
-        return;
-    }
-}
-
-class BooleanChoiceOneCorrect extends QuestionType{
-    public $specificOptioNumber;
-    public function __toString(){
-        return "boolean_choice_one_correct";
-    }
-    private function getSpecificOptionNumber($key){
-        return intval(substr($key,16,strlen($key)));
-    }
-    private function getOptionNumber($key){
-        //we assume that there will be less than 11 boolean choice tables dunnu why the first if is here like it's def a option_numeber_ but wahtevs -> todo:fix
-        if (substr($key,0,19)=='option_text_number_') {
-            return intval(substr($key,19,20));
-        }
-        return intval(substr($key,14,15));
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['option_array'])) {
-            $this->data['option_array']=collect();
-        }
-        if (str_contains($key,"option_text_number_")) {
-            $this->data['option_array']->push($val);
-        }else if(str_contains($key,"correct_option_")) {
-            $this->data['correct_index']=$val;
-        }
-
-        return;
-    }
-
-}
-class WriteIn extends QuestionType{
-    public function __toString(){
-        return "write_in";
-    }
-    public function readOption($key,$val){
-        if (str_contains($key,"option_number_")) {
-            $this->data['correct_answer']=$val;
-        }else if (str_contains($key,"after_text")) {
-            $this->data['after_text']=$val;
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class MultipleChoice extends QuestionType{
-    public function __toString(){
-        return "multiple_choice";
-    }
-    public function readOption($key,$val){
-
-        if (!isset($this->data['column_names'])) {
-            $this->data['column_names']=collect();
-            $this->data['row_array']=collect();
-        }
-        if (str_contains($key,"column_number_")) {
-            $this->data['column_names']->push($val);
-        }else if (str_contains($key,"correct_option_")) {
-            $rowName=$this->input['row_text_'.substr($key,15,strlen($key))];
-            $this->data['row_array']->push(['row_name'=>$rowName,'correct_answer'=>$val]);
-        }else if (str_contains($key,"row_text_")) {
-            return;
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class FillInTable extends QuestionType{
-    public function __toString(){
-        return "fill_in_table";
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['row_array'])) {
-            $this->data['row_array']=collect();
-        }
-        if(str_contains($key,"is_answer_") || str_contains($key,"option_id_")){
-            return;
-        }else if (str_contains($key,"correct_option_")) {
-            $rowNumber=explode("_",$key)[3];
-            if(!isset($this->data['row_array'][intval($rowNumber)])){
-                $this->data['row_array'][intval($rowNumber)]=collect();
-            }
-            $this->data['row_array'][$rowNumber]->push([
-                "cellText"=>$val,
-                "isAnswer"=>isset($this->input["is_answer_".substr($key,15,strlen($key))])
-            ]);
-        }else {
-            Log::error('$key does not contain option_number_ .Error in input key:'.$key);
-        }
-        return;
-    }
-}
-class OneFromMany extends QuestionType{
-    public function __toString(){
-        return "one_from_many";
-    }
-    public function readOption($key,$val){
-        if (!isset($this->data['option_array'])) {
-            $this->data['option_array']=collect();
-        }
-        if (str_contains($key,"option_number_")) {
-            $this->data['option_array']->push($val);
-        }else if (str_contains($key,"correct_option_index_")) {
-
-            //we assume that the user will not fuck with the html..(and that the json data will be in order but i do that quite a bit here bcs i dont see reason why na) like yes you could do it very easily but omg woow gj you did something on a student for fun project ur so kewl
-            $this->data['correct_option']=intval($val);
-        }else{
-            Log::error('$key does not contain option_number_ .Error in input key ');
-        }
-        return;
-    }
-}
-class OpenAnswer extends QuestionType{
-    public function __toString(){
-        return "open_answer";
-    }
-    public function readOption($key,$val){
-        return;
-    }
-}
