@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Models\Subjects;
 use App\Models\SubjectTag;
+use App\Models\TetsSubject;
 use App\Models\SubjectRating;
 use App\Models\Tag;
 
@@ -64,6 +65,7 @@ class SubjectController extends Controller
             "school_id" => $subject->school_id,
             "tags" => Subjects::find($subject["id"])->tags()->get(),
             "subject_user_rating" => $userRating,
+            "subject_tests" => Subjects::find($subject["id"])->tests()->get(),
         ]);
     }
 

@@ -1,12 +1,12 @@
 @extends('layouts.app')
 @section('mainContent')
 <div class="w-full p-10">
-<span>Hi! Here I will try to explain everything bcs everyone who was</span><br>
+<span>Hi! Here I will try to explain everything about tests</span><br>
 <span id="TestCreation" class="text-xl font-bold">Test Creation:</span><br>
 <span>Tests can be created in admin panel when you enter a TestPage of any school. Tests can NOT be deleted (only directly trough db) so please don't create them for no reason(button for test deletion has been disabled for social reasons)</span><br>
 
 <span id="QuestionCreationSection" class="text-xl font-bold">Question Creation:</span><br>
-<span>To create question enter the Admin Page. In Tests table find the test into which you'd like to add the question and click the Big Bold plush sign in the "add question" column.</span><br>
+<span>To create question enter the Admin Page. In Tests table find the test into which you'd like to add the question and click the Big Bold plus sign in the "add question" column.</span><br>
 <img  src="{{asset('storage/assets/blankQuestion.png')}}" alt="question creator screenshot"><br>
 <ul class="list-disc">
    <li>First input field of the form is the Question Text input field. It should display question itself which should be answered in the option fields.</li>

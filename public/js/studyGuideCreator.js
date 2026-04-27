@@ -136,6 +136,21 @@ function createTextField() {
   removeSectionButton.type = 'button';
   removeSectionButton.innerText = 'delete section'
 
+  SUNEDITOR.create(sectionText, {
+    /*plugins : plugins,*/
+    height : 300,
+    buttonList : [ [
+      'undo',           'redo',           'font',        'fontSize',
+      'formatBlock',    'paragraphStyle', 'blockquote',  'bold',
+      'underline',      'italic',         'strike',      'subscript',
+      'superscript',    'fontColor',      'hiliteColor', 'textStyle',
+      'removeFormat',   'outdent',        'indent',      'align',
+      'horizontalRule', 'list',           'lineHeight',  'table',
+      'link',           'fullScreen',     'showBlocks',  'preview',
+      'save',           'template',
+    ] ],
+  });
+
   return wrapper;
 }
 
@@ -168,18 +183,39 @@ function displaySectionCreators(parentElement) {
     }
     element.appendChild(createImageField());
   };
-  const createVerticallySplitTextFieldButton = document.createElement('button');
+  /*const createVerticallySplitTextFieldButton =
+  document.createElement('button');
   element.parentElement.appendChild(createVerticallySplitTextFieldButton);
   createVerticallySplitTextFieldButton.type = "button";
-    createVerticallySplitTextFieldButton.classList.add('border', 'p-2');
-    createVerticallySplitTextFieldButton.innerText = "|Vert split text|";
-    createVerticallySplitTextFieldButton.onclick =
-        function() {
-            element.appendChild(createVerticallySplitTextField());
-        };
+  createVerticallySplitTextFieldButton.classList.add('border', 'p-2');
+  createVerticallySplitTextFieldButton.innerText = "|Vert split text|";
+  createVerticallySplitTextFieldButton.onclick =
+      function() { element.appendChild(createVerticallySplitTextField()); };
+      */
 }
 
 function initScrollable(id) {
-    const studyGuideContents = document.getElementById(id);
-    new Sortable(studyGuideContents, {});
+  const studyGuideContents = document.getElementById(id);
+  new Sortable(studyGuideContents, {});
+}
+
+function initSunEditor() {
+  const matches = document.querySelectorAll("textarea.suneditor");
+  for (const textarea of matches) {
+
+    SUNEDITOR.create(textarea, {
+      /*plugins : plugins,*/
+      height : 300,
+      buttonList : [ [
+        'undo',           'redo',           'font',        'fontSize',
+        'formatBlock',    'paragraphStyle', 'blockquote',  'bold',
+        'underline',      'italic',         'strike',      'subscript',
+        'superscript',    'fontColor',      'hiliteColor', 'textStyle',
+        'removeFormat',   'outdent',        'indent',      'align',
+        'horizontalRule', 'list',           'lineHeight',  'table',
+        'link',           'fullScreen',     'showBlocks',  'preview',
+        'save',           'template',
+      ] ],
+    });
+  }
 }

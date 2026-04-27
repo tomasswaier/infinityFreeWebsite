@@ -37,7 +37,7 @@
                         @elseif($section['data']['sectionType']=="simpleTextSection")
                           <div>
                             <input type="text" class="m-1" name="section_title_{{$section->id}}" placeholder="mofokintitler" value="@isset($section['data']['title']){{$section['data']['title']}}@endisset"><br>
-                            <textarea rows="4" cols="100" name="section_text_{{$section['id']}}" class="border border-project-blue rounded-md">@isset($section['data']['text']){{$section['data']['text']}}@endisset</textarea>
+                            <textarea rows="4" cols="100" name="section_text_{{$section['id']}}" class="border border-project-blue rounded-md suneditor">@isset($section['data']['text']){{$section['data']['text']}}@endisset</textarea>
                           </div>
                         @elseif($section['data']['sectionType']=="verticalSplitTextSection")
                           <div>
@@ -68,7 +68,7 @@
 
 </div>
 
-<script src="{{ asset('js/studyGuideCreator.js') }}" onload="displaySectionCreators();initScrollable('studyGuideContents')"></script>
+<script src="{{ asset('js/studyGuideCreator.js') }}" onload="displaySectionCreators();initScrollable('studyGuideContents');initSunEditor()"></script>
 
 @endsection
 

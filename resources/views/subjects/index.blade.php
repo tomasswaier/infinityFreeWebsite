@@ -9,8 +9,8 @@
                 <div>
                     <h3 class="font-bold text-2xl">Tags</h3>
                     @foreach($tags as $tag)
-                        <span>{{$tag['name']}}</span>
-                        <input type="checkbox" name="checkbox_{{$tag['id']}}" value="{{$tag['id']}}">
+                        <span class="ml-2 bg-project-blue p-1 rounded-md">{{$tag['name']}}
+                        <input type="checkbox" name="checkbox_{{$tag['id']}}" value="{{$tag['id']}}"></span>
                     @endforeach
                 </div>
                 <button type="submit" class="border-black border p-2 rounded-md mb-4 mt-2">Filter</button>

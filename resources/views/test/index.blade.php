@@ -1,6 +1,8 @@
 @extends('layouts.app')
 @section('mainContent')
 <div class="border-t pt-10 border-black sm:p-10 sm:border-none  text-project-dark-blue">
+    <!-- ask us page-->
+    <x-anonym-request-popup source="adminPage"/>
     <span name="numberOfPointsPopup" class="p-2 text-6xl fixed top-1/2 left-1/2 bg-project-light-blue hidden">
         <div class="bg-project-white w-full h-full grid grid-flow-row">
 
@@ -231,9 +233,9 @@
                             hidden
                             @endif
                         >
-                            <span class="text-slate-500">
+                            <pre class="text-slate-500">
                                {{$question['explanation_text']}}
-                            </span>
+                            </pre>
                         </div>
                     </td>
                 </tr>
@@ -250,7 +252,7 @@
             <span>Select Test</span>
             <select id="test_selector" class="rounded-md appearance-auto bg-none p-2" name="test_selector">
                @foreach($tests as $test)
-                <option value="{{$test->id}}" @if(isset($test_id) && $test->id==$test_id) selected @endif>{{$test->test_name}}</option>
+                <option value="{{$test->id}}" @if(isset($test_id) && $test->id==$test_id) selected @endif>{{$test->test_name}} by {{$test->test_author}}</option>
                @endforeach
             </select>
             <br>

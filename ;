@@ -9,8 +9,6 @@ use App\Models\Option;
 use App\Models\School;
 use App\Models\Question;
 use App\Models\Test;
-use App\Models\Subjects;
-use App\Models\TestSubject;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\ImageController;
@@ -22,7 +20,6 @@ use App\Helpers\QuestionCreators\OneFromMany;
 use App\Helpers\QuestionCreators\OpenAnswer;
 use App\Helpers\QuestionCreators\WriteIn;
 use function App\AuthHelper;
-//Sorry about the code quality
 
 //use app\Models\Question;
 
@@ -38,66 +35,15 @@ class TestController extends Controller
             'school_id' =>$school_id,
         ]);
     }
-    private function getSchoolId($testId){
-
-        $test=Test::find($testId);
-        return $test->school_id;
-    }
-    public function saveTestSubject(Request $request,$testId){
-        //todo :check if user can acually alter it... rn it will work with html injection
-        if (!$request['subject_id']) {
-            Log::info("no subject is");
-            return $this->showTestQuestionNames($testId);
-        }
-        $subjectId=$request['subject_id'];
-        Log::info("NIGG");
-        Log::info($request);
-        if(!Subjects::find($subjectId)){
-            Log::info("subject id does not belong to a subject//someone is fucking with my website");
-            return $this->showTestQuestionNames($testId);
-        }
-        //so that you can have only one
-        $testSubject= TestSubject::where('test_id','=',$testId)->get();
-        if (!$testSubject || !$testSubject->count()) {
-            $testSubject= new TestSubject;
-            $testSubject->test_id=$testId;
-            $testSubject->subject_id=$subjectId;
-            $testSubject->save();
-        }else{
-            //sorry
-            $testSubject[0]->subject_id=$subjectId;
-            $testSubject[0]->save();
-        }
-
-        return $this->showTestQuestionNames($testId);
-    }
     public function showTestQuestionNames($testId)
     {
-        $schoolId=$this->getSchoolId($testId);
-        Log::info(Test::find($testId)->subjects()->get());
-        Log::info(Subjects::where('school_id','=',$schoolId)->get());
-        $selectedSubjects= null;
-        if (isset($testId)) {
-            $temp = TestSubject::select("subject_id")
-                ->where("test_id", "=", $testId)
-                ->get();
-            $selectedSubjects = [];
-            foreach ($temp as $subject) {
-                array_push($selectedSubjects, $subject["subject_id"]);
-            }
-        }
-        Log::info("selectedSubjects");
-        Log::info($selectedSubjects);
         return view('admin/test/allQuestions',[
-            'testId'=>$testId,
             'data'=>Question::select('id','question_text')->where('tests_id','=',$testId)->get(),
-            'selectedSubjects'=>$selectedSubjects,
-            'allSubjects'=>School::find($schoolId)->subjects()->get()
+            'subjects'=>Test::select('id','name')->subjects()->get()
         ]);
     }
     public function editQuestion(Request $request,$questionId)
     {
-
         return view('admin/test/editQuestion',[
             'question'=>Question::find($questionId),
             'options'=>Question::find($questionId)->options()->get(),

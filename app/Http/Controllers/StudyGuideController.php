@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\School;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-
-
 use Illuminate\Support\Str;
 use App\Models\StudyGuide;
 use App\Models\StudyGuideSubjects;
@@ -17,6 +15,7 @@ use App\Models\Subjects;
 class StudyGuideController extends Controller
 {
     public function create(Request $request,$schoolId){
+        Log::info($request->all());
         if (!(intval($schoolId)>0 && $request['title']) ){
             Log::error('something went wrong');
             return redirect('school/'.$schoolId);

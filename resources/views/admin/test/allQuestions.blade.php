@@ -1,5 +1,20 @@
 @extends('layouts.app')
 @section('mainContent')
+        @isset($allSubjects)
+            <div name="school_subjects" class="flex flex-row">
+                <form class="p-10" id='test_subject_form' action="{{url('admin/questionDisplay/'.$testId)}}" method="post" enctype="multipart/form-data">
+                @csrf
+                @foreach($allSubjects as $subject)
+                    <span class="p-2">{{$subject->name}}</span>
+                    <input type="radio" name="subject_id" value="{{$subject->id}}"
+                    {{isset($selectedSubjects)&&in_array($subject['id'],$selectedSubjects)?'checked="true"' : ''}}value="true"}}
+                    >
+                @endforeach
+                <br>
+                <button type="submit" class=" bg-project-blue text-white rounded-sm p-2">submit change</button>
+                </form>
+            </div>
+        @endif
         @if($data)
         <table class="m-10 border rounded-xl overflow-hidden">
             <thead class="bg-project-super-blue px-4 h-16 text-xl text-white ">

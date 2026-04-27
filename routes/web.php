@@ -7,6 +7,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudyGuideController;
+use App\Http\Controllers\AnonymRequestController;
 Route::get('/', [SchoolController::class, 'showAll'])->name('mainPage');
 //example of old urls
 // http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
@@ -45,6 +46,7 @@ Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 Route::get('test', function(){
     return redirect('test/redirect');
 });
+Route::post('anonymRequest', [AnonymRequestController::class,'store'])->name('anonymRequest.store');
 Route::middleware('auth')->group(function () {
     Route::post('subjects/rating/{id}',[SubjectController::class,'saveRating']);
 
@@ -57,8 +59,11 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware('more_than_user')->group(function () {
 
-        Route::get('admin/testGuide',function(){
-            return view('admin/testGuide');
+        Route::get('admin/resources/testGuide',function(){
+            return view('admin/resources/testGuide');
+        });
+        Route::get('admin/resources/studyGuideGuide',function(){
+            return view('admin/resources/studyGuideGuide');
         });
         Route::get('admin/studyGuide/create/{id}', [StudyGuideController::class,'blank'] );
         Route::post('admin/studyGuide/create/{id}', [StudyGuideController::class,'create'] );
@@ -73,6 +78,7 @@ Route::middleware('auth')->group(function () {
         });
         Route::post('admin/test/testCreator', [TestController::class,'createTest'])->name('testCreator.store');
         Route::get('admin/questionDisplay/{test_id}',[TestController::class,'showTestQuestionNames']);
+        Route::post('admin/questionDisplay/{test_id}',[TestController::class,'saveTestSubject']);
         Route::get('admin/questionDelete/{questionId}',[TestController::class,'deleteQuestion']);
 
         Route::get('admin/questionCreator/{test_id}', function($test_id)
@@ -112,16 +118,12 @@ Route::middleware('auth')->group(function () {
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
 
 
-            //Route::get('admin/studyGuide/{school_id}',[StudyGuideController::class,'create']);
-            //Route::get('admin/studyGuide/{school_id}/{subject_id}',[SubjectController::class,'editSubject']);
-            //Route::post('admin/studyGuide',[SubjectController::class,'saveSubject'])->name('subject.store');
-
-
         });
     });
 });
 Route::prefix('api')->group(function () {
     Route::get('/incrementNumberOfSubmits/{id}',[TestController::class,'incrementNumberOfSubmits']);
 
+    Route::post('/anonymRequest',[AnonymRequestController::class,'store']);
 });
 require __DIR__.'/auth.php';

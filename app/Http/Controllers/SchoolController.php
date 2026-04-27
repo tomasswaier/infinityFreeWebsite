@@ -24,7 +24,7 @@ class SchoolController extends Controller
         return redirect('/');
     }
     public function info(Request $request,$school_id){
-        Log::info($request->all());
+        //Log::info($request->all());
         $selected_subject_id=0;
         $query= School::find($school_id)->studyGuides();
         if (!isset($request->order)) {
@@ -52,7 +52,7 @@ class SchoolController extends Controller
         [
             'school_id'=>$school_id,
             'study_guides'=>$studyGuides,
-            'subjects'=>School::find($school_id)->subjects()->get(),
+            'subjects'=>School::find($school_id)->subjects()->orderBy('name','asc')->get(),
             'order'=>$order,
             'selected_subject_id'=>$selected_subject_id,
         ]
