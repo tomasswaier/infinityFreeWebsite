@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('mainContent')
 <div class="p-10">
+    <x-anonym-request-popup source="subjectPage" buttonText="Add/Edit Subject" />
     <section>
         <div class="inline-block float-left w-3/4">
             <h2>This is a page dedicated to sharing information about subjects. So you know what to expect</h2>

@@ -2,7 +2,11 @@
 @section('mainContent')
 <div class="border-t pt-10 border-black sm:p-10 sm:border-none  text-project-dark-blue">
     <!-- ask us page-->
-    <x-anonym-request-popup source="adminPage"/>
+    @isset($test_id)
+    <x-anonym-request-popup source="testPage/{{$test_id}}" buttonText="Send question" />
+    @else
+    <x-anonym-request-popup source="testPage" buttonText="Send question" />
+    @endisset
     <span name="numberOfPointsPopup" class="p-2 text-6xl fixed top-1/2 left-1/2 bg-project-light-blue hidden">
         <div class="bg-project-white w-full h-full grid grid-flow-row">
 

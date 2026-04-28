@@ -32,7 +32,7 @@
                 <td></td>
                 <td>{{$anonymRequest->source}}</td>
                 <td>{{$anonymRequest->text}}</td>
-                <td align="center"><button type="submit" title="heh lmao never gonna implement this">X</button></td><td></td>
+                <td align="center"><a  href="{{url('admin/anonymRequestDelete/'.$anonymRequest->id)}}"class="text-4xl font-bold">X</a></td><td></td>
             </tr>
 
         @endforeach

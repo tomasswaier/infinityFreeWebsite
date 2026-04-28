@@ -11,6 +11,7 @@ use App\Models\AnonymRequest;
 class AnonymRequestController extends Controller
 {
     public function store(Request $request){
+        //TODO move these bullshits to validator
         if (!$request["source"]) {
             return response()->json([
                 'success' => false,
@@ -33,5 +34,9 @@ class AnonymRequestController extends Controller
             return response()->json([
                 'success' => true,
             ]);
+    }
+    public function delete(Request $request,$request_id){
+        AnonymRequest::find($request_id)->delete();
+        return redirect('admin/');
     }
 }

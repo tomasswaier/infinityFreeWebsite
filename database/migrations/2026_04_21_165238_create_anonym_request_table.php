@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
+    { //too late did i realise that for it to work with supervisors you'd need an extra column for schools... meow
         Schema::create('anonym_requests', function (Blueprint $table) {
             $table->id('id')->primary();
             //source= any kind of lead as to where the request is coming from so it can be tests,question, subjects...

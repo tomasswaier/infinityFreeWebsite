@@ -27,7 +27,7 @@
                 <input id="anonym_request_source" type="hidden" name="source" value="{{$source}}">
                 <div class="mb-4">
                     <label for="anonym_request_text" class="block mb-2.5 text-sm font-medium text-heading">What would you like to change:</label>
-                    <textarea rows="" cols="" id="anonym_request_text" name="anonym_request_text" class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="add question:2+2. options are 2,3,4,5 (correct is 5)" required ></textarea>
+                    <textarea rows="" cols="" id="anonym_request_text" name="anonym_request_text" class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="add question:2+2. options are 2,3,4,5 (correct is 4)" required ></textarea>
                 </div>
                 <button id="anonym_request_submit_button" type="submit" name="submit" class="bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none w-full mb-3">Submit</button>
                 <span class="hidden" id="response_message"></span>

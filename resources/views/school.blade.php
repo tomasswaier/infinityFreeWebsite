@@ -10,6 +10,7 @@
         </div>
     @endif
     <section name="placeholder section">
+        <x-anonym-request-popup source="schoolPage/{{$school_id}}" buttonText="Contact Us" />
 
         <h3>Welcome to your school page</h3>
         <br>

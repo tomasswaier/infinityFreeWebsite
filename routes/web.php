@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
             Route::post('admin/schoolCreator',[SchoolController::class,'save'])->name('school.store');
 
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
+            Route::get('admin/anonymRequestDelete/{request_id}',[AnonymRequestController::class,'delete']);
 
 
         });

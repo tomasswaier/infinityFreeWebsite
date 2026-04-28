@@ -2,6 +2,7 @@
 @section('mainContent')
 
 <div class="p-10 inline-block float-left lx:w-3/4">
+    <x-anonym-request-popup source="subjectPage/{{$subject->id}}" buttonText="Add/Edit Subject" />
     <div class="ml-20">
         <h1 class="text-2xl">{{$subject['name']}}</h1>
         <span>Average rating:{{$subject['rating']}}/10. (Rateing is average of past 20 votes)</span>
