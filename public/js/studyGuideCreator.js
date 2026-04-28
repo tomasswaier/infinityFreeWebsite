@@ -139,15 +139,37 @@ function createTextField() {
   SUNEDITOR.create(sectionText, {
     /*plugins : plugins,*/
     height : 300,
+    plugins : SUNEDITOR.plugins,
     buttonList : [ [
-      'undo',           'redo',           'font',        'fontSize',
-      'formatBlock',    'paragraphStyle', 'blockquote',  'bold',
-      'underline',      'italic',         'strike',      'subscript',
-      'superscript',    'fontColor',      'hiliteColor', 'textStyle',
-      'removeFormat',   'outdent',        'indent',      'align',
-      'horizontalRule', 'list',           'lineHeight',  'table',
-      'link',           'fullScreen',     'showBlocks',  'preview',
-      'save',           'template',
+      'undo',
+      'redo',
+      'font',
+      'fontSize',
+      /*'formatBlock',*/ 'paragraphStyle',
+      'blockquote',
+      'bold',
+      'underline',
+      'italic',
+      'strike',
+      'subscript',
+      'superscript',
+      'fontColor',
+      /*'hiliteColor',*/
+      'textStyle',
+      'removeFormat',
+      'outdent',
+      'indent',
+      'align',
+      /*'horizontalRule',*/
+      'list',
+      'lineHeight',
+      'table',
+      'link',
+      'fullScreen',
+      'showBlocks',
+      'preview',
+      'save',
+      'template',
     ] ],
   });
 
@@ -202,20 +224,45 @@ function initScrollable(id) {
 function initSunEditor() {
   const matches = document.querySelectorAll("textarea.suneditor");
   for (const textarea of matches) {
+    console.log(SUNEDITOR.plugins)
 
     SUNEDITOR.create(textarea, {
-      /*plugins : plugins,*/
+      plugins : SUNEDITOR.plugins,
       height : 300,
+      toolbar_sticky : 93,
+
       buttonList : [ [
-        'undo',           'redo',           'font',        'fontSize',
-        'formatBlock',    'paragraphStyle', 'blockquote',  'bold',
-        'underline',      'italic',         'strike',      'subscript',
-        'superscript',    'fontColor',      'hiliteColor', 'textStyle',
-        'removeFormat',   'outdent',        'indent',      'align',
-        'horizontalRule', 'list',           'lineHeight',  'table',
-        'link',           'fullScreen',     'showBlocks',  'preview',
-        'save',           'template',
+        'undo',
+        'redo',
+        'font',
+        'fontSize',
+        /*'formatBlock',*/ 'paragraphStyle',
+        'blockquote',
+        'bold',
+        'underline',
+        'italic',
+        'strike',
+        'subscript',
+        'superscript',
+        'fontColor',
+        /*'hiliteColor',*/
+        'textStyle',
+        'removeFormat',
+        'outdent',
+        'indent',
+        'align',
+        /*'horizontalRule',*/
+        'list',
+        'lineHeight',
+        'table',
+        'link',
+        'fullScreen',
+        'showBlocks',
+        'preview',
+        'save',
+        'template',
       ] ],
+
     });
   }
 }
