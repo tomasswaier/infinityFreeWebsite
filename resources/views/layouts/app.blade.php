@@ -9,11 +9,13 @@
 
         <!-- Fonts -->
         @include('layouts.tailwindHeader')
-        @if(Request::is('admin/studyGuide/*'))
+
+        @if(Request::is('admin/studyGuide/*') || Request::is('studyGuide/*'))
             <link href="https://cdn.jsdelivr.net/npm/suneditor@3.1.2/dist/suneditor.min.css" rel="stylesheet">
+        @endif
+        @if(Request::is('admin/studyGuide/*'))
             <script src="https://cdn.jsdelivr.net/npm/suneditor@3.1.2/dist/suneditor.min.js"></script>
         @endif
-
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     </head>

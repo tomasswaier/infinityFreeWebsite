@@ -13,6 +13,21 @@ use App\Models\Tag;
 
 class SubjectController extends Controller
 {
+    private const INFO_FIELDS = [
+        //'subjectDescription'     => 'description',
+        'subjectLanguage'        => 'language',
+        'subjectContent'         => 'content',
+        'subjectProcedure'       => 'procedure',
+        'subjectPriorKnowledge'  => 'prior_knowledge',
+        'subjectLectures'        => 'lectures',
+        'subjectExercises'       => 'exercises',
+        'subjectGrading'         => 'grading',
+        'subjectTimeExpenditure' => 'time_expenditure',
+        'subjectTips'            => 'tips',
+        'subjectHighlights'      => 'highlights',
+        'subjectCriticism'       => 'criticism',
+    ];
+
     public function showAllSubjects(Request $request, int $school_id)
     {
         $query = Subjects::query()
@@ -59,6 +74,9 @@ class SubjectController extends Controller
                 }
             }
         }
+        $subject->views=$subject->views+1;
+        $subject->save();
+
 
         return view("subjects/subject", [
             "subject" => $subject,
@@ -95,6 +113,50 @@ class SubjectController extends Controller
     //
     public function saveSubject(Request $request)
     {
+        $subject = $request->filled("subjectId")
+            ? Subjects::findOrFail($request->input("subjectId"))
+            : new Subjects();
+
+        $subject->name = $request->input("subjectName");
+        $subject->school_id = $request->input("school_id");
+        $subject->tldr = $request->input("subjectTldr");
+        $subject->rating = $request->input("subjectRating");
+
+        // Flat, fixed-shape array of strings. Laravel turns empty inputs into null,
+        // so `?? ""` makes empty and missing fields both end up as "".
+        $subject->info = collect(self::INFO_FIELDS)
+            ->mapWithKeys(fn ($key, $field) => [
+                $key => (string) ($request->input($field) ?? ""),
+            ])
+            ->all();
+
+        $subject->save();
+
+        // Re-create the tag links
+        SubjectTag::query()->where("subject_id", "=", $subject->id)->delete();
+
+        foreach ($request->keys() as $key) {
+            if (str_starts_with($key, "tag_id_")) {
+                $id = (int) substr($key, 7);
+                if ($id > 0) {
+                    SubjectTag::create([
+                        "subject_id" => $subject->id,
+                        "tag_id" => $id,
+                    ]);
+                }
+            }
+        }
+
+        return redirect("admin/subjectCreator/" . $subject->school_id);
+    }
+
+    public function saveTag(Request $request)
+    {
+        //should I check the users rights here ? if im not mistaken then the csrf token should take care of someone just calling this but i'm not sure
+        try {
+            $info = $request->all();
+    function saveSubject(Request $request)
+    {
         $info = $request->all();
         if (isset($info["subjectId"])) {
             $subject = Subjects::find($info["subjectId"]);
@@ -103,7 +165,10 @@ class SubjectController extends Controller
         }
         $subject->name = $info["subjectName"];
         $subject->school_id = $info["school_id"];
-        $subject->description = $info["subjectDescription"];
+        //$subject->description = $info["subjectDescription"];
+        Log::info($info);
+        return redirect("admin/subjectCreator/" . $info["school_id"]);
+        $subject->info= $info["subjectDescription"];
         $subject->tldr = $info["subjectTldr"];
         $subject->rating = $info["subjectRating"];
         $subject->save();
@@ -129,12 +194,6 @@ class SubjectController extends Controller
         }
         return redirect("admin/subjectCreator/" . $info["school_id"]);
     }
-
-    public function saveTag(Request $request)
-    {
-        //should I check the users rights here ? if im not mistaken then the csrf token should take care of someone just calling this but i'm not sure
-        try {
-            $info = $request->all();
             $tag = new Tag();
             $tag->name = $info["tagName"];
             $tag->school_id = $info["school_id"];

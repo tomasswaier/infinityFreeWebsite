@@ -13,8 +13,9 @@ class Subjects extends Model
     protected $fillable=[
         'rating',
         'name',
-        'description',
+        'info',
         'tldr',
+        'views'
 
     ];
     public function tags(){

@@ -10,7 +10,7 @@
 <div class="ml-10">
   <h2 class="text-4xl font-bold">{{$studyGuide->name}}</h2>
   <br>
-  <div clas="list-disc">
+  <div class="list-disc">
 
   @foreach($studyGuide['section_data'] as $_key => $section)
     <section class="w-full">
@@ -25,7 +25,8 @@
           <br>
         @elseif($section['data']['sectionType']=="simpleTextSection")
             <!--<pre class="whitespace-pre-wrap break-words overflow-x-auto">{{$section['data']['text']}}</pre>-->
-            <div>{!!$section['data']['text']!!}</div>
+
+            <div class="sun-editor-editable">{!! $section['data']['text'] !!}</div>
             <br>
         @elseif($section['data']['sectionType']=="verticalSplitTextSection")
           <div class="grid  grid-cols-1 md:grid-cols-2">

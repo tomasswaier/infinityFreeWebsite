@@ -3,15 +3,10 @@
 <div class="p-10">
     <section>
         <h2>WELCOME</h2>
-        <span>This is my webisite for studying and testing your konwledge</span>
-        <br>
-        <span>main purpose of this website is to share study guides, share information on subjects at your faculty and create tests to test the knowledge of poeple who studied from study guides</span>
-        <br>
-        <span>Content on this website is regulated only for racial slurs and nsfw content. If there happens to be content which violates copyright or any kind of law please contact me(discord .maryann)</span>
     </section>
     <br>
     <section class="m-30">
-        <span>click the buttons</span>
+        <span>Current schools:</span>
         <div class="flex gap-4">
             @foreach($schools as $school)
             <a href="{{url('school/'.$school->id)}}" class="">
@@ -24,15 +19,15 @@
         <br>
     <section class="max-w-5xl">
         <h3>help</h3>
-        <span>I'm reworking this site into a platform! In this way anyone may share their study guides online and keep them within their custom school environment</span>
-        <br><br>
+        <span>Recently the UI changed bcs ppl have been complaining. Now instead of my beautiful handcrafted manually written beauty that perfectly fit the style of 2009 first time webdev now you have this ai slop. Fuck u!!</span><br><br
         <span>This is an open source student project and passwords are not safe in my hands!</span>
+        <br><br><span>Code is a big mess. Anyone who knows a little laravel who wants to help is welcome</span>
         <br><br>
-        <span>There are 2 account tiers 1)user 2)supervisor(tiny admin). Supervisors role is to take care of content in school environments. They may create update delete everything and anything which belongs to school supervised by them. Users may only suggest changes to content on a study guide but it's up to supervisor to accept or deny this change. Users account may be changed to supervisor of certain school upon request(to me) or by another supervisor.</span>
-        <br><br>
-        <span>study guide page coming soon)</span>
-        <br><br>
-        <span></span>
+        <span>This is my webisite for studying and testing your knowledge</span>
+        <br>
+        <span>main purpose of this website is to share study guides, share information on subjects at your faculty and create tests to test the knowledge of poeple who studied from study guides</span>
+        <br>
+        <span>Content on this website is regulated only for racial slurs and nsfw content. If there happens to be content which violates copyright or any kind of law please contact me(discord .maryann)</span>
     </section>
 </div>
 @endsection
