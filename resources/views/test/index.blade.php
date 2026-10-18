@@ -63,7 +63,11 @@
                         <br>
                             @foreach($question->options as $option)
                                 @if(isset($option->preceding_text))
-                                    <pre class="">{{$option->preceding_text}}</pre>
+                                    @if($option->option_type =='write_in')
+                                        <span class="whitespace-pre-wrap">{{$option->preceding_text}}</span>
+                                    @else
+                                        <pre class="">{{$option->preceding_text}}</pre>
+                                    @endif
                                 @endif
                                 @if($option->option_type =='boolean_choice')
                                     <table  >
@@ -100,13 +104,13 @@
                                     </table>
                                 @elseif($option->option_type =='write_in')
                                         <span>
-                                        <input type="text" class="rounded-lg border-none ring-2  ring-project-dark-blue focues:border-none" name="{{$optionIndex}}"
+                                        <input type="text" class="w-32 px-1 py-0 leading-5 rounded-lg border-none ring-2  ring-project-dark-blue focues:border-none" name="{{$optionIndex}}"
                                         @if( $displayCorrectAnswers==true )
                                             value="{{$option['data']['correct_answer']}}"
                                         @endif
                                         ></span>
                                         @isset($option['data']['after_text'])
-                                            <span>{{$option['data']['after_text']}}</span>
+                                            <span class="whitespace-pre-wrap">{{$option['data']['after_text']}}</span>
                                         @endisset
                                         @php
                                             $correctOptions[$optionIndex]=$option['data']['correct_answer'];
@@ -209,7 +213,7 @@
                                               @foreach($row as $cell)
                                                 <td align="middle" class="border border-black">
                                                 @if($cell['isAnswer'])
-                                                  <input type="text" class="border-none ring-2 ring-project-dark-blue focues:border-none" name="{{$optionIndex}}" @if( $displayCorrectAnswers==true ) value="{{$cell['cellText']}}" @endif>
+                                                  <input type="text" class="w-32 px-1 py-0 leading-5 border-none ring-2 ring-project-dark-blue focues:border-none" name="{{$optionIndex}}" @if( $displayCorrectAnswers==true ) value="{{$cell['cellText']}}" @endif>
 
                                                   @php
                                                     $correctOptions[$optionIndex]=$cell['cellText'];
