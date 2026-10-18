@@ -9,11 +9,11 @@ use App\Models\School;
 use App\Models\Test;
 
 /*
- * Endpoints used by the local MCP server (see mcp/ folder). They are protected by the
- * shared MCP_API_KEY (EnsureMcpKey middleware).
+ * Endpoints used by the local MCP server (see mcp/ folder).
  * InfinityFree blocks requests that don't come from a real browser so the MCP server
  * doesn't call these directly. It sends them to the mcp/bridge page open in the
- * user's browser which then calls them with fetch().
+ * user's browser which then calls them with fetch(). So they run as the logged in user and
+ * use the same permissions as the question creator: admins everywhere, supervisors only in their schools.
  *
  * The LLM sends nicely structured json and this controller turns it into the same
  * flat key format the question creator form sends (preceding_text_write_in_0, option_number_0 ...)
@@ -28,9 +28,11 @@ class McpController extends Controller
         return view('mcpBridge');
     }
 
-    public function listTests()
+    public function listTests(Request $request)
     {
+        $user = $request->user();
         $tests = Test::orderBy('school_id')->orderBy('test_name')->withCount('questions')->get()
+            ->filter(fn ($test) => supervisesSchool($user, $test->school_id))
             ->map(fn ($test) => [
                 'test_id' => $test->id,
                 'test_name' => $test->test_name,
@@ -41,11 +43,11 @@ class McpController extends Controller
         return response()->json(['success' => true, 'tests' => $tests]);
     }
 
-    public function listQuestions($testId)
+    public function listQuestions(Request $request, $testId)
     {
         $test = Test::find($testId);
-        if (!$test) {
-            return $this->error('test_id does not exist', 404);
+        if (!$test || !supervisesSchool($request->user(), $test->school_id)) {
+            return $this->error('test_id does not exist or you are not allowed to edit it', 404);
         }
         $questions = Question::where('tests_id', '=', $testId)->with('options')->get()
             ->map(fn ($question) => [
@@ -70,8 +72,8 @@ class McpController extends Controller
             'question_explanation' => 'nullable|string',
         ]);
         $test = Test::find($request['test_id']);
-        if (!$test) {
-            return $this->error('test_id does not exist', 404);
+        if (!$test || !supervisesSchool($request->user(), $test->school_id)) {
+            return $this->error('test_id does not exist or you are not allowed to edit it', 404);
         }
 
         $options = match ($request['type']) {

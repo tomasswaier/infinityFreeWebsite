@@ -1,7 +1,7 @@
 // Forwards requests from the local MCP server (mcp/ folder) to the website.
-// Message from the MCP server: {id, method, path, key, body}  (key = MCP_API_KEY, sent as X-MCP-Key)
+// Message from the MCP server: {id, method, path, body}
 // Message back:               {id, status, body}  (body is the raw response text)
-// Requests are made from this page so they pass the infinityfree bot check.
+// Requests are made from this page so they pass the infinityfree bot check and run as the logged in user.
 
 const RETRY_MS = 3000;
 const MAX_LOG_LINES = 200;
@@ -39,17 +39,29 @@ function log(text, isError = false) {
   }
 }
 
+function csrfToken() {
+  return document.querySelector('meta[name="csrf-token"]').content;
+}
+
+// what the AI gets told when the website refuses the request because of the login
+const AUTH_ERRORS = {
+  401 : 'The user is not logged in on the website anymore. Ask them to log in again and reload the MCP bridge page.',
+  403 : 'The logged in user is not allowed to do this. Only admins and supervisors can add questions.',
+  419 : 'The website session expired. Ask the user to reload the MCP bridge page (and log in again if needed).',
+};
+
 async function forward(message) {
   // the bridge only ever touches the mcp endpoints, never the rest of the site
-  if (typeof message.path !== 'string' || !message.path.startsWith('/api/mcp/')) {
-    return {status : 400, body : JSON.stringify({success : false, message : 'bridge only forwards /api/mcp/ paths'})};
+  if (typeof message.path !== 'string' || !message.path.startsWith('/mcp/')) {
+    return {status : 400, body : JSON.stringify({success : false, message : 'bridge only forwards /mcp/ paths'})};
   }
   const options = {
     method : message.method || 'GET',
     credentials : 'same-origin',
     headers : {
       'Accept' : 'application/json',
-      'X-MCP-Key' : message.key || '',
+      'X-Requested-With' : 'XMLHttpRequest',
+      'X-CSRF-TOKEN' : csrfToken(),
     },
   };
   if (message.body !== undefined && message.body !== null) {
@@ -58,7 +70,9 @@ async function forward(message) {
   }
   const response = await fetch(MCP_BASE_URL + message.path, options);
   let body = await response.text();
-  if ((response.headers.get('content-type') || '').includes('text/html')) {
+  if (AUTH_ERRORS[response.status]) {
+    body = JSON.stringify({success : false, message : AUTH_ERRORS[response.status]});
+  } else if ((response.headers.get('content-type') || '').includes('text/html')) {
     // most likely the hosting's bot check page or a laravel error page
     body = JSON.stringify({success : false, message : 'Website answered with an html page instead of json (status ' + response.status + '). Ask the user to reload the MCP bridge page.'});
   }

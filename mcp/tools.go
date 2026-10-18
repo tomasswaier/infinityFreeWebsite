@@ -108,14 +108,14 @@ func registerTools(server *mcp.Server, bridge *Bridge) {
 		Name:        "list_tests",
 		Description: "Lists all tests on the website with their test_id, school and number of questions.",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ listTestsInput) (*mcp.CallToolResult, any, error) {
-		return call(ctx, bridge, "GET", "/api/mcp/tests", nil)
+		return call(ctx, bridge, "GET", "/mcp/tests", nil)
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        "list_questions",
 		Description: "Lists the questions already in a test. Use it to avoid adding duplicate questions.",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in listQuestionsInput) (*mcp.CallToolResult, any, error) {
-		return call(ctx, bridge, "GET", "/api/mcp/tests/"+url.PathEscape(fmt.Sprint(in.TestID))+"/questions", nil)
+		return call(ctx, bridge, "GET", "/mcp/tests/"+url.PathEscape(fmt.Sprint(in.TestID))+"/questions", nil)
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
@@ -202,7 +202,7 @@ func addQuestion(ctx context.Context, bridge *Bridge, questionType string, base 
 	if base.QuestionExplanation != "" {
 		fields["question_explanation"] = base.QuestionExplanation
 	}
-	return call(ctx, bridge, "POST", "/api/mcp/questions", fields)
+	return call(ctx, bridge, "POST", "/mcp/questions", fields)
 }
 
 // call returns the website's json answer as the tool result so the model sees validation errors and can fix its input

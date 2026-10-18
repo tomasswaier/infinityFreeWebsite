@@ -19,7 +19,6 @@ import (
 // The website is hosted on infinityfree which only lets real browsers through,
 // so the page does the actual fetch() and sends the response back over the websocket.
 type Bridge struct {
-	apiKey         string
 	allowedOrigins []string
 	bridgePageURL  string
 
@@ -34,7 +33,6 @@ type bridgeRequest struct {
 	ID     int    `json:"id"`
 	Method string `json:"method"`
 	Path   string `json:"path"`
-	Key    string `json:"key"`
 	Body   any    `json:"body,omitempty"`
 }
 
@@ -49,9 +47,8 @@ const (
 	requestTimeout     = 60 * time.Second
 )
 
-func NewBridge(apiKey string, allowedOrigins []string, bridgePageURL string) *Bridge {
+func NewBridge(allowedOrigins []string, bridgePageURL string) *Bridge {
 	return &Bridge{
-		apiKey:         apiKey,
 		allowedOrigins: allowedOrigins,
 		bridgePageURL:  bridgePageURL,
 		connected:      make(chan struct{}),
@@ -140,7 +137,7 @@ func (b *Bridge) Do(ctx context.Context, method, path string, body any) (int, st
 
 	b.mu.Lock()
 	b.nextID++
-	req := bridgeRequest{ID: b.nextID, Method: method, Path: path, Key: b.apiKey, Body: body}
+	req := bridgeRequest{ID: b.nextID, Method: method, Path: path, Body: body}
 	ch := make(chan bridgeResponse, 1)
 	b.pending[req.ID] = ch
 	b.mu.Unlock()

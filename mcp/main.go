@@ -31,13 +31,13 @@ You have to pick exactly one of --localhost or --http.
   --http        Runs an MCP http server on --http-addr (endpoint /mcp). Apps on the internet
                 can only reach it trough a tunnel, e.g.  ngrok http 8080
                 and then use  https://<tunnel>/mcp  as the server url.
-                There is no password, anyone with the tunnel url can add questions.
+                There is no password, anyone with the tunnel url can add questions as you.
 
-In both modes, keep <site>/mcp/bridge open in your browser. The requests to the website go
-trough that tab, because the hosting blocks everything that isn't a real browser.
+In both modes, keep <site>/mcp/bridge open in your browser and be logged in there as an admin
+or supervisor. The requests to the website go trough that tab (the hosting blocks everything
+that isn't a real browser), so they run as that user with that user's permissions.
 
-Settings are read from the environment and from .env in the current directory:
-  MCP_API_KEY       (required) same value as MCP_API_KEY in the website's .env
+Settings are read from the environment and from .env in the current directory (all optional):
   MCP_SITE, MCP_BRIDGE_PORT, MCP_HTTP_ADDR, MCP_ALLOW_ORIGIN   defaults for the options below
 
 Options:
@@ -58,7 +58,7 @@ func main() {
 	localhostMode := flag.Bool("localhost", false, "talk to a local AI app over stdin/stdout")
 	httpMode := flag.Bool("http", false, "run an MCP http server (for remote AI apps, use with a tunnel)")
 	httpAddr := flag.String("http-addr", envOr("MCP_HTTP_ADDR", "127.0.0.1:8080"), "address the --http server listens on")
-	site := flag.String("site", envOr("MCP_SITE", "http://maryann.free.nf"), "url of the website")
+	site := flag.String("site", envOr("MCP_SITE", "https://maryann.free.nf"), "url of the website")
 	port := flag.String("port", envOr("MCP_BRIDGE_PORT", "8765"), "local port the bridge page connects to")
 	extraOrigins := flag.String("allow-origin", os.Getenv("MCP_ALLOW_ORIGIN"), "extra comma separated origins allowed to open the bridge, e.g. http://localhost:8000")
 	if err := flag.CommandLine.Parse(os.Args[1:]); errors.Is(err, flag.ErrHelp) {
@@ -83,13 +83,8 @@ func main() {
 		log.Printf("loaded .env from the current directory")
 	}
 
-	apiKey := os.Getenv("MCP_API_KEY")
-	if apiKey == "" {
-		usageError("MCP_API_KEY is not set. Put it into .env in the current directory (or the environment). It has to be the same as MCP_API_KEY in the website's .env")
-	}
-
 	siteURL := strings.TrimRight(*site, "/")
-	bridge := NewBridge(apiKey, allowedOrigins(siteURL, *extraOrigins), siteURL+"/mcp/bridge")
+	bridge := NewBridge(allowedOrigins(siteURL, *extraOrigins), siteURL+"/mcp/bridge")
 	listener, err := net.Listen("tcp", "127.0.0.1:"+*port)
 	if err != nil {
 		log.Fatalf("can't listen on 127.0.0.1:%s (is another instance running?): %v", *port, err)
@@ -102,7 +97,7 @@ func main() {
 	log.Printf("waiting for the bridge page on 127.0.0.1:%s. Open %s/mcp/bridge in your browser", *port, siteURL)
 
 	server := mcp.NewServer(&mcp.Implementation{Name: "test-questions", Version: "1.0.0"}, &mcp.ServerOptions{
-		Instructions: "Adds questions to tests on the study website. Call list_tests first to find the test_id. " +
+		Instructions: "Adds questions to tests on the study website. Call list_tests first to find the test_id; it only lists tests the logged in user may edit. " +
 			"The requests go trough a browser tab the user has open (" + siteURL + "/mcp/bridge); " +
 			"if a tool says no browser is connected, ask the user to open that page.",
 	})

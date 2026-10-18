@@ -47,18 +47,14 @@ Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 Route::get('test', function(){
     return redirect('test/redirect');
 });
-//page that forwards requests from the local mcp server to api/mcp (see mcp/README.md)
-Route::get('mcp/bridge', [McpController::class,'bridge']);
 Route::post('anonymRequest', [AnonymRequestController::class,'store'])->name('anonymRequest.store');
 Route::middleware('auth')->group(function () {
     Route::post('subjects/rating/{id}',[SubjectController::class,'saveRating']);
 
     //Route::post('test', [TestController::class,'getTest'])->name('displayTest');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile', [ProfileController::class, 'saveUpdate'])->name('profile.privilege.save');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
 
     Route::middleware('more_than_user')->group(function () {
 
@@ -111,6 +107,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('admin', [AdminController::class,'show'])->name('adminPage');
 
+        //mcp server (mcp/ folder) talks to these trough the mcp/bridge page open in the users browser
+        Route::get('mcp/bridge', [McpController::class,'bridge']);
+        Route::get('mcp/tests', [McpController::class,'listTests']);
+        Route::get('mcp/tests/{test_id}/questions', [McpController::class,'listQuestions']);
+        Route::post('mcp/questions', [McpController::class,'addQuestion']);
+
 
         Route::middleware('is_admin')->group(function () {
             Route::get('admin/schoolCreator', function(){
@@ -119,6 +121,9 @@ Route::middleware('auth')->group(function () {
             Route::post('admin/schoolCreator',[SchoolController::class,'save'])->name('school.store');
 
             Route::get('admin/users/manage', [ProfileController::class,'showAll']);
+            //changing someones role has to stay admin only. Outside of this group any logged in user could make themselves admin
+            Route::get('/profile/update/{id}', [ProfileController::class, 'update']);
+            Route::post('/profile', [ProfileController::class, 'saveUpdate'])->name('profile.privilege.save');
             Route::get('admin/anonymRequestDelete/{request_id}',[AnonymRequestController::class,'delete']);
 
 

@@ -9,41 +9,33 @@ come from a real browser (it checks for a JS-generated `__test` cookie). So the 
 can't call the website directly. Instead:
 
 ```
-AI assistant --stdio--> test-questions-mcp --websocket (127.0.0.1:8765)--> /mcp/bridge tab in your browser --fetch--> /api/mcp/*
+AI assistant --stdio--> test-questions-mcp --websocket (127.0.0.1:8765)--> /mcp/bridge tab in your browser --fetch--> /mcp/*
 ```
 
 The `/mcp/bridge` page does the actual requests. They come from a real browser, so the bot
-check passes. The `/api/mcp/*` endpoints require the shared key `MCP_API_KEY` (`X-MCP-Key` header).
+check passes, and they carry your login session. So there is no API key: the `/mcp/*` endpoints
+use the same permissions as the question creator. You have to be logged in as an **admin** (any
+test) or a **supervisor** (only tests of the schools you supervise).
 
 ## Setup
 
-1. **Website**: set a key in the website's `.env` (on InfinityFree, edit it over FTP):
-   ```
-   MCP_API_KEY=<long random string>   # php -r "echo bin2hex(random_bytes(32));"
-   ```
-   If the key is empty, the MCP api is disabled. If you use `php artisan config:cache`, re-run it.
-2. **Build** (Go 1.26+, see go.mod):
+1. **Build** (Go 1.26+, see go.mod):
    ```
    cd mcp && go build -o test-questions-mcp .
    ```
-3. **Give the server the key.** On startup it reads `.env` from its **current working directory**
-   (values already set in the real environment win). Running it from the repo root picks up the
-   website's own `.env`, which already contains `MCP_API_KEY`. Otherwise put a `.env` next to where
-   you start it:
-   ```
-   MCP_API_KEY=<same key as the website>
-   # optional: MCP_SITE=..., MCP_BRIDGE_PORT=..., MCP_ALLOW_ORIGIN=...
-   ```
-   Register it with your assistant, e.g. Claude Code (it starts MCP servers in the directory you run `claude` from):
+2. **Register it with your assistant**, e.g. Claude Code:
    ```
    claude mcp add test-questions -- /absolute/path/to/mcp/test-questions-mcp --localhost
    ```
-   Claude Desktop and other clients may start it in a different directory. There, either set `"cwd"`
-   if the client supports it, or pass the key through `"env": {"MCP_API_KEY": "..."}` instead.
-   Don't forget `"args": ["--localhost"]`.
-4. Open **http://maryann.free.nf/mcp/bridge** in your browser and keep the tab open. It reconnects
-   by itself, so the order doesn't matter. Chrome may ask to allow access to "apps on this device";
-   click allow.
+   Claude Desktop and other clients: command `/absolute/path/to/mcp/test-questions-mcp`, `"args": ["--localhost"]`.
+   Settings are optional; it reads them from the environment or a `.env` in its current directory
+   (`MCP_SITE`, `MCP_BRIDGE_PORT`, `MCP_HTTP_ADDR`, `MCP_ALLOW_ORIGIN`).
+3. **Log in** on the website as an admin or supervisor, then open
+   **https://maryann.free.nf/mcp/bridge** and keep the tab open. It reconnects by itself, so the order
+   doesn't matter. Your browser may ask to allow access to apps/devices on this computer; allow it.
+   Use **https**: Firefox/Zen and Chrome block plain `http://` pages from reaching 127.0.0.1.
+   The login expires after the session lifetime (`SESSION_LIFETIME`, 2 hours by default) of inactivity;
+   log in with "remember me" or just reload the bridge page when a tool says the session expired.
 
 ## Modes
 
@@ -58,7 +50,8 @@ You have to pass exactly one of these (`test-questions-mcp --help` explains ever
   ngrok http 8080
   ```
   Then use `https://<your-tunnel>/mcp` as the server url. There's no password: anyone with the
-  tunnel url can add questions while it's running, so keep it to yourself. Requests coming from web
+  tunnel url can add questions as you (the user logged in on the bridge tab) while it's running,
+  so keep it to yourself. Requests coming from web
   pages (with an `Origin` header) are rejected, so websites you visit can't call it.
 
 The `/mcp/bridge` tab has to be open in both modes.

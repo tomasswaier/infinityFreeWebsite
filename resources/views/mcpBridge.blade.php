@@ -5,7 +5,8 @@
         <h1 class="text-3xl font-bold sm:text-4xl">MCP bridge</h1>
         <p class="mt-1 max-w-prose text-project-dark-blue/80">
             Keep this tab open while your AI assistant adds questions. The MCP server running on your computer
-            sends its requests here and this page forwards them to the website.
+            sends its requests here and this page forwards them to the website as you
+            (<span class="font-semibold">{{ Auth::user()->name }}</span>), so it can only add questions to tests you are allowed to edit.
             The hosting blocks requests that don't come from a browser, which is why it works like this.
         </p>
     </header>

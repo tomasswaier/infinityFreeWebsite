@@ -22,7 +22,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'more_than_user' => \App\Http\Middleware\EnsureIsMoreThanUser::class,
             'is_admin' => \App\Http\Middleware\EnsureIsAdmin::class,
-            'mcp_key' => \App\Http\Middleware\EnsureMcpKey::class,
         ]);
         $middleware->remove([
             ConvertEmptyStringsToNull::class,
