@@ -9,8 +9,8 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/mcp/add/writeIn', [McpController::class,'addWriteInQuestion']);
-Route::post('/mcp/add/booleanChoiceAdvanced', [McpController::class,'addBooleanChoiceQuestionAdvanced']);
-Route::post('/mcp/add/booleanChoiceSimple', [McpController::class,'addBooleanChoiceQuestionSimple']);
-Route::post('/mcp/add/booleanChoiceOneCorrectSimple', [McpController::class,'addBooleanChoiceQuestionOneCorrectSimple']);
-Route::post('/mcp/add/openAnswer', [McpController::class,'addOpenAnswerQuestion']);
+Route::middleware('mcp_key')->prefix('mcp')->group(function () {
+    Route::get('/tests', [McpController::class,'listTests']);
+    Route::get('/tests/{test_id}/questions', [McpController::class,'listQuestions']);
+    Route::post('/questions', [McpController::class,'addQuestion']);
+});

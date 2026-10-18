@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    // shared key the local mcp server has to send in the X-MCP-Key header. Empty = mcp api disabled
+    'mcp' => [
+        'key' => env('MCP_API_KEY'),
+    ],
+
 ];

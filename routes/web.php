@@ -8,6 +8,7 @@ use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StudyGuideController;
 use App\Http\Controllers\AnonymRequestController;
+use App\Http\Controllers\McpController;
 Route::get('/', [SchoolController::class, 'showAll'])->name('mainPage');
 //example of old urls
 // http://maryann.free.nf/test/#PPI_FINAL_EXAM_2024/2025/Alica(.MaryAnn)#1#30
@@ -46,6 +47,8 @@ Route::post('test', [TestController::class,'getTest'])->name('displayTest');
 Route::get('test', function(){
     return redirect('test/redirect');
 });
+//page that forwards requests from the local mcp server to api/mcp (see mcp/README.md)
+Route::get('mcp/bridge', [McpController::class,'bridge']);
 Route::post('anonymRequest', [AnonymRequestController::class,'store'])->name('anonymRequest.store');
 Route::middleware('auth')->group(function () {
     Route::post('subjects/rating/{id}',[SubjectController::class,'saveRating']);
